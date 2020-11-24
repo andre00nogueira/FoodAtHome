@@ -14,7 +14,7 @@ Vue.component('app', AppComponent)
 const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
-    { path: '/products', component: ProductsComponent }
+    { path: '/menu', component: ProductsComponent }
 ]
 
 const router = new VueRouter({

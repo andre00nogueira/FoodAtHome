@@ -12,7 +12,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         if ($request->has('page')) {
-            return ProductResource::collection(Product::paginate(5));
+            return ProductResource::collection(Product::paginate(10));
         } else {
             return ProductResource::collection(Product::all());
         }

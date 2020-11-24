@@ -2070,17 +2070,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       products: [],
       productsData: {},
-      searchQuery: ''
+      searchQuery: ""
     };
   },
   mounted: function mounted() {
-    this.getProducts();
+    this.getProducts(1);
   },
   computed: {
     filterProducts: function filterProducts() {
@@ -2100,7 +2102,13 @@ __webpack_require__.r(__webpack_exports__);
       var _this2 = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      axios.get("api/products?page=" + page).then(function (response) {
+      var url = "api/products";
+
+      if (page != 0) {
+        url += "?page=".concat(page);
+      }
+
+      axios.get(url).then(function (response) {
         _this2.products = response.data.data;
         _this2.productsData = response.data;
       });
@@ -6572,7 +6580,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\n#pagination {\r\n  margin-top: 5%;\n}\r\n", ""]);
+exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\n#tableProducts {\r\n  margin-top: 2%;\r\n  margin-bottom: 3%;\n}\n#filterArea {\r\n  margin-top: 3%;\r\n  display: flex;\n}\n#productTypeFilter{\r\n  width: 20%;\n}\r\n", ""]);
 
 // exports
 
@@ -39033,7 +39041,7 @@ var render = function() {
         _vm._v("Food@Home")
       ]),
       _vm._v(" "),
-      _c("router-link", { attrs: { to: "/products" } }, [_vm._v("Products")])
+      _c("router-link", { attrs: { to: "/menu" } }, [_vm._v("Menu")])
     ],
     1
   )
@@ -39065,61 +39073,71 @@ var render = function() {
     [
       _c("navbar"),
       _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.searchQuery,
-            expression: "searchQuery"
-          }
-        ],
-        staticClass: "form-control",
-        attrs: { id: "myInput", type: "text", placeholder: "Search.." },
-        domProps: { value: _vm.searchQuery },
-        on: {
-          input: function($event) {
-            if ($event.target.composing) {
-              return
-            }
-            _vm.searchQuery = $event.target.value
-          }
-        }
-      }),
+      _c("h2", [_vm._v("Menu")]),
       _vm._v(" "),
-      _c("table", { staticClass: "table table-striped" }, [
-        _vm._m(0),
+      _c("div", { attrs: { id: "filterArea" } }, [
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.searchQuery,
+              expression: "searchQuery"
+            }
+          ],
+          staticClass: "form-control",
+          attrs: { type: "text", placeholder: "Search for a product..." },
+          domProps: { value: _vm.searchQuery },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.searchQuery = $event.target.value
+            }
+          }
+        }),
         _vm._v(" "),
-        _c(
-          "tbody",
-          _vm._l(_vm.filterProducts, function(product) {
-            return _c("tr", { key: product.id }, [
-              _c("td", [
-                _c("img", {
-                  attrs: {
-                    id: "productPhoto",
-                    src: "storage/products/" + product.photo_url
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.name))]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.type))]),
-              _vm._v(" "),
-              _c("td", [
-                _vm._v(_vm._s(product.description.substring(0, 100) + "..."))
-              ]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.price) + "€")])
-            ])
-          }),
-          0
-        )
+        _vm._m(0)
       ]),
       _vm._v(" "),
+      _c(
+        "table",
+        { staticClass: "table table-striped", attrs: { id: "tableProducts" } },
+        [
+          _vm._m(1),
+          _vm._v(" "),
+          _c(
+            "tbody",
+            _vm._l(_vm.filterProducts, function(product) {
+              return _c("tr", { key: product.id }, [
+                _c("td", [
+                  _c("img", {
+                    attrs: {
+                      id: "productPhoto",
+                      src: "storage/products/" + product.photo_url
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(product.name))]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(product.type))]),
+                _vm._v(" "),
+                _c("td", [
+                  _vm._v(_vm._s(product.description.substring(0, 100) + "..."))
+                ]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(product.price) + "€")])
+              ])
+            }),
+            0
+          )
+        ]
+      ),
+      _vm._v(" "),
       _c("pagination", {
-        attrs: { id: "pagination", data: _vm.productsData },
+        attrs: { data: _vm.productsData },
         on: { "pagination-change-page": _vm.getProducts }
       })
     ],
@@ -39127,6 +39145,24 @@ var render = function() {
   )
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "select",
+      { staticClass: "custom-select", attrs: { id: "productTypeFilter" } },
+      [
+        _c("option", { attrs: { selected: "" } }, [_vm._v("Type")]),
+        _vm._v(" "),
+        _c("option", { attrs: { value: "1" } }, [_vm._v("One")]),
+        _vm._v(" "),
+        _c("option", { attrs: { value: "2" } }, [_vm._v("Two")]),
+        _vm._v(" "),
+        _c("option", { attrs: { value: "3" } }, [_vm._v("Three")])
+      ]
+    )
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -54490,7 +54526,7 @@ var routes = [{
   path: '/index',
   component: _App_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
 }, {
-  path: '/products',
+  path: '/menu',
   component: _components_products_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]({
