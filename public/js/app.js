@@ -2065,25 +2065,44 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       products: [],
-      productsData: {}
+      productsData: {},
+      searchQuery: ''
     };
   },
   mounted: function mounted() {
     this.getProducts();
   },
+  computed: {
+    filterProducts: function filterProducts() {
+      var _this = this;
+
+      if (!this.searchQuery) {
+        return this.products;
+      } else {
+        return this.products.filter(function (product) {
+          return product.name.toLowerCase().includes(_this.searchQuery.toLowerCase());
+        });
+      }
+    }
+  },
   methods: {
     getProducts: function getProducts() {
-      var _this = this;
+      var _this2 = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       axios.get("api/products?page=" + page).then(function (response) {
-        _this.products = response.data.data;
-        _this.productsData = response.data;
+        _this2.products = response.data.data;
+        _this2.productsData = response.data;
       });
     }
   },
@@ -6553,7 +6572,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\n#pagination{\r\n  margin-top: 5%;\n}\r\n", ""]);
+exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\n#pagination {\r\n  margin-top: 5%;\n}\r\n", ""]);
 
 // exports
 
@@ -39047,8 +39066,25 @@ var render = function() {
       _c("navbar"),
       _vm._v(" "),
       _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.searchQuery,
+            expression: "searchQuery"
+          }
+        ],
         staticClass: "form-control",
-        attrs: { id: "myInput", type: "text", placeholder: "Search.." }
+        attrs: { id: "myInput", type: "text", placeholder: "Search.." },
+        domProps: { value: _vm.searchQuery },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.searchQuery = $event.target.value
+          }
+        }
       }),
       _vm._v(" "),
       _c("table", { staticClass: "table table-striped" }, [
@@ -39056,7 +39092,7 @@ var render = function() {
         _vm._v(" "),
         _c(
           "tbody",
-          _vm._l(_vm.products, function(product) {
+          _vm._l(_vm.filterProducts, function(product) {
             return _c("tr", { key: product.id }, [
               _c("td", [
                 _c("img", {

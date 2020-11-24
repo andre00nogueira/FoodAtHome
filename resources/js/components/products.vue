@@ -6,6 +6,7 @@
       class="form-control"
       id="myInput"
       type="text"
+      v-model="searchQuery"
       placeholder="Search.."
     />
     <table class="table table-striped">
@@ -20,7 +21,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="product of products" :key="product.id">
+        <tr v-for="product of filterProducts" :key="product.id">
           <td>
             <img
               id="productPhoto"
@@ -42,7 +43,11 @@
         </tr>
       </tbody>
     </table>
-    <pagination id="pagination" :data="productsData" @pagination-change-page="getProducts"></pagination>
+    <pagination
+      id="pagination"
+      :data="productsData"
+      @pagination-change-page="getProducts"
+    ></pagination>
   </div>
 </template>
 
@@ -54,10 +59,20 @@ export default {
     return {
       products: [],
       productsData: {},
+      searchQuery: '',
     };
   },
-   mounted() {
+  mounted() {
     this.getProducts();
+  },
+  computed: {
+    filterProducts () {
+      if(!this.searchQuery){
+        return this.products;
+      }else{
+        return this.products.filter((product) => { return (product.name).toLowerCase().includes(this.searchQuery.toLowerCase())})
+      }
+    },
   },
   methods: {
     getProducts(page = 1) {
@@ -65,7 +80,7 @@ export default {
         this.products = response.data.data;
         this.productsData = response.data;
       });
-    }
+    },
   },
   components: { navbar },
 };
@@ -77,7 +92,7 @@ export default {
   height: 50px;
 }
 
-#pagination{
+#pagination {
   margin-top: 5%;
 }
 </style>
