@@ -1,7 +1,7 @@
 <template>
   <div>
     <navbar />
-    
+
     <input
       class="form-control"
       id="myInput"
@@ -42,31 +42,32 @@
         </tr>
       </tbody>
     </table>
-    <pagination :data="products" @pagination-change-page="getProducts"/>
+    <pagination id="pagination" :data="productsData" @pagination-change-page="getProducts"></pagination>
   </div>
 </template>
 
 <script>
 import navbar from "./navbar.vue";
-import pagination from 'laravel-vue-pagination';
 
 export default {
-  data () {
+  data() {
     return {
-      products: {},
+      products: [],
+      productsData: {},
     };
   },
-  mounted() {
-      this.getProducts();
+   mounted() {
+    this.getProducts();
   },
   methods: {
-      getProducts(page = 2){
-         axios.get("api/products?page=" + page).then((response) => {
-            this.products = response.data.data;
-         }); 
-      },
+    getProducts(page = 1) {
+      axios.get("api/products?page=" + page).then((response) => {
+        this.products = response.data.data;
+        this.productsData = response.data;
+      });
+    }
   },
-  components: { navbar, pagination },
+  components: { navbar },
 };
 </script>
 
@@ -74,5 +75,9 @@ export default {
 #productPhoto {
   width: 50px;
   height: 50px;
+}
+
+#pagination{
+  margin-top: 5%;
 }
 </style>

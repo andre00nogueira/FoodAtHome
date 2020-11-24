@@ -2069,7 +2069,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      products: {}
+      products: [],
+      productsData: {}
     };
   },
   mounted: function mounted() {
@@ -2079,9 +2080,10 @@ __webpack_require__.r(__webpack_exports__);
     getProducts: function getProducts() {
       var _this = this;
 
-      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 2;
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       axios.get("api/products?page=" + page).then(function (response) {
         _this.products = response.data.data;
+        _this.productsData = response.data;
       });
     }
   },
@@ -6551,7 +6553,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\r\n", ""]);
+exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\n#pagination{\r\n  margin-top: 5%;\n}\r\n", ""]);
 
 // exports
 
@@ -39081,7 +39083,7 @@ var render = function() {
       ]),
       _vm._v(" "),
       _c("pagination", {
-        attrs: { data: _vm.products },
+        attrs: { id: "pagination", data: _vm.productsData },
         on: { "pagination-change-page": _vm.getProducts }
       })
     ],
@@ -54436,8 +54438,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
 /* harmony import */ var _App_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./App.vue */ "./resources/js/App.vue");
 /* harmony import */ var _components_products_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/products.vue */ "./resources/js/components/products.vue");
-/* harmony import */ var laravel_vue_pagination__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! laravel-vue-pagination */ "./node_modules/laravel-vue-pagination/dist/laravel-vue-pagination.common.js");
-/* harmony import */ var laravel_vue_pagination__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(laravel_vue_pagination__WEBPACK_IMPORTED_MODULE_3__);
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
@@ -54445,9 +54445,8 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 Vue.use(vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 
-
+Vue.component('pagination', __webpack_require__(/*! laravel-vue-pagination */ "./node_modules/laravel-vue-pagination/dist/laravel-vue-pagination.common.js"));
 Vue.component('app', _App_vue__WEBPACK_IMPORTED_MODULE_1__["default"]);
-Vue.component('pagination', laravel_vue_pagination__WEBPACK_IMPORTED_MODULE_3___default.a);
 var routes = [{
   path: '/',
   redirect: '/index'

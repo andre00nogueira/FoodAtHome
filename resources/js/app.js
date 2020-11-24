@@ -8,6 +8,7 @@ Vue.use(VueRouter)
 import AppComponent from './App.vue'
 import ProductsComponent from './components/products.vue'
 
+Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('app', AppComponent)
 
 const routes = [
