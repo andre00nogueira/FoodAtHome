@@ -2,7 +2,6 @@
   <div>
     <navbar />
 
-
     <h2>Menu</h2>
 
     <div id="filterArea">
@@ -13,13 +12,16 @@
         placeholder="Search for a product..."
       />
 
-      <select class="custom-select" id="productTypeFilter">
-        <option selected>Type</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
+      <select
+        @change="getProductsByType($event)"
+        class="custom-select"
+        id="productTypeFilter"
+      >
+        <option value="">Choose Type...</option>
+        <option v-for="(type, index) in types" :key="index" :value="type.name">
+          {{ type.name }}
+        </option>
       </select>
-
     </div>
     <table id="tableProducts" class="table table-striped">
       <thead>
@@ -61,11 +63,13 @@ export default {
     return {
       products: [],
       productsData: {},
+      types: [],
       searchQuery: "",
     };
   },
   mounted() {
-    this.getProducts(1);
+    this.getProducts();
+    this.getTypes();
   },
   computed: {
     filterProducts() {
@@ -83,12 +87,30 @@ export default {
   methods: {
     getProducts(page = 1) {
       let url = `api/products`;
-      if(page != 0){
-        url += `?page=${page}`
+      if (page != 0) {
+        url += `?page=${page}`;
       }
       axios.get(url).then((response) => {
         this.products = response.data.data;
         this.productsData = response.data;
+      });
+    },
+    getProductsByType(event) {
+      let selectedTypeValue = event.target.value;
+      if (selectedTypeValue == "") {
+        this.getProducts()
+      } else {
+        let url = `api/products/types/${selectedTypeValue}`;
+        axios.get(url).then((response) => {
+          this.products = response.data.data;
+          this.productsData = response.data;
+        });
+      }
+    },
+    getTypes() {
+      let url = `api/products/types`;
+      axios.get(url).then((response) => {
+        this.types = response.data.data;
       });
     },
   },
@@ -112,7 +134,7 @@ export default {
   display: flex;
 }
 
-#productTypeFilter{
+#productTypeFilter {
   width: 20%;
 }
 </style>

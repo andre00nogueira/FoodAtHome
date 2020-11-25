@@ -2072,17 +2072,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       products: [],
       productsData: {},
+      types: [],
       searchQuery: ""
     };
   },
   mounted: function mounted() {
-    this.getProducts(1);
+    this.getProducts();
+    this.getTypes();
   },
   computed: {
     filterProducts: function filterProducts() {
@@ -2111,6 +2115,29 @@ __webpack_require__.r(__webpack_exports__);
       axios.get(url).then(function (response) {
         _this2.products = response.data.data;
         _this2.productsData = response.data;
+      });
+    },
+    getProductsByType: function getProductsByType(event) {
+      var _this3 = this;
+
+      var selectedTypeValue = event.target.value;
+
+      if (selectedTypeValue == "") {
+        this.getProducts();
+      } else {
+        var url = "api/products/types/".concat(selectedTypeValue);
+        axios.get(url).then(function (response) {
+          _this3.products = response.data.data;
+          _this3.productsData = response.data;
+        });
+      }
+    },
+    getTypes: function getTypes() {
+      var _this4 = this;
+
+      var url = "api/products/types";
+      axios.get(url).then(function (response) {
+        _this4.types = response.data.data;
       });
     }
   },
@@ -6580,7 +6607,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\n#tableProducts {\r\n  margin-top: 2%;\r\n  margin-bottom: 3%;\n}\n#filterArea {\r\n  margin-top: 3%;\r\n  display: flex;\n}\n#productTypeFilter{\r\n  width: 20%;\n}\r\n", ""]);
+exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\n#tableProducts {\r\n  margin-top: 2%;\r\n  margin-bottom: 3%;\n}\n#filterArea {\r\n  margin-top: 3%;\r\n  display: flex;\n}\n#productTypeFilter {\r\n  width: 20%;\n}\r\n", ""]);
 
 // exports
 
@@ -39098,14 +39125,37 @@ var render = function() {
           }
         }),
         _vm._v(" "),
-        _vm._m(0)
+        _c(
+          "select",
+          {
+            staticClass: "custom-select",
+            attrs: { id: "productTypeFilter" },
+            on: {
+              change: function($event) {
+                return _vm.getProductsByType($event)
+              }
+            }
+          },
+          [
+            _c("option", { attrs: { value: "" } }, [_vm._v("Choose Type...")]),
+            _vm._v(" "),
+            _vm._l(_vm.types, function(type, index) {
+              return _c(
+                "option",
+                { key: index, domProps: { value: type.name } },
+                [_vm._v("\n        " + _vm._s(type.name) + "\n      ")]
+              )
+            })
+          ],
+          2
+        )
       ]),
       _vm._v(" "),
       _c(
         "table",
         { staticClass: "table table-striped", attrs: { id: "tableProducts" } },
         [
-          _vm._m(1),
+          _vm._m(0),
           _vm._v(" "),
           _c(
             "tbody",
@@ -39145,24 +39195,6 @@ var render = function() {
   )
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "select",
-      { staticClass: "custom-select", attrs: { id: "productTypeFilter" } },
-      [
-        _c("option", { attrs: { selected: "" } }, [_vm._v("Type")]),
-        _vm._v(" "),
-        _c("option", { attrs: { value: "1" } }, [_vm._v("One")]),
-        _vm._v(" "),
-        _c("option", { attrs: { value: "2" } }, [_vm._v("Two")]),
-        _vm._v(" "),
-        _c("option", { attrs: { value: "3" } }, [_vm._v("Three")])
-      ]
-    )
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
