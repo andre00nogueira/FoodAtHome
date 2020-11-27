@@ -2166,26 +2166,105 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      products: {}
+      allProducts: [],
+      allProductsData: {},
+      products: [],
+      productsData: {},
+      types: [],
+      searchQuery: "",
+      selectedTypeValue: ""
     };
   },
   mounted: function mounted() {
     this.getProducts();
+    this.getTypes();
+  },
+  computed: {
+    filterProducts: function filterProducts() {
+      var _this = this;
+
+      if (!this.searchQuery) {
+        this.allProductsData = {};
+        return this.products;
+      } else {
+        if (this.selectedTypeValue == "") {
+          if (this.allProducts.length == 0) {
+            this.getProducts(0);
+          }
+
+          return this.allProducts.filter(function (product) {
+            return product.name.toLowerCase().includes(_this.searchQuery.toLowerCase());
+          });
+        } else {
+          return this.products.filter(function (product) {
+            return product.name.toLowerCase().includes(_this.searchQuery.toLowerCase());
+          });
+        }
+      }
+    }
   },
   methods: {
     getProducts: function getProducts() {
-      var _this = this;
+      var _this2 = this;
 
-      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 2;
-      axios.get("api/products?page=" + page).then(function (response) {
-        _this.products = response.data.data;
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      var url = "api/products";
+
+      if (page != 0) {
+        url += "?page=".concat(page);
+        axios.get(url).then(function (response) {
+          _this2.products = response.data.data;
+          _this2.productsData = response.data;
+        });
+      } else {
+        axios.get(url).then(function (response) {
+          _this2.allProducts = response.data.data;
+          _this2.allProductsData = response.data;
+        });
+      }
+    },
+    //#region GET FOOD BY TYPE
+    getProductsByType: function getProductsByType(event) {
+      var _this3 = this;
+
+      this.selectedTypeValue = event.target.value;
+
+      if (this.selectedTypeValue == "") {
+        this.getProducts();
+      } else {
+        var url = "api/products/types/".concat(this.selectedTypeValue);
+        axios.get(url).then(function (response) {
+          _this3.products = response.data.data;
+          _this3.productsData = response.data;
+        });
+      }
+    },
+    //#endregion
+    //#region GET FOOD TYPES
+    getTypes: function getTypes() {
+      var _this4 = this;
+
+      var url = "api/products/types";
+      axios.get(url).then(function (response) {
+        _this4.types = response.data.data;
       });
-    }
+    } //#endregion
+
   },
   components: {
     navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
@@ -6654,7 +6733,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\r\n", ""]);
+exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\n#tableProducts {\r\n  margin-top: 2%;\r\n  margin-bottom: 3%;\n}\n#filterArea {\r\n  margin-top: 3%;\r\n  display: flex;\n}\n#productTypeFilter {\r\n  width: 20%;\n}\r\n", ""]);
 
 // exports
 
@@ -39421,7 +39500,7 @@ var render = function() {
         _vm._v("Food@Home")
       ]),
       _vm._v(" "),
-      _c("router-link", { attrs: { to: "/products" } }, [_vm._v("Products")])
+      _c("router-link", { attrs: { to: "/menu" } }, [_vm._v("Menu")])
     ],
     1
   )
@@ -39453,44 +39532,99 @@ var render = function() {
     [
       _c("navbar"),
       _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: { id: "myInput", type: "text", placeholder: "Search.." }
-      }),
+      _c("h2", [_vm._v("Menu")]),
       _vm._v(" "),
-      _c("table", { staticClass: "table table-striped" }, [
-        _vm._m(0),
+      _c("div", { attrs: { id: "filterArea" } }, [
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.searchQuery,
+              expression: "searchQuery"
+            }
+          ],
+          staticClass: "form-control",
+          attrs: { type: "text", placeholder: "Search for a product..." },
+          domProps: { value: _vm.searchQuery },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.searchQuery = $event.target.value
+            }
+          }
+        }),
         _vm._v(" "),
         _c(
-          "tbody",
-          _vm._l(_vm.products, function(product) {
-            return _c("tr", { key: product.id }, [
-              _c("td", [
-                _c("img", {
-                  attrs: {
-                    id: "productPhoto",
-                    src: "storage/products/" + product.photo_url
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.name))]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.type))]),
-              _vm._v(" "),
-              _c("td", [
-                _vm._v(_vm._s(product.description.substring(0, 100) + "..."))
-              ]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.price) + "€")])
-            ])
-          }),
-          0
+          "select",
+          {
+            staticClass: "custom-select",
+            attrs: { id: "productTypeFilter" },
+            on: {
+              change: function($event) {
+                return _vm.getProductsByType($event)
+              }
+            }
+          },
+          [
+            _c("option", { attrs: { value: "" } }, [_vm._v("Choose Type...")]),
+            _vm._v(" "),
+            _vm._l(_vm.types, function(type, index) {
+              return _c(
+                "option",
+                { key: index, domProps: { value: type.name } },
+                [_vm._v("\n        " + _vm._s(type.name) + "\n      ")]
+              )
+            })
+          ],
+          2
         )
       ]),
       _vm._v(" "),
+      _c(
+        "table",
+        { staticClass: "table table-striped", attrs: { id: "tableProducts" } },
+        [
+          _vm._m(0),
+          _vm._v(" "),
+          _c(
+            "tbody",
+            _vm._l(_vm.filterProducts, function(product) {
+              return _c("tr", { key: product.id }, [
+                _c("td", [
+                  _c("img", {
+                    attrs: {
+                      id: "productPhoto",
+                      src: "storage/products/" + product.photo_url
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(product.name))]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(product.type))]),
+                _vm._v(" "),
+                _c("td", [
+                  _vm._v(_vm._s(product.description.substring(0, 100) + "..."))
+                ]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(product.price) + "€")])
+              ])
+            }),
+            0
+          )
+        ]
+      ),
+      _vm._v(" "),
       _c("pagination", {
-        attrs: { data: _vm.products },
+        attrs: {
+          data:
+            Object.keys(_vm.productsData).length === 0
+              ? _vm.allProductsData
+              : _vm.productsData
+        },
         on: { "pagination-change-page": _vm.getProducts }
       })
     ],
@@ -54853,7 +54987,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 Vue.use(vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 
-
+Vue.component('pagination', __webpack_require__(/*! laravel-vue-pagination */ "./node_modules/laravel-vue-pagination/dist/laravel-vue-pagination.common.js"));
 Vue.component('app', _App_vue__WEBPACK_IMPORTED_MODULE_1__["default"]);
 Vue.component('app', _components_customer_create_customer_vue__WEBPACK_IMPORTED_MODULE_3__["default"]);
 var routes = [{
@@ -54863,7 +54997,7 @@ var routes = [{
   path: '/index',
   component: _App_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
 }, {
-  path: '/products',
+  path: '/menu',
   component: _components_products_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
 }, {
   path: '/customers/create',
@@ -55084,14 +55218,15 @@ __webpack_require__.r(__webpack_exports__);
 /*!**********************************************!*\
   !*** ./resources/js/components/products.vue ***!
   \**********************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _products_vue_vue_type_template_id_4de840af___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./products.vue?vue&type=template&id=4de840af& */ "./resources/js/components/products.vue?vue&type=template&id=4de840af&");
 /* harmony import */ var _products_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./products.vue?vue&type=script&lang=js& */ "./resources/js/components/products.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _products_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./products.vue?vue&type=style&index=0&lang=css& */ "./resources/js/components/products.vue?vue&type=style&index=0&lang=css&");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _products_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _products_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _products_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./products.vue?vue&type=style&index=0&lang=css& */ "./resources/js/components/products.vue?vue&type=style&index=0&lang=css&");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -55123,7 +55258,7 @@ component.options.__file = "resources/js/components/products.vue"
 /*!***********************************************************************!*\
   !*** ./resources/js/components/products.vue?vue&type=script&lang=js& ***!
   \***********************************************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
