@@ -7,13 +7,16 @@ Vue.use(VueRouter)
 
 import AppComponent from './App.vue'
 import ProductsComponent from './components/products.vue'
+import CustomerComponent from './components/customer/create_customer.vue'
 
 Vue.component('app', AppComponent)
+Vue.component('app', CustomerComponent)
 
 const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
-    { path: '/products', component: ProductsComponent }
+    { path: '/products', component: ProductsComponent },
+    { path: '/customers/create', component: CustomerComponent }
 ]
 
 const router = new VueRouter({

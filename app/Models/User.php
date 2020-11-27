@@ -20,8 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'age',
-        'department_id',
+        'photo_url'
     ];
 
     /**
@@ -46,5 +45,10 @@ class User extends Authenticatable
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function userable()
+    {
+        return $this->morphTo();
     }
 }
