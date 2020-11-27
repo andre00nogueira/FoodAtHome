@@ -165,8 +165,9 @@ export default {
         background-color: black;
         color: white;
         border: 2px solid #555555;
-
-
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     #buttonMenu:hover {
@@ -176,8 +177,14 @@ export default {
     .jumbotron{
         
     }
-    .menu{
-        display:inline-block;
 
+    .menu{
+        position: relative;
     }
+
+    .menu > h5{
+        position: relative;
+        text-align: center;
+    }
+
 </style>    
