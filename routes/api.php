@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('products', [ProductController::class, 'index']);
 Route::post('customers',[CustomerController::class, 'store']);
+Route::post('login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
+Route::middleware('auth:sanctum')->post('users/me', [UserController::class, 'me']);

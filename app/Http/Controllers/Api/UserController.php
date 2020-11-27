@@ -8,9 +8,14 @@ use App\Http\Resources\User as UserResource;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    public function me(Request $request){
+        return $request->user();
+    }
+
     public function index(Request $request)
     {
         if ($request->has('page')) {
