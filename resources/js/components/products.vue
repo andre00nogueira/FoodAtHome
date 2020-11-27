@@ -48,8 +48,9 @@
         </tr>
       </tbody>
     </table>
+
     <pagination
-      :data="productsData"
+      :data="Object.keys(productsData).length === 0 ? allProductsData : productsData"
       @pagination-change-page="getProducts"
     ></pagination>
   </div>
@@ -61,10 +62,13 @@ import navbar from "./navbar.vue";
 export default {
   data() {
     return {
+      allProducts: [],
+      allProductsData: {},
       products: [],
       productsData: {},
       types: [],
       searchQuery: "",
+      selectedTypeValue: "",
     };
   },
   mounted() {
@@ -74,13 +78,25 @@ export default {
   computed: {
     filterProducts() {
       if (!this.searchQuery) {
+        this.allProductsData = {}
         return this.products;
       } else {
-        return this.products.filter((product) => {
-          return product.name
-            .toLowerCase()
-            .includes(this.searchQuery.toLowerCase());
-        });
+        if (this.selectedTypeValue == "") {
+          if (this.allProducts.length == 0) {
+            this.getProducts(0);
+          }
+          return this.allProducts.filter((product) => {
+            return product.name
+              .toLowerCase()
+              .includes(this.searchQuery.toLowerCase());
+          });
+        } else {
+          return this.products.filter((product) => {
+            return product.name
+              .toLowerCase()
+              .includes(this.searchQuery.toLowerCase());
+          });
+        }
       }
     },
   },
@@ -89,31 +105,44 @@ export default {
       let url = `api/products`;
       if (page != 0) {
         url += `?page=${page}`;
-      }
-      axios.get(url).then((response) => {
-        this.products = response.data.data;
-        this.productsData = response.data;
-      });
-    },
-    getProductsByType(event) {
-      let selectedTypeValue = event.target.value;
-      if (selectedTypeValue == "") {
-        this.getProducts()
+
+        axios.get(url).then((response) => {
+          this.products = response.data.data;
+          this.productsData = response.data;
+        });
       } else {
-        let url = `api/products/types/${selectedTypeValue}`;
+        axios.get(url).then((response) => {
+          this.allProducts = response.data.data;
+          this.allProductsData = response.data;
+        });
+      }
+    },
+
+    //#region GET FOOD BY TYPE
+    getProductsByType(event) {
+      this.selectedTypeValue = event.target.value;
+      if (this.selectedTypeValue == "") {
+        this.getProducts();
+      } else {
+        let url = `api/products/types/${this.selectedTypeValue}`;
         axios.get(url).then((response) => {
           this.products = response.data.data;
           this.productsData = response.data;
         });
       }
     },
+    //#endregion
+
+    //#region GET FOOD TYPES
     getTypes() {
       let url = `api/products/types`;
       axios.get(url).then((response) => {
         this.types = response.data.data;
       });
     },
+    //#endregion
   },
+
   components: { navbar },
 };
 </script>
