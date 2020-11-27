@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <router-link class="navbar-brand" to="/">Food@Home</router-link>
-    <router-link  to="/products">Products</router-link>
+    <router-link to="/menu">Menu</router-link>
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <li class="nav-item">

@@ -2189,8 +2189,6 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _navbar_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./navbar.vue */ "./resources/js/components/navbar.vue");
-/* harmony import */ var laravel_vue_pagination__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! laravel-vue-pagination */ "./node_modules/laravel-vue-pagination/dist/laravel-vue-pagination.common.js");
-/* harmony import */ var laravel_vue_pagination__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(laravel_vue_pagination__WEBPACK_IMPORTED_MODULE_1__);
 //
 //
 //
@@ -2239,30 +2237,107 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      products: {}
+      allProducts: [],
+      allProductsData: {},
+      products: [],
+      productsData: {},
+      types: [],
+      searchQuery: "",
+      selectedTypeValue: ""
     };
   },
   mounted: function mounted() {
     this.getProducts();
+    this.getTypes();
+  },
+  computed: {
+    filterProducts: function filterProducts() {
+      var _this = this;
+
+      if (!this.searchQuery) {
+        this.allProductsData = {};
+        return this.products;
+      } else {
+        if (this.selectedTypeValue == "") {
+          if (this.allProducts.length == 0) {
+            this.getProducts(0);
+          }
+
+          return this.allProducts.filter(function (product) {
+            return product.name.toLowerCase().includes(_this.searchQuery.toLowerCase());
+          });
+        } else {
+          return this.products.filter(function (product) {
+            return product.name.toLowerCase().includes(_this.searchQuery.toLowerCase());
+          });
+        }
+      }
+    }
   },
   methods: {
     getProducts: function getProducts() {
-      var _this = this;
+      var _this2 = this;
 
-      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 2;
-      axios.get("api/products?page=" + page).then(function (response) {
-        _this.products = response.data.data;
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      var url = "api/products";
+
+      if (page != 0) {
+        url += "?page=".concat(page);
+        axios.get(url).then(function (response) {
+          _this2.products = response.data.data;
+          _this2.productsData = response.data;
+        });
+      } else {
+        axios.get(url).then(function (response) {
+          _this2.allProducts = response.data.data;
+          _this2.allProductsData = response.data;
+        });
+      }
+    },
+    //#region GET FOOD BY TYPE
+    getProductsByType: function getProductsByType(event) {
+      var _this3 = this;
+
+      this.selectedTypeValue = event.target.value;
+
+      if (this.selectedTypeValue == "") {
+        this.getProducts();
+      } else {
+        var url = "api/products/types/".concat(this.selectedTypeValue);
+        axios.get(url).then(function (response) {
+          _this3.products = response.data.data;
+          _this3.productsData = response.data;
+        });
+      }
+    },
+    //#endregion
+    //#region GET FOOD TYPES
+    getTypes: function getTypes() {
+      var _this4 = this;
+
+      var url = "api/products/types";
+      axios.get(url).then(function (response) {
+        _this4.types = response.data.data;
       });
-    }
+    } //#endregion
+
   },
   components: {
-    navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    pagination: laravel_vue_pagination__WEBPACK_IMPORTED_MODULE_1___default.a
+    navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   }
 });
 
@@ -6727,7 +6802,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\r\n", ""]);
+exports.push([module.i, "\n#productPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\n#tableProducts {\r\n  margin-top: 2%;\r\n  margin-bottom: 3%;\n}\n#filterArea {\r\n  margin-top: 3%;\r\n  display: flex;\n}\n#productTypeFilter {\r\n  width: 20%;\n}\r\n", ""]);
 
 // exports
 
@@ -39598,7 +39673,7 @@ var render = function() {
         _vm._v("Food@Home")
       ]),
       _vm._v(" "),
-      _c("router-link", { attrs: { to: "/products" } }, [_vm._v("Products")]),
+      _c("router-link", { attrs: { to: "/menu" } }, [_vm._v("Menu")]),
       _vm._v(" "),
       _c("div", { staticClass: "collapse navbar-collapse" }, [
         _c("ul", { staticClass: "navbar-nav ml-auto mt-2 mt-lg-0" }, [
@@ -39659,44 +39734,99 @@ var render = function() {
     [
       _c("navbar"),
       _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: { id: "myInput", type: "text", placeholder: "Search.." }
-      }),
+      _c("h2", [_vm._v("Menu")]),
       _vm._v(" "),
-      _c("table", { staticClass: "table table-striped" }, [
-        _vm._m(0),
+      _c("div", { attrs: { id: "filterArea" } }, [
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.searchQuery,
+              expression: "searchQuery"
+            }
+          ],
+          staticClass: "form-control",
+          attrs: { type: "text", placeholder: "Search for a product..." },
+          domProps: { value: _vm.searchQuery },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.searchQuery = $event.target.value
+            }
+          }
+        }),
         _vm._v(" "),
         _c(
-          "tbody",
-          _vm._l(_vm.products, function(product) {
-            return _c("tr", { key: product.id }, [
-              _c("td", [
-                _c("img", {
-                  attrs: {
-                    id: "productPhoto",
-                    src: "storage/products/" + product.photo_url
-                  }
-                })
-              ]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.name))]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.type))]),
-              _vm._v(" "),
-              _c("td", [
-                _vm._v(_vm._s(product.description.substring(0, 100) + "..."))
-              ]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.price) + "€")])
-            ])
-          }),
-          0
+          "select",
+          {
+            staticClass: "custom-select",
+            attrs: { id: "productTypeFilter" },
+            on: {
+              change: function($event) {
+                return _vm.getProductsByType($event)
+              }
+            }
+          },
+          [
+            _c("option", { attrs: { value: "" } }, [_vm._v("Choose Type...")]),
+            _vm._v(" "),
+            _vm._l(_vm.types, function(type, index) {
+              return _c(
+                "option",
+                { key: index, domProps: { value: type.name } },
+                [_vm._v("\n        " + _vm._s(type.name) + "\n      ")]
+              )
+            })
+          ],
+          2
         )
       ]),
       _vm._v(" "),
+      _c(
+        "table",
+        { staticClass: "table table-striped", attrs: { id: "tableProducts" } },
+        [
+          _vm._m(0),
+          _vm._v(" "),
+          _c(
+            "tbody",
+            _vm._l(_vm.filterProducts, function(product) {
+              return _c("tr", { key: product.id }, [
+                _c("td", [
+                  _c("img", {
+                    attrs: {
+                      id: "productPhoto",
+                      src: "storage/products/" + product.photo_url
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(product.name))]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(product.type))]),
+                _vm._v(" "),
+                _c("td", [
+                  _vm._v(_vm._s(product.description.substring(0, 100) + "..."))
+                ]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(product.price) + "€")])
+              ])
+            }),
+            0
+          )
+        ]
+      ),
+      _vm._v(" "),
       _c("pagination", {
-        attrs: { data: _vm.products },
+        attrs: {
+          data:
+            Object.keys(_vm.productsData).length === 0
+              ? _vm.allProductsData
+              : _vm.productsData
+        },
         on: { "pagination-change-page": _vm.getProducts }
       })
     ],
@@ -55062,6 +55192,7 @@ Vue.use(vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 
 
+Vue.component('pagination', __webpack_require__(/*! laravel-vue-pagination */ "./node_modules/laravel-vue-pagination/dist/laravel-vue-pagination.common.js"));
 Vue.component('app', _App_vue__WEBPACK_IMPORTED_MODULE_1__["default"]);
 Vue.component('app', _components_customer_create_customer_vue__WEBPACK_IMPORTED_MODULE_3__["default"]);
 var routes = [{
@@ -55079,6 +55210,9 @@ var routes = [{
 }, {
   path: '/login',
   component: _components_login__WEBPACK_IMPORTED_MODULE_4__["default"]
+}, {
+  path: '/menu',
+  component: _components_products_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]({
   routes: routes
