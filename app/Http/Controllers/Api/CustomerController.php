@@ -44,12 +44,22 @@ class CustomerController extends Controller
         $user->name =$request->name;
         $user->email=$request->email;
         $user->password= bcrypt($request->password);
+        if($request->has('photo_url')){
+            /*
+            $upload_path = public_path('foto');
+            $file_name = $request->photo_url->getClientOriginalName();
+            $generated_new_name = time() . '.' . $request->photo_url->getClientOriginalExtension();
+            $request->file->move($upload_path, $generated_new_name);
+            $user->photo_url=$file_name;*/
+        }
         $user->save();
         $customer = new Customer();
         $customer->id = $user->id;
         $customer->address = $request->address;
         $customer->phone = $request->phone;
-        $customer->nif = $request->nif;
+        if($request->has('nif')){
+            $customer->nif = $request->nif;
+        }
         $customer->save();
         return response()->json(new CustomerResource($customer,$user),201);
     }

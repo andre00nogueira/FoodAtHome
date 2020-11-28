@@ -5,10 +5,10 @@
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <li class="nav-item">
-          <router-link  to="/login">Login</router-link>
+          <router-link  to="/login" class="btn btn-primary">Login</router-link>
         </li>
         <li class="nav-item">
-          <a  href="#" @click.prevent="logout">Logout</a>
+          <a  href="#" @click.prevent="logout" class="btn btn-secondary">Logout</a>
         </li>
       </ul>
     </div>
