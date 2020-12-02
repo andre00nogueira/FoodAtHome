@@ -20,9 +20,9 @@ use App\Http\Controllers\Api\AuthController;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+/*Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
-});
+});*/   
 
 
 //products
@@ -33,12 +33,12 @@ Route::get('products/types/{type_name}', [ProductController::class, 'productByTy
 //customers
 Route::post('customers',[CustomerController::class, 'store']);
 
-
 //login/logout
 Route::post('login', [AuthController::class, 'login']);
+
 Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
 
 //current user
-Route::middleware('auth:sanctum')->post('users/me', [UserController::class, 'me']);
+Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']);
 
 

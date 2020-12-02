@@ -15,7 +15,7 @@
     </div>
 </template>
 <script>
-export default{
+export default {
     data: function() {
         return{
             credentials: {
@@ -26,10 +26,16 @@ export default{
     },
     methods: {
         login () {
+            this.$store.commit('clearUser')
             axios.get('/sanctum/csrf-cookie').then(response =>{
                 axios.post('/api/login', this.credentials).then(response =>{
-                    console.log('User has loggeg in')
-                    console.dir(response.data)
+                    // This sets the current user
+                    // To the logged in user
+                    this.$store.commit('setUser', response.data)
+                    console.log('User has logged in')
+
+                    // Sends user to home page
+                    this.$router.push('/') 
                 }).catch(error =>{
                     console.log('Invalid Authentication')
                 })

@@ -1,9 +1,14 @@
 <template>
   <div>
     <navbar />
+    
     <div class="jumbotron">
       <h1>FOOD@HOME</h1>
       <h5>WELCOME TO OUR PROJECT</h5>
+       <a
+        href="#"
+        @click.prevent="myself"
+      >Myself</a>
     </div>
   </div>
 </template>
@@ -14,6 +19,19 @@ import navbar from "./components/navbar.vue";
 
 export default {
   components: { navbar },
+  methods: {
+      myself() {
+          this.$store.dispatch('loadUserLogged').then(() => {
+              if (this.$store.state.user) {
+                  console.log('User currently logged:')
+                  //console.dir(this.$store.state.user)
+              }else{
+                  console.log('No user is currently logged:')
+                  //console.dir(this.$store.state.user)
+              }
+          })
+      }
+  }
   /*data: function() {
             return {
                 title: 'List Users',

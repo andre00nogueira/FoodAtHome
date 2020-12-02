@@ -17,7 +17,7 @@ class AuthController extends Controller{
     }
 
     public function logout(){
-        Auth::guard('web')->logout();//check if Auth::logout();works
+        Auth::guard('web')->logout(); //check if Auth::logout();works
         return response()->json(['msg'=> 'User session closed'], 200);
     }
 }

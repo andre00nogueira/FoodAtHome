@@ -2,13 +2,19 @@ require('./bootstrap')
 
 window.Vue = require('vue')
 
+
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
+
+// VUEX
+import store from './stores/global-store'
 
 import AppComponent from './App.vue'
 import ProductsComponent from './components/products.vue'
 import CustomerComponent from './components/create_customer.vue'
 import LoginComponent from'./components/login'
+
+
 
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('app', AppComponent)
@@ -29,5 +35,9 @@ const router = new VueRouter({
 
 const app = new Vue({
     el: '#app',
-    router
+    router,
+    store,
+    created () {
+        store.dispatch('loadUserLogged')
+    },
 })
