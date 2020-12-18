@@ -30,12 +30,12 @@ export default {
         console.log('User has logged out')
         // This updates the store
         // And sets current user to NULL
-        this.$store.commit('clearUser')
         this.$store.commit('clearCart')
+        this.$store.commit('clearUser')
 
         this.$router.push('/')
       }).catch(error =>{
-        console.log('Invalid Logout')
+        console.log(`Invalid Logout ${error}`)
       })
     }
   }

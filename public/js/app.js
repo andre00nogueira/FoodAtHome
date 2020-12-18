@@ -1948,9 +1948,9 @@ __webpack_require__.r(__webpack_exports__);
 
       this.$store.dispatch('loadUserLogged').then(function () {
         if (_this.$store.state.user) {
-          console.log('User currently logged:'); //console.dir(this.$store.state.user)
+          console.log('User currently logged:');
         } else {
-          console.log('No user is currently logged:'); //console.dir(this.$store.state.user)
+          console.log('No user is currently logged');
         }
       });
     }
@@ -2179,9 +2179,8 @@ __webpack_require__.r(__webpack_exports__);
         axios.post('/api/login', _this.credentials).then(function (response) {
           // This sets the current user
           // To the logged in user
-          _this.$store.commit('setUser', response.data);
+          _this.$store.commit('setUser', response.data); // Sends user to home page
 
-          console.log('User has logged in'); // Sends user to home page
 
           _this.$router.push('/');
         })["catch"](function (error) {
@@ -2236,13 +2235,13 @@ __webpack_require__.r(__webpack_exports__);
         console.log('User has logged out'); // This updates the store
         // And sets current user to NULL
 
-        _this.$store.commit('clearUser');
-
         _this.$store.commit('clearCart');
+
+        _this.$store.commit('clearUser');
 
         _this.$router.push('/');
       })["catch"](function (error) {
-        console.log('Invalid Logout');
+        console.log("Invalid Logout ".concat(error));
       });
     }
   }
@@ -58209,7 +58208,6 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
     setUser: function setUser(state, user) {
       state.user = user;
       state.cart = JSON.parse(localStorage.getItem('cart' + state.user.id));
-      console.log("STORE " + state.cart);
     },
     clearCart: function clearCart(state) {
       state.cart = [];

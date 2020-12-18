@@ -15,7 +15,6 @@ export default new Vuex.Store({
         setUser(state, user) {
             state.user = user
             state.cart = JSON.parse(localStorage.getItem('cart' + state.user.id))
-            console.log("STORE " + state.cart)
         },
         clearCart(state) {
             state.cart = []

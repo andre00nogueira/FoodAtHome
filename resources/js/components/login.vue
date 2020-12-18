@@ -32,7 +32,6 @@ export default {
                     // This sets the current user
                     // To the logged in user
                     this.$store.commit('setUser', response.data)
-                    console.log('User has logged in')
 
                     // Sends user to home page
                     this.$router.push('/') 

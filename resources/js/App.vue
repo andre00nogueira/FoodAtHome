@@ -24,10 +24,8 @@ export default {
           this.$store.dispatch('loadUserLogged').then(() => {
               if (this.$store.state.user) {
                   console.log('User currently logged:')
-                  //console.dir(this.$store.state.user)
               }else{
-                  console.log('No user is currently logged:')
-                  //console.dir(this.$store.state.user)
+                  console.log('No user is currently logged')
               }
           })
       }
