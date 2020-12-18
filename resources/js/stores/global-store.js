@@ -28,6 +28,13 @@ export default new Vuex.Store({
             state.cart = state.cart.splice(itemId)
             localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart))
         },
+        addOneUnitToItem(state, itemId){
+            let item = state.cart[itemId]
+            state.cart[itemId].quantity = item.quantity++
+            state.cart[itemId].subtotal = item.quantity * item.price
+
+            localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart))
+        },
         addItemToCart(state, itemCart) {
             state.cart = JSON.parse(localStorage.getItem('cart' + state.user.id)) || []
             console.log(state.cart)

@@ -14,12 +14,12 @@
               <th>Name</th>
               <th>Unit Price</th>
               <th>Sub Total</th>
-              <th></th>
+              <th>Quantity</th>
               <th>Total</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item of cart" :key="item.id">
+            <tr v-for="(item,index) of cart" :key="item.id">
               <td>
                 <img
                   id="productPhoto"
@@ -32,29 +32,31 @@
               <td>
                 <div style="display: flex">
                   <input
-                    type="number"
                     class="form-control"
-                    style="width: 40%"
+                    style="width: 15%; text-align: right"
                     :value="item.quantity"
                     min="1"
                     max="10"
+                    readonly
                   />
                   <button
                     class="btn btn-secondary"
                     style="margin-left: 2%"
+                    @click="removeOneUnitFromItem(item.id)"
                   >
                     ➖
                   </button>
                   <button
                     class="btn btn-primary"
                     style="margin-left: 2%"
+                    @click="addOneUnitToItem(index)"
                   >
                     ➕
                   </button>
                   <button
                     class="btn btn-danger"
                     style="margin-left: 2%"
-                    @click="clearCartItem(item.id)"
+                    @click="clearCartItem(index)"
                   >
                     🗑️
                   </button>
@@ -88,9 +90,15 @@ export default {
       this.$store.commit("clearCart");
       this.cart = this.$store.state.cart;
     },
-    clearCartItem(itemId){
-      this.cart.splice(itemId, 1);
-      this.$store.commit('removeItemFromCart', itemId);
+    clearCartItem(index){
+      this.cart.splice(index, 1);
+      this.$store.commit('removeItemFromCart', index);
+    },
+    addOneUnitToItem(index){
+      let item = this.cart[index]
+      item.quantity = item.quantity + 1
+      item.subtotal = item.quantity * item.price
+      this.$store.commit('addOneUnitToItem', index)
     }
   },
   mounted() {

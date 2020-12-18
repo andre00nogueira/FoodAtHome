@@ -2524,6 +2524,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2559,9 +2561,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.$store.commit("clearCart");
       this.cart = this.$store.state.cart;
     },
-    clearCartItem: function clearCartItem(itemId) {
-      this.cart.splice(itemId, 1);
-      this.$store.commit('removeItemFromCart', itemId);
+    clearCartItem: function clearCartItem(index) {
+      this.cart.splice(index, 1);
+      this.$store.commit('removeItemFromCart', index);
+    },
+    addOneUnitToItem: function addOneUnitToItem(index) {
+      var item = this.cart[index];
+      item.quantity = item.quantity + 1;
+      item.subtotal = item.quantity * item.price;
+      this.$store.commit('addOneUnitToItem', index);
     }
   },
   mounted: function mounted() {
@@ -41031,7 +41039,7 @@ var render = function() {
                   _vm._v(" "),
                   _c(
                     "tbody",
-                    _vm._l(_vm.cart, function(item) {
+                    _vm._l(_vm.cart, function(item, index) {
                       return _c("tr", { key: item.id }, [
                         _c("td", [
                           _c("img", {
@@ -41052,8 +41060,11 @@ var render = function() {
                           _c("div", { staticStyle: { display: "flex" } }, [
                             _c("input", {
                               staticClass: "form-control",
-                              staticStyle: { width: "40%" },
-                              attrs: { type: "number", min: "1", max: "10" },
+                              staticStyle: {
+                                width: "15%",
+                                "text-align": "right"
+                              },
+                              attrs: { min: "1", max: "10", readonly: "" },
                               domProps: { value: item.quantity }
                             }),
                             _vm._v(" "),
@@ -41061,7 +41072,12 @@ var render = function() {
                               "button",
                               {
                                 staticClass: "btn btn-secondary",
-                                staticStyle: { "margin-left": "2%" }
+                                staticStyle: { "margin-left": "2%" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.removeOneUnitFromItem(item.id)
+                                  }
+                                }
                               },
                               [
                                 _vm._v(
@@ -41074,7 +41090,12 @@ var render = function() {
                               "button",
                               {
                                 staticClass: "btn btn-primary",
-                                staticStyle: { "margin-left": "2%" }
+                                staticStyle: { "margin-left": "2%" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.addOneUnitToItem(index)
+                                  }
+                                }
                               },
                               [
                                 _vm._v(
@@ -41090,7 +41111,7 @@ var render = function() {
                                 staticStyle: { "margin-left": "2%" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.clearCartItem(item.id)
+                                    return _vm.clearCartItem(index)
                                   }
                                 }
                               },
@@ -41132,7 +41153,7 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Sub Total")]),
         _vm._v(" "),
-        _c("th"),
+        _c("th", [_vm._v("Quantity")]),
         _vm._v(" "),
         _c("th", [_vm._v("Total")])
       ])
@@ -58255,6 +58276,12 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
     },
     removeItemFromCart: function removeItemFromCart(state, itemId) {
       state.cart = state.cart.splice(itemId);
+      localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart));
+    },
+    addOneUnitToItem: function addOneUnitToItem(state, itemId) {
+      var item = state.cart[itemId];
+      state.cart[itemId].quantity = item.quantity++;
+      state.cart[itemId].subtotal = item.quantity * item.price;
       localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart));
     },
     addItemToCart: function addItemToCart(state, itemCart) {
