@@ -24,6 +24,10 @@ export default new Vuex.Store({
             state.cart = cart
             localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart))
         },
+        removeItemFromCart(state, itemId){
+            state.cart = state.cart.splice(itemId)
+            localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart))
+        },
         addItemToCart(state, itemCart) {
             state.cart = JSON.parse(localStorage.getItem('cart' + state.user.id)) || []
             console.log(state.cart)

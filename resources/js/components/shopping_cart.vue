@@ -14,9 +14,8 @@
               <th>Name</th>
               <th>Unit Price</th>
               <th>Sub Total</th>
-              <th>Quantity</th>
-              <th>Total</th>
               <th></th>
+              <th>Total</th>
             </tr>
           </thead>
           <tbody>
@@ -30,26 +29,38 @@
               <td>{{ item.name }}</td>
               <td>{{ item.price }}€</td>
               <td>{{ item.subtotal }}€</td>
-              <td>{{ item.quantity }}</td>
-              <td>{{ item.total }}€</td>
               <td>
                 <div style="display: flex">
                   <input
                     type="number"
                     class="form-control"
-                    style="width: 65%"
-                    placeholder="Quantity"
+                    style="width: 40%"
+                    :value="item.quantity"
                     min="1"
                     max="10"
                   />
                   <button
+                    class="btn btn-secondary"
+                    style="margin-left: 2%"
+                  >
+                    ➖
+                  </button>
+                  <button
                     class="btn btn-primary"
                     style="margin-left: 2%"
                   >
-                    🛒
+                    ➕
+                  </button>
+                  <button
+                    class="btn btn-danger"
+                    style="margin-left: 2%"
+                    @click="clearCartItem(item.id)"
+                  >
+                    🗑️
                   </button>
                 </div>
               </td>
+              <td></td>
             </tr>
           </tbody>
         </table>
@@ -77,6 +88,10 @@ export default {
       this.$store.commit("clearCart");
       this.cart = this.$store.state.cart;
     },
+    clearCartItem(itemId){
+      this.cart.splice(itemId, 1);
+      this.$store.commit('removeItemFromCart', itemId);
+    }
   },
   mounted() {
     this.getCart();

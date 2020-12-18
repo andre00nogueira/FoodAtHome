@@ -2513,6 +2513,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2547,6 +2558,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     clearCart: function clearCart() {
       this.$store.commit("clearCart");
       this.cart = this.$store.state.cart;
+    },
+    clearCartItem: function clearCartItem(itemId) {
+      this.cart.splice(itemId, 1);
+      this.$store.commit('removeItemFromCart', itemId);
     }
   },
   mounted: function mounted() {
@@ -41033,11 +41048,62 @@ var render = function() {
                         _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(item.subtotal) + "€")]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(item.quantity))]),
+                        _c("td", [
+                          _c("div", { staticStyle: { display: "flex" } }, [
+                            _c("input", {
+                              staticClass: "form-control",
+                              staticStyle: { width: "40%" },
+                              attrs: { type: "number", min: "1", max: "10" },
+                              domProps: { value: item.quantity }
+                            }),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-secondary",
+                                staticStyle: { "margin-left": "2%" }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                  ➖\n                "
+                                )
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-primary",
+                                staticStyle: { "margin-left": "2%" }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                  ➕\n                "
+                                )
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-danger",
+                                staticStyle: { "margin-left": "2%" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.clearCartItem(item.id)
+                                  }
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                  🗑️\n                "
+                                )
+                              ]
+                            )
+                          ])
+                        ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(item.total) + "€")]),
-                        _vm._v(" "),
-                        _vm._m(1, true)
+                        _c("td")
                       ])
                     }),
                     0
@@ -41066,39 +41132,9 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Sub Total")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Quantity")]),
+        _c("th"),
         _vm._v(" "),
-        _c("th", [_vm._v("Total")]),
-        _vm._v(" "),
-        _c("th")
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("div", { staticStyle: { display: "flex" } }, [
-        _c("input", {
-          staticClass: "form-control",
-          staticStyle: { width: "65%" },
-          attrs: {
-            type: "number",
-            placeholder: "Quantity",
-            min: "1",
-            max: "10"
-          }
-        }),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-primary",
-            staticStyle: { "margin-left": "2%" }
-          },
-          [_vm._v("\n                  🛒\n                ")]
-        )
+        _c("th", [_vm._v("Total")])
       ])
     ])
   }
@@ -58215,6 +58251,10 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
     },
     setCart: function setCart(state, cart) {
       state.cart = cart;
+      localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart));
+    },
+    removeItemFromCart: function removeItemFromCart(state, itemId) {
+      state.cart = state.cart.splice(itemId);
       localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart));
     },
     addItemToCart: function addItemToCart(state, itemCart) {
