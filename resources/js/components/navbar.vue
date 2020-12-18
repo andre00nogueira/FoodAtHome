@@ -12,6 +12,7 @@
         </template>
         <template v-else>
         <li class="nav-item">
+          <router-link to="/cart" class="btn btn-primary">Cart</router-link>
           <a  href="#" @click.prevent="logout" class="btn btn-secondary">Logout</a>
         </li>
         </template>
@@ -30,6 +31,7 @@ export default {
         // This updates the store
         // And sets current user to NULL
         this.$store.commit('clearUser')
+        this.$store.commit('clearCart')
 
         this.$router.push('/')
       }).catch(error =>{

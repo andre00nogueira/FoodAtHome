@@ -12,8 +12,8 @@ import store from './stores/global-store'
 import AppComponent from './App.vue'
 import ProductsComponent from './components/products.vue'
 import CustomerComponent from './components/create_customer.vue'
-import LoginComponent from'./components/login'
-
+import LoginComponent from'./components/login.vue'
+import ShoppingCartComponent from'./components/shopping_cart.vue'
 
 
 Vue.component('pagination', require('laravel-vue-pagination'));
@@ -26,7 +26,8 @@ const routes = [
     { path: '/products', component: ProductsComponent },
     { path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
-    { path: '/menu', component: ProductsComponent }
+    { path: '/menu', component: ProductsComponent },
+    { path: '/cart', component: ShoppingCartComponent }
 ]
 
 const router = new VueRouter({
@@ -37,7 +38,7 @@ const app = new Vue({
     el: '#app',
     router,
     store,
-    created () {
+    mounted() {
         store.dispatch('loadUserLogged')
-    },
+    }
 })

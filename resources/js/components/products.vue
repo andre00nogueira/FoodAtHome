@@ -31,6 +31,7 @@
           <th>Type</th>
           <th>Description</th>
           <th>Price</th>
+          <th />
         </tr>
       </thead>
       <tbody>
@@ -45,12 +46,30 @@
           <td>{{ product.type }}</td>
           <td>{{ product.description.substring(0, 100) + "..." }}</td>
           <td>{{ product.price }}€</td>
+          <td>
+            <div style="display:flex">
+              <input
+                v-model="product.quantity"
+                type="number"
+                class="form-control"
+                style="width: 65%"
+                placeholder="Quantity"
+                min="1"
+                max="10"
+              />
+              <button class="btn btn-primary" style="margin-left: 2%" v-on:click="addToCart(product)">
+                🛒
+              </button>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
 
     <pagination
-      :data="Object.keys(productsData).length === 0 ? allProductsData : productsData"
+      :data="
+        Object.keys(productsData).length === 0 ? allProductsData : productsData
+      "
       @pagination-change-page="getProducts"
     ></pagination>
   </div>
@@ -78,7 +97,7 @@ export default {
   computed: {
     filterProducts() {
       if (!this.searchQuery) {
-        this.allProductsData = {}
+        this.allProductsData = {};
         return this.products;
       } else {
         if (this.selectedTypeValue == "") {
@@ -141,6 +160,10 @@ export default {
       });
     },
     //#endregion
+
+    addToCart(product, quantity) {
+      this.$store.commit('addItemToCart', product)
+    }
   },
 
   components: { navbar },
