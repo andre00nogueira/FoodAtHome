@@ -40827,14 +40827,16 @@ var render = function() {
                     "li",
                     { staticClass: "nav-item" },
                     [
-                      _c(
-                        "router-link",
-                        {
-                          staticClass: "btn btn-primary",
-                          attrs: { to: "/cart" }
-                        },
-                        [_vm._v("Cart")]
-                      ),
+                      _vm.$store.state.user.type == "C"
+                        ? _c(
+                            "router-link",
+                            {
+                              staticClass: "btn btn-primary",
+                              attrs: { to: "/cart" }
+                            },
+                            [_vm._v("Cart")]
+                          )
+                        : _vm._e(),
                       _vm._v(" "),
                       _c(
                         "a",
@@ -41207,7 +41209,11 @@ var render = function() {
                         staticStyle: { "text-align": "right" },
                         attrs: { colspan: "12" }
                       },
-                      [_vm._v("Total: " + _vm._s(_vm.totalPrice.toFixed(2)))]
+                      [
+                        _vm._v(
+                          "Total: " + _vm._s(_vm.totalPrice.toFixed(2)) + "€"
+                        )
+                      ]
                     )
                   ])
                 ]

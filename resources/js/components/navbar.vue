@@ -12,8 +12,8 @@
         </template>
         <template v-else>
         <li class="nav-item">
-          <router-link to="/cart" class="btn btn-primary">Cart</router-link>
-          <a  href="#" @click.prevent="logout" class="btn btn-secondary">Logout</a>
+          <router-link v-if="$store.state.user.type == 'C'" to="/cart" class="btn btn-primary">Cart</router-link>
+          <a href="#" @click.prevent="logout" class="btn btn-secondary">Logout</a>
         </li>
         </template>
       </ul>

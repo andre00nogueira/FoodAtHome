@@ -65,7 +65,7 @@
             </tr>
           </tbody>
           <tr>
-            <td style="text-align:right" colspan="12">Total: {{ totalPrice.toFixed(2) }}</td>
+            <td style="text-align:right" colspan="12">Total: {{ totalPrice.toFixed(2) }}€</td>
           </tr>
         </table>
       </div>
