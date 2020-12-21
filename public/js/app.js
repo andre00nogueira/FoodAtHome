@@ -2567,7 +2567,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     addOneUnitToItem: function addOneUnitToItem(index) {
       var item = this.cart[index];
-      item.quantity = item.quantity + 1;
+      item.quantity++;
       item.subtotal = item.quantity * item.price;
       this.$store.commit('addOneUnitToItem', index);
     }
@@ -41054,7 +41054,9 @@ var render = function() {
                         _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(item.price) + "€")]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(item.subtotal) + "€")]),
+                        _c("td", [
+                          _vm._v(_vm._s(item.subtotal.toFixed(2)) + "€")
+                        ]),
                         _vm._v(" "),
                         _c("td", [
                           _c("div", { staticStyle: { display: "flex" } }, [

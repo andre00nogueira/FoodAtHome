@@ -28,7 +28,7 @@
               </td>
               <td>{{ item.name }}</td>
               <td>{{ item.price }}€</td>
-              <td>{{ item.subtotal }}€</td>
+              <td>{{ item.subtotal.toFixed(2) }}€</td>
               <td>
                 <div style="display: flex">
                   <input
@@ -96,7 +96,7 @@ export default {
     },
     addOneUnitToItem(index){
       let item = this.cart[index]
-      item.quantity = item.quantity + 1
+      item.quantity++
       item.subtotal = item.quantity * item.price
       this.$store.commit('addOneUnitToItem', index)
     }
