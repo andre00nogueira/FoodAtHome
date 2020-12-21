@@ -25,12 +25,19 @@ export default new Vuex.Store({
             localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart))
         },
         removeItemFromCart(state, itemId){
-            state.cart = state.cart.splice(itemId)
+            state.cart.splice(itemId, 1)
             localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart))
         },
         addOneUnitToItem(state, itemId){
             let item = state.cart[itemId]
             state.cart[itemId].quantity = item.quantity++
+            state.cart[itemId].subtotal = item.quantity * item.price
+
+            localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart))
+        },
+        removeOneUnitToItem(state, itemId){
+            let item = state.cart[itemId]
+            state.cart[itemId].quantity = item.quantity--
             state.cart[itemId].subtotal = item.quantity * item.price
 
             localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart))

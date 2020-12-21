@@ -2562,7 +2562,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.cart = this.$store.state.cart;
     },
     clearCartItem: function clearCartItem(index) {
-      this.cart.splice(index, 1);
       this.$store.commit('removeItemFromCart', index);
     },
     addOneUnitToItem: function addOneUnitToItem(index) {
@@ -2570,6 +2569,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       item.quantity++;
       item.subtotal = item.quantity * item.price;
       this.$store.commit('addOneUnitToItem', index);
+    },
+    removeOneUnitFromItem: function removeOneUnitFromItem(index) {
+      var item = this.cart[index];
+
+      if (item.quantity == 1) {
+        return;
+      }
+
+      item.quantity--;
+      item.subtotal = item.quantity * item.price;
+      this.$store.commit('removeOneUnitToItem', index);
     }
   },
   mounted: function mounted() {
@@ -41077,7 +41087,7 @@ var render = function() {
                                 staticStyle: { "margin-left": "2%" },
                                 on: {
                                   click: function($event) {
-                                    return _vm.removeOneUnitFromItem(item.id)
+                                    return _vm.removeOneUnitFromItem(index)
                                   }
                                 }
                               },
@@ -58277,12 +58287,18 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
       localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart));
     },
     removeItemFromCart: function removeItemFromCart(state, itemId) {
-      state.cart = state.cart.splice(itemId);
+      state.cart.splice(itemId, 1);
       localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart));
     },
     addOneUnitToItem: function addOneUnitToItem(state, itemId) {
       var item = state.cart[itemId];
       state.cart[itemId].quantity = item.quantity++;
+      state.cart[itemId].subtotal = item.quantity * item.price;
+      localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart));
+    },
+    removeOneUnitToItem: function removeOneUnitToItem(state, itemId) {
+      var item = state.cart[itemId];
+      state.cart[itemId].quantity = item.quantity--;
       state.cart[itemId].subtotal = item.quantity * item.price;
       localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart));
     },

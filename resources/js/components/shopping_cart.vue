@@ -42,7 +42,7 @@
                   <button
                     class="btn btn-secondary"
                     style="margin-left: 2%"
-                    @click="removeOneUnitFromItem(item.id)"
+                    @click="removeOneUnitFromItem(index)"
                   >
                     ➖
                   </button>
@@ -91,7 +91,6 @@ export default {
       this.cart = this.$store.state.cart;
     },
     clearCartItem(index){
-      this.cart.splice(index, 1);
       this.$store.commit('removeItemFromCart', index);
     },
     addOneUnitToItem(index){
@@ -99,6 +98,15 @@ export default {
       item.quantity++
       item.subtotal = item.quantity * item.price
       this.$store.commit('addOneUnitToItem', index)
+    },
+    removeOneUnitFromItem(index){
+      let item = this.cart[index]
+      if (item.quantity == 1){
+        return
+      }
+      item.quantity--
+      item.subtotal = item.quantity * item.price
+      this.$store.commit('removeOneUnitToItem', index)
     }
   },
   mounted() {
