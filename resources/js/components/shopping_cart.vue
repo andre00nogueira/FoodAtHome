@@ -15,7 +15,7 @@
               <th>Unit Price</th>
               <th>Sub Total</th>
               <th>Quantity</th>
-              <th>Total</th>
+             
             </tr>
           </thead>
           <tbody>
@@ -62,9 +62,11 @@
                   </button>
                 </div>
               </td>
-              <td></td>
             </tr>
           </tbody>
+          <tr>
+            <td style="text-align:right" colspan="12">Total: {{ totalPrice.toFixed(2) }}</td>
+          </tr>
         </table>
       </div>
     </template>
@@ -112,9 +114,23 @@ export default {
   mounted() {
     this.getCart();
   },
+  computed: {
+    totalPrice() {
+      let sum = 0
+      this.cart.forEach(product => {
+        sum += product.subtotal
+      });
+      return sum
+    }
+  },
   components: { navbar },
 };
 </script>
 
 <style>
+  tfoot {
+    display: table-footer-group;
+    vertical-align: middle;
+    border-color: inherit;
+  }
 </style>
