@@ -10,6 +10,7 @@ import ProductsComponent from './components/products.vue'
 import CustomerComponent from './components/customer/create_customer.vue'
 import EditUserComponent from './components/user/edit_user.vue'
 import EditCustomerComponent from './components/customer/edit_customer.vue'
+import ProfileComponent from './components/profile.vue'
 
 
 Vue.component('app', AppComponent)
@@ -21,7 +22,8 @@ const routes = [
     { path: '/products', component: ProductsComponent },
     { path: '/customers/create', component: CustomerComponent },
     { path: '/users/edit/:id', component: EditUserComponent },
-    { path: '/customers/edit/:id', component: EditCustomerComponent }
+    { path: '/customers/edit/:id', component: EditCustomerComponent },
+    { path: '/users/:id', component: ProfileComponent }
 ]
 
 const router = new VueRouter({

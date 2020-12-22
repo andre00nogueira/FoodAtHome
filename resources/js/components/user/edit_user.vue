@@ -15,7 +15,6 @@
             </div>    
             <div class="form-group">
                     <button class="btn btn-primary" type="submit">Save</button>
-                    <!--<button class="btn btn-secondary">Cancel</button> -->
                     <a class="btn btn-danger" href="#/index">Cancel</a>
             </div>
         </form>
