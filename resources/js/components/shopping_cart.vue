@@ -6,69 +6,9 @@
 
     <template v-if="cart">
       <div v-if="cart.length>0" style="display: block">
-        <a @click="clearCart" class="btn btn-primary">Clear All</a>
-        <table  id="tableProducts" class="table table-striped">
-          <thead>
-            <tr>
-              <th />
-              <th>Name</th>
-              <th>Unit Price</th>
-              <th>Sub Total</th>
-              <th>Quantity</th>
-             
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item,index) of cart" :key="item.id">
-              <td>
-                <img
-                  id="productPhoto"
-                  :src="'storage/products/' + item.photo_url"
-                />
-              </td>
-              <td>{{ item.name }}</td>
-              <td>{{ item.price }}€</td>
-              <td>{{ item.subtotal.toFixed(2) }}€</td>
-              <td>
-                <div style="display: flex">
-                  <input
-                    class="form-control"
-                    style="width: 15%; text-align: right"
-                    :value="item.quantity"
-                    min="1"
-                    max="10"
-                    readonly
-                  />
-                  <button
-                    class="btn btn-secondary"
-                    style="margin-left: 2%"
-                    @click="removeOneUnitFromItem(index)"
-                  >
-                    ➖
-                  </button>
-                  <button
-                    class="btn btn-primary"
-                    style="margin-left: 2%"
-                    @click="addOneUnitToItem(index)"
-                  >
-                    ➕
-                  </button>
-                  <button
-                    class="btn btn-danger"
-                    style="margin-left: 2%"
-                    @click="clearCartItem(index)"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-          <tr>
-            <td style="text-align:right" colspan="12">Total: {{ totalPrice.toFixed(2) }}€</td>
-          </tr>
-        </table>
-        <div v-if="checkoutAvailable" class="text-right">
+        <cart :myCart="cart" :isCheckout="false"/>
+        <div v-if="checkoutAvailable" class="text-right"> 
+          <a @click="clearCart" class="btn btn-danger">Clear All</a>
           <router-link to="/cart/checkout" class="btn btn-primary">Checkout</router-link>
         </div>
       </div>
@@ -79,6 +19,8 @@
 
 <script>
 import navbar from "./navbar.vue";
+import cart from "./cart.vue";
+
 
 export default {
   data() {
@@ -95,42 +37,17 @@ export default {
     clearCart() {
       this.$store.commit("clearCart");
       this.cart = this.$store.state.cart;
-    },
-    clearCartItem(index){
-      this.$store.commit('removeItemFromCart', index);
-    },
-    addOneUnitToItem(index){
-      let item = this.cart[index]
-      item.quantity++
-      item.subtotal = item.quantity * item.price
-      this.$store.commit('addOneUnitToItem', index)
-    },
-    removeOneUnitFromItem(index){
-      let item = this.cart[index]
-      if (item.quantity == 1){
-        return
-      }
-      item.quantity--
-      item.subtotal = item.quantity * item.price
-      this.$store.commit('removeOneUnitToItem', index)
     }
   },
   mounted() {
     this.getCart();
   },
   computed: {
-    totalPrice() {
-      let sum = 0
-      this.cart.forEach(product => {
-        sum += product.subtotal
-      });
-      return sum
-    },
     checkoutAvailable(){
       return typeof this.cart !== 'undefined' && this.cart.length > 0
     }
   },
-  components: { navbar },
+  components: { navbar, cart },
 };
 </script>
 

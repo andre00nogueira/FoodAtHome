@@ -6,35 +6,7 @@
 
     <template v-if="cart">
       <div style="display: block">
-        <table id="tableProducts" class="table table-striped">
-          <thead>
-            <tr>
-              <th />
-              <th>Name</th>
-              <th>Unit Price</th>
-              <th>Sub Total</th>
-              <th>Quantity</th>
-             
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item of cart" :key="item.id">
-              <td>
-                <img
-                  id="productPhoto"
-                  :src="'storage/products/' + item.photo_url"
-                />
-              </td>
-              <td>{{ item.name }}</td>
-              <td>{{ item.price }}€</td>
-              <td>{{ item.subtotal.toFixed(2) }}€</td>
-              <td>{{ item.quantity }}</td>
-            </tr>
-          </tbody>
-          <tr>
-            <td style="text-align:right" class="font-weight-bold" colspan="12">Total: {{ totalPrice.toFixed(2) }}€</td>
-          </tr>
-        </table>
+        <cart :myCart="cart" :isCheckout="true"/>
         <div class="form-group">
             <label for="notes">Notes</label>
             <textarea
@@ -55,6 +27,7 @@
 
 <script>
 import navbar from "./navbar.vue";
+import cart from "./cart.vue";
 
 export default {
     data() {
@@ -96,7 +69,7 @@ export default {
             return sum
         }
     },
-    components: { navbar }
+    components: { navbar, cart}
 }
 </script>
 
