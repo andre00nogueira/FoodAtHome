@@ -14,10 +14,4 @@ class Customer extends Model
         'phone',
         'nif'
     ];
-
-
-    public function user()
-    {
-        return $this->morphOne('App\User', 'userable','type','id');
-    }
 }

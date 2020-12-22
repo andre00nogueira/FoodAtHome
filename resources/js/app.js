@@ -14,6 +14,7 @@ import ProductsComponent from './components/products.vue'
 import CustomerComponent from './components/create_customer.vue'
 import LoginComponent from'./components/login.vue'
 import ShoppingCartComponent from'./components/shopping_cart.vue'
+import CartCheckoutComponent from'./components/cart_checkout.vue'
 
 
 Vue.component('pagination', require('laravel-vue-pagination'));
@@ -27,7 +28,8 @@ const routes = [
     { path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
-    { path: '/cart', component: ShoppingCartComponent }
+    { path: '/cart', component: ShoppingCartComponent },
+    { path: '/cart/checkout', component: CartCheckoutComponent}
 ]
 
 const router = new VueRouter({

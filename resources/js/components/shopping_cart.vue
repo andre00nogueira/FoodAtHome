@@ -5,9 +5,9 @@
     <h2>My Cart</h2>
 
     <template v-if="cart">
-      <div style="display: block">
+      <div v-if="cart.length>0" style="display: block">
         <a @click="clearCart" class="btn btn-primary">Clear All</a>
-        <table id="tableProducts" class="table table-striped">
+        <table  id="tableProducts" class="table table-striped">
           <thead>
             <tr>
               <th />
@@ -68,7 +68,11 @@
             <td style="text-align:right" colspan="12">Total: {{ totalPrice.toFixed(2) }}€</td>
           </tr>
         </table>
+        <div v-if="checkoutAvailable" class="text-right">
+          <router-link to="/cart/checkout" class="btn btn-primary">Checkout</router-link>
+        </div>
       </div>
+      <p class="text-center" v-else >Cart is Empty</p>
     </template>
   </div>
 </template>
@@ -121,6 +125,9 @@ export default {
         sum += product.subtotal
       });
       return sum
+    },
+    checkoutAvailable(){
+      return typeof this.cart !== 'undefined' && this.cart.length > 0
     }
   },
   components: { navbar },

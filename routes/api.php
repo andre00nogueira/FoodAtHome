@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,9 @@ Route::post('customers',[CustomerController::class, 'store']);
 Route::post('login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
+
+//cart
+Route::post('cart/checkout', [CartController::class,'checkout']);
 
 //current user
 Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']);

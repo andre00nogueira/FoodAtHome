@@ -24,8 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Relation::morphMap([
-            'C' => 'App\Customer'
-        ]);
+        //
     }
 }
