@@ -24,7 +24,6 @@ Vue.component('app', CustomerComponent)
 const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
-    { path: '/products', component: ProductsComponent },
     { path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
