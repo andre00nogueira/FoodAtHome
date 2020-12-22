@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,7 +40,14 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
 
+//cart
+Route::post('cart/checkout', [CartController::class,'checkout']);
+
 //current user
 Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']);
+
+
+// Cook -> get Order
+Route::get('orders/{id}', [OrderController::class,'show']);
 
 
