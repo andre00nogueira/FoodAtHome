@@ -1949,6 +1949,7 @@ __webpack_require__.r(__webpack_exports__);
       this.$store.dispatch('loadUserLogged').then(function () {
         if (_this.$store.state.user) {
           console.log('User currently logged:');
+          console.log(_this.$store.state.user);
         } else {
           console.log('No user is currently logged');
         }
@@ -2202,6 +2203,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
 //
 //
 //
@@ -40835,6 +40837,17 @@ var render = function() {
                               attrs: { to: "/cart" }
                             },
                             [_vm._v("Cart")]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.$store.state.user.type == "EC"
+                        ? _c(
+                            "router-link",
+                            {
+                              staticClass: "btn btn-primary",
+                              attrs: { to: "/cook_dashboard" }
+                            },
+                            [_vm._v("Dashboard")]
                           )
                         : _vm._e(),
                       _vm._v(" "),

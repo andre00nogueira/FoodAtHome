@@ -13,6 +13,7 @@
         <template v-else>
         <li class="nav-item">
           <router-link v-if="$store.state.user.type == 'C'" to="/cart" class="btn btn-primary">Cart</router-link>
+          <router-link v-if="$store.state.user.type == 'EC'" to="/cook_dashboard" class="btn btn-primary">Dashboard</router-link>
           <a href="#" @click.prevent="logout" class="btn btn-secondary">Logout</a>
         </li>
         </template>
