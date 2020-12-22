@@ -30,7 +30,13 @@ class UserController extends Controller
     {
         return new UserResource($user);
     }
-
+/*
+    public function show(int $id)
+    {
+        $user = User::findOrFail($id);
+        return new UserResource($user);
+    }
+*/
     public function store(StoreUserRequest $request)
     {
         $user = new User();
@@ -59,6 +65,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $user->update($request->validated());
+        $user->save();
         return new UserResource($user);
     }
     /* SEM UpdateUserRequest */

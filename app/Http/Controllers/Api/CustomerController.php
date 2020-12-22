@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreCustomerRequest;
+use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\User;
 use App\Models\Customer;
 use App\Http\Resources\CustomerResource;
@@ -18,7 +19,11 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        //
+        if ($request->has('page')) {
+            return CustomerResource::collection(Customer::paginate(5));
+        } else {
+            return CustomerResource::collection(Customer::all());
+        }
     }
 
     /**
@@ -60,9 +65,9 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Customer $customer)
     {
-        //
+        return new CustomerResource($customer);
     }
 
     /**
@@ -83,9 +88,11 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        //
+        $customer->update($request->validated());
+        $customer->save();
+        return new CustomerResource($customer);
     }
 
     /**
