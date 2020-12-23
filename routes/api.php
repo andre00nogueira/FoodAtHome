@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\OrderItemsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,6 @@ Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']
 
 
 // Cook -> get Order
-Route::get('orders/{id}', [OrderController::class,'show']);
+Route::get('orders/{id}', [OrderController::class,'get']);
 
 

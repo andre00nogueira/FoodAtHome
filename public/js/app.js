@@ -2322,19 +2322,48 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       order: undefined,
+      orderItems: [],
       isFetching: true
     };
   },
   methods: {
-    getCurrentOrder: function getCurrentOrder(id) {
+    getCurrentOrder: function getCurrentOrder(orderId) {
       var _this = this;
 
-      axios.get("api/orders/".concat(id)).then(function (response) {
+      axios.get("api/orders/".concat(orderId)).then(function (response) {
         _this.order = response.data.data;
         console.log(response.data.data);
         _this.isFetching = false;
@@ -2344,7 +2373,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
-    this.getCurrentOrder(1);
+    this.getCurrentOrder(106780);
   },
   components: {
     navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
@@ -7359,7 +7388,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.content{\n    margin-top: 3%;\n}\n", ""]);
+exports.push([module.i, "\n.content {\r\n  text-align: center;\r\n  margin-top: 3%;\n}\n#tableItems {\r\n  margin-top: 2%;\r\n  margin-bottom: 3%;\n}\n#itemPhoto {\r\n  width: 50px;\r\n  height: 50px;\n}\r\n", ""]);
 
 // exports
 
@@ -41157,12 +41186,18 @@ var render = function() {
       _c("h2", [_vm._v("Cook Dashboard")]),
       _vm._v(" "),
       !_vm.isFetching
-        ? [
+        ? _c("div", { staticClass: "content" }, [
             _c("h3", [_vm._v("Current Order - #" + _vm._s(_vm.order.id))]),
             _vm._v(" "),
-            _c("h6", [_vm._v("Date - " + _vm._s(_vm.order.date))]),
+            _c("br"),
             _vm._v(" "),
-            _c("h6", [_vm._v("Status - " + _vm._s(_vm.order.status))]),
+            _c("h3", [_vm._v("Customer - " + _vm._s(_vm.order.customer_name))]),
+            _vm._v(" "),
+            _c("h4", [_vm._v("Status - " + _vm._s(_vm.order.status))]),
+            _vm._v(" "),
+            _c("h5", [
+              _vm._v("Preparation Started - " + _vm._s(_vm.order.opened_at))
+            ]),
             _vm._v(" "),
             _c("h6", [
               _vm._v("Price - " + _vm._s(_vm.order.total_price) + "€")
@@ -41170,14 +41205,69 @@ var render = function() {
             _vm._v(" "),
             _vm.order.notes
               ? _c("h6", [_vm._v("Notes - " + _vm._s(_vm.order.notes))])
-              : _c("h6", [_vm._v("Notes - No notes")])
-          ]
+              : _c("h6", [_vm._v("Notes - No notes")]),
+            _vm._v(" "),
+            _c("div", { staticClass: "content" }, [
+              _c("h2", [_vm._v("Items")]),
+              _vm._v(" "),
+              _c(
+                "table",
+                {
+                  staticClass: "table table-striped",
+                  attrs: { id: "tableItems" }
+                },
+                [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c(
+                    "tbody",
+                    _vm._l(_vm.order.orderItems, function(item) {
+                      return _c("tr", { key: item.id }, [
+                        _c("td", [
+                          _c("img", {
+                            attrs: {
+                              id: "itemPhoto",
+                              src: "storage/products/" + item.photo_url
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(item.name))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(item.quantity))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(item.sub_total_price) + "€")])
+                      ])
+                    }),
+                    0
+                  )
+                ]
+              )
+            ])
+          ])
         : _vm._e()
     ],
-    2
+    1
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th"),
+        _vm._v(" "),
+        _c("th", [_vm._v("Name")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Quantity")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Sub Total")])
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
