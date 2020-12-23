@@ -51,6 +51,7 @@ export default {
                 }).then(result=>{
                     this.$store.commit("clearCart");
                     this.cart = this.$store.state.cart;
+                    this.$router.push(`/customer/${this.$store.state.user.id}/dashboard`)
                 }).catch(error=>{
                     console.log(error)
                 })

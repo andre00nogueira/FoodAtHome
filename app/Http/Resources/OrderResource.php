@@ -20,7 +20,12 @@ class OrderResource extends JsonResource
             'customer_id' => $this->customer_id,
             'notes' => $this->notes,
             'total_price' => $this->total_price,
-            'date' => $this->date
+            'date' => $this->date,
+            'preparation_time' => $this->preparation_time,
+            'prepared_by' => $this->prepared_by,
+            'delivery_time' => $this->delivery_time,
+            'delivered_by' => $this->delivered_by,
+            'total_time' => $this->total_time
         ];
     }
 }

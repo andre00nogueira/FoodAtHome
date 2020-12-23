@@ -1,6 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <router-link class="navbar-brand" to="/">Food@Home</router-link>
+    <router-link v-if="$store.state.user" class="navbar-brand" :to="`/customer/${$store.state.user.id}/dashboard`">Dashboard</router-link>
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <template v-if="!$store.state.user">

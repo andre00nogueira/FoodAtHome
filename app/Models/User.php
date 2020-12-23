@@ -42,8 +42,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function department()
+    public function orders()
     {
-        return $this->belongsTo(Department::class);
+        return $this->hasMany('App\Order');
     }
 }

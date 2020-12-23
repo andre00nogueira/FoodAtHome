@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,8 @@ Route::get('products/types/{type_name}', [ProductController::class, 'productByTy
 //customers
 Route::post('customers',[CustomerController::class, 'store']);
 
+
+
 //login/logout
 Route::post('login', [AuthController::class, 'login']);
 
@@ -42,7 +45,16 @@ Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logou
 //cart
 Route::post('cart/checkout', [CartController::class,'checkout']);
 
+
+//user
+Route::get('users/{user}', [UserController::class, 'show']);
 //current user
 Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']);
+
+//orders
+Route::get('users/orders/{userID}', [UserController::class, 'orders']);
+Route::get('users/orders/{userID}/closed', [UserController::class, 'ordersClosed']);
+Route::get('orders/{id}', [OrderController::class, 'show']);
+
 
 

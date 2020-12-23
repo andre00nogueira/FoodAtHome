@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\User as UserResource;
+use App\Http\Resources\OrderResource as OrderResource; 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use App\Models\Order;
+
 
 class UserController extends Controller
 {
@@ -103,4 +106,19 @@ class UserController extends Controller
         }
         return response()->json($totalEmail == 0);
     }
+
+    public function orders(Request $request)
+    {
+        $orders = Order::where('customer_id',$request->userID)->whereNotIn('status', ["D","C"])->orderBy('date', 'desc')->paginate(10);
+        //$orders = Order::find(1);
+        return OrderResource::collection($orders);
+        //return response()->json($orders,200);
+    }
+    public function ordersClosed(Request $request)
+    {
+        $orders = Order::where('customer_id',$request->userID)->whereIn('status', ["D","C"])->orderBy('date', 'desc')->paginate(10);
+        //$orders = Order::find(1);
+        return OrderResource::collection($orders);
+        //return response()->json($orders,200);
+    } 
 }
