@@ -2662,6 +2662,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2680,15 +2681,22 @@ __webpack_require__.r(__webpack_exports__);
 
       if (_this.order.prepared_by) {
         axios.get("api/users/".concat(_this.order.prepared_by)).then(function (response) {
-          _this.cooker = "".concat(response.data.data.name, " Email:").concat(response.data.data.email);
+          _this.cooker = "".concat(response.data.data.name, " (").concat(response.data.data.email, ")");
         });
       }
 
       if (_this.order.delivered_by) {
         axios.get("api/users/".concat(_this.order.delivered_by)).then(function (response) {
-          _this.deliver = "".concat(response.data.data.name, " Email:").concat(response.data.data.email);
+          _this.deliver = "".concat(response.data.data.name, " (").concat(response.data.data.email, ")");
         });
       }
+
+      axios.get("api/orders/".concat(_this.$route.params.id, "/items")).then(function (response) {
+        _this.orderItens = response.data.data;
+
+        _this.orderItens.forEach(function (item) {});
+      });
+      console.log("teste1");
     });
   },
   methods: {
@@ -2731,10 +2739,6 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       return hours + ':' + minutes + ':' + seconds;
-    },
-    getUser: function getUser(id) {
-      console.log("teste1");
-      console.log("teste2");
     }
   },
   components: {
@@ -42105,7 +42109,9 @@ var render = function() {
             )
           )
         ]
-      )
+      ),
+      _vm._v(" "),
+      _c("h1", [_vm._v("Itens List")])
     ],
     1
   )

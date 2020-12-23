@@ -28,6 +28,7 @@
         <br>
         <label for="total_time" class="lead font-weight-bold">Total time: </label>
         <span id="total_time" class="lead font-weight">{{order.total_time ? getTime(order.total_time) : "-"}}</span>
+        <h1>Itens List</h1>
   </div>
 </template>
 
@@ -47,14 +48,21 @@ export default {
             this.order=response.data.data
             if(this.order.prepared_by){
                 axios.get(`api/users/${this.order.prepared_by}`).then((response)=>{
-                    this.cooker=`${response.data.data.name} Email:${response.data.data.email}`
+                    this.cooker=`${response.data.data.name} (${response.data.data.email})`
                 })
             }
             if(this.order.delivered_by){
                 axios.get(`api/users/${this.order.delivered_by}`).then((response)=>{
-                    this.deliver=`${response.data.data.name} Email:${response.data.data.email}`
+                    this.deliver=`${response.data.data.name} (${response.data.data.email})`
                 })
             }
+            axios.get(`api/orders/${this.$route.params.id}/items`).then((response)=>{
+                this.orderItens=response.data.data
+                this.orderItens.forEach(item=>{
+                    
+                })
+            })
+            console.log("teste1")
         })
     },
     methods:{
@@ -82,11 +90,6 @@ export default {
             if (minutes < 10) {minutes = "0"+minutes;}
             if (seconds < 10) {seconds = "0"+seconds;}
             return hours+':'+minutes+':'+seconds;
-        },
-        getUser(id){
-            console.log("teste1")
-            
-            console.log("teste2")
         }
     },
     components: { navbar}

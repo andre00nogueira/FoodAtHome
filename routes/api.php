@@ -55,6 +55,7 @@ Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']
 Route::get('users/orders/{userID}', [UserController::class, 'orders']);
 Route::get('users/orders/{userID}/closed', [UserController::class, 'ordersClosed']);
 Route::get('orders/{id}', [OrderController::class, 'show']);
+Route::get('orders/{id}/items', [OrderController::class, 'items']);
 
 
 

@@ -13,13 +13,9 @@ class Order extends Model
         'notes'
     ];
 
-    public function orderItens()
+    public function orderItems()
     {
         return $this->hasMany('App\OrderItem');
     }
     
-    public function user()
-    {
-        return $this->belongsTo('App\User');
-    }
 }
