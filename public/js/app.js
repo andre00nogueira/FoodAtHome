@@ -2270,6 +2270,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
           _this2.cart = _this2.$store.state.cart;
 
+          _this2.$socket.emit('order_checkout_request', result.data);
+
+          _this2.$toasted.show('Order created successfully!', {
+            type: 'info'
+          });
+
           _this2.$router.push("/customer/".concat(_this2.$store.state.user.id, "/dashboard"));
         })["catch"](function (error) {
           console.log(error);
@@ -2307,7 +2313,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _navbar_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./navbar.vue */ "./resources/js/components/navbar.vue");
-/* harmony import */ var _items_table_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./items_table.vue */ "./resources/js/components/items_table.vue");
+/* harmony import */ var _items_table_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./items_table.vue */ "./resources/js/components/items_table.vue");
 //
 //
 //
@@ -2382,13 +2388,14 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   sockets: {
-    order_id_message: function order_id_message(payload) {
-      this.getCurrentOrder(payload.orderId);
+    order_id_message: function order_id_message(orderID) {
+      console.log("receiving");
+      this.getCurrentOrder(orderID);
     }
   },
   components: {
     navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    itemsTable: _items_table_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+    itemsTable: _items_table_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   }
 });
 
@@ -41548,7 +41555,7 @@ var render = function() {
               [
                 _c("h2", [_vm._v("Items")]),
                 _vm._v(" "),
-                _c("itens-table", { attrs: { items: _vm.order.orderItems } })
+                _c("itemsTable", { attrs: { items: _vm.order.orderItems } })
               ],
               1
             )
@@ -60662,10 +60669,25 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
   },
   mutations: {
     clearUser: function clearUser(state) {
+      if (state.user) {
+        this._vm.$socket.emit('user_logged_out', state.user);
+      }
+
       state.user = null;
     },
     setUser: function setUser(state, user) {
-      state.user = user;
+      if (state.user !== user) {
+        if (state.user) {
+          this._vm.$socket.emit('user_logged_out', state.user);
+        }
+
+        state.user = user;
+
+        if (state.user) {
+          this._vm.$socket.emit('user_logged', state.user);
+        }
+      }
+
       state.cart = JSON.parse(localStorage.getItem('cart' + state.user.id));
     },
     clearCart: function clearCart(state) {

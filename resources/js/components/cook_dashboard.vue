@@ -15,7 +15,7 @@
 
       <div class="content">
         <h2>Items</h2>
-        <itens-table :items="order.orderItems"/>
+        <itemsTable :items="order.orderItems"/>
       </div>
     </div>
   </div>
@@ -68,8 +68,9 @@ export default {
     },
   },
   sockets: {
-    order_id_message(payload){
-      this.getCurrentOrder(payload.orderId)
+    order_id_message(orderID){
+      console.log("receiving")
+      this.getCurrentOrder(orderID)
     }
   },
   components: { navbar ,itemsTable},
