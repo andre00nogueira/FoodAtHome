@@ -5,7 +5,7 @@
     <h2>Cook Dashboard</h2>
     <div class="content" v-if="!isFetching">
       <h3>Current Order - #{{ order.id }}</h3>
-      <br>
+      <br />
       <h3>Customer - {{ order.customer_name }}</h3>
       <h4>Status - {{ order.status }}</h4>
       <h5>Preparation Started - {{ order.opened_at }}</h5>
@@ -61,6 +61,26 @@ export default {
         .then((response) => {
           this.order = response.data.data;
           console.log(response.data.data);
+          switch (this.order.status) {
+            case "H":
+              this.order.status = "Holding";
+              break;
+            case "P":
+                this.order.status = "Preparing";
+                break;
+            case "R":
+                this.order.status = "Ready";
+                break;
+            case "T":
+                this.order.status = "In Transit";
+                break;
+            case "D":
+                this.order.status = "Delivered";
+                break;
+            default:
+                this.order.status = "Cancelled";
+                break;
+          }
           this.isFetching = false;
         })
         .catch((error) => {
@@ -69,7 +89,7 @@ export default {
     },
   },
   mounted() {
-    this.getCurrentOrder(106780);
+    this.getCurrentOrder(3);
   },
   components: { navbar },
 };

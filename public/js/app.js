@@ -2366,6 +2366,33 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("api/orders/".concat(orderId)).then(function (response) {
         _this.order = response.data.data;
         console.log(response.data.data);
+
+        switch (_this.order.status) {
+          case "H":
+            _this.order.status = "Holding";
+            break;
+
+          case "P":
+            _this.order.status = "Preparing";
+            break;
+
+          case "R":
+            _this.order.status = "Ready";
+            break;
+
+          case "T":
+            _this.order.status = "In Transit";
+            break;
+
+          case "D":
+            _this.order.status = "Delivered";
+            break;
+
+          default:
+            _this.order.status = "Cancelled";
+            break;
+        }
+
         _this.isFetching = false;
       })["catch"](function (error) {
         console.log(error);
@@ -2373,7 +2400,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
-    this.getCurrentOrder(106780);
+    this.getCurrentOrder(3);
   },
   components: {
     navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
