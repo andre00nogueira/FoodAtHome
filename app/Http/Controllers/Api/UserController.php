@@ -11,6 +11,10 @@ use App\Models\User;
 
 class UserController extends Controller
 {
+    public function me(Request $request){
+        return $request->user();
+    }
+
     public function index(Request $request)
     {
         if ($request->has('page')) {

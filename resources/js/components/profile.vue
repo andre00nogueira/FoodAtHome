@@ -2,8 +2,8 @@
     <div class="jumbotron">
     <h2>User Details</h2>
         <p style="text-align:center">
-        <!--
-        <img class="img-profile rounded-circle" style="width: 100px; height: 100px;" src="{{asset('storage/fotos/'.Auth::user()->foto)}}">
+        
+          <!--  <img class="img-profile rounded-circle" style="width: 100px; height: 100px;" :src="'storage/fotos/' + user.photo_url">
         -->
             <div style="text-align:center">
                 <span class="lead font-weight-bold">Name: {{user.name}}</span>
@@ -11,25 +11,45 @@
             <div style="text-align:center">
                 <span class="lead">Email: {{user.email}}</span>
             </div>
-            <div style="text-align:center">
+            <div v-if="user.type == 'C'" style="text-align:center">
                 <span class="lead">Address: {{user.address}}</span>
             </div>
+            <div v-if="user.type == 'C'" style="text-align:center">
+                <span class="lead">NIF: {{user.nif}}</span>
+            </div>
+            <div v-if="user.type == 'C'" style="text-align:center">
+                <span class="lead">Phone: {{user.phone}}</span>
+            </div>
+
+            <router-link :to="`/customers/edit/${this.user.id}`">Edit User</router-link>
     </div>
 </template>
 
 <script>
 export default {
-  data: function () {
-    return {
-      user: undefined
-    }
+    data(){
+        return{
+            customer:{}
+        }
+    },
+computed:{
+    user(){
+            return this.$store.state.user
+          }
   },
-  async created(){
-        const userID = this.$route.params.id
-        this.user = (await axios.get(`/api/users/${userID}`)).data.data
-        console.log(this.user)
-    }
-}
+  created(){
+            if(typeof this.user !== 'undefined' && this.user.type == 'C'){
+                axios.get(`api/customers/${this.user.id}`).then((response)=>{
+                    console.log(response)
+                    customer = response.data.data
+                }).catch((error)=>{
+                    console.log(error)
+                })
+            }
+            
+          }
+   
+  }
 </script>
 
 <style>

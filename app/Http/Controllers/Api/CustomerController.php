@@ -49,12 +49,22 @@ class CustomerController extends Controller
         $user->name =$request->name;
         $user->email=$request->email;
         $user->password= bcrypt($request->password);
+        if($request->has('photo_url')){
+            /*
+            $upload_path = public_path('foto');
+            $file_name = $request->photo_url->getClientOriginalName();
+            $generated_new_name = time() . '.' . $request->photo_url->getClientOriginalExtension();
+            $request->file->move($upload_path, $generated_new_name);
+            $user->photo_url=$file_name;*/
+        }
         $user->save();
         $customer = new Customer();
         $customer->id = $user->id;
         $customer->address = $request->address;
         $customer->phone = $request->phone;
-        $customer->nif = $request->nif;
+        if($request->has('nif')){
+            $customer->nif = $request->nif;
+        }
         $customer->save();
         return response()->json(new CustomerResource($customer,$user),201);
     }
@@ -65,11 +75,28 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    
     public function show(Customer $customer)
     {
         return new CustomerResource($customer);
     }
 
+/*
+
+    public function show(Request $customerID)
+    {
+        $user = User::findOrFail($customerID);
+        $customer = Customer::findOrFail($customerID);
+        $aux->id = $user->id;
+        $aux->name = $user->name;
+        $aux->email = $user->email;
+        $aux->nif = $customer->nif;
+        $aux->address = $customer->address;
+        $aux->phone = $customer->phone;
+        $aux->photo_url = $user->photo_url;
+        return new CustomerResource($customer);
+    }
+    */
     /**
      * Show the form for editing the specified resource.
      *
