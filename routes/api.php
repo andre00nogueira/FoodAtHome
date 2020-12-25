@@ -46,14 +46,17 @@ Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logou
 Route::post('cart/checkout', [CartController::class,'checkout']);
 
 
-//user
-Route::get('users/{user}', [UserController::class, 'show']);
 //current user
 Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']);
+
 
 //orders
 Route::get('users/orders/{userID}', [UserController::class, 'orders']);
 Route::get('users/orders/{userID}/closed', [UserController::class, 'ordersClosed']);
+//user
+Route::get('users/{user}', [UserController::class, 'show']);
+
+
 Route::get('orders/{id}', [OrderController::class, 'show']);
 Route::get('orders/{id}/items', [OrderController::class, 'items']);
 
