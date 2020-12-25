@@ -14,4 +14,9 @@ class Customer extends Model
         'phone',
         'nif'
     ];
+
+    public function orders()
+    {
+        return $this->hasMany('App\Order');
+    }
 }

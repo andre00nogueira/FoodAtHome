@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\OrderItemsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,9 +57,10 @@ Route::get('users/orders/{userID}/closed', [UserController::class, 'ordersClosed
 //user
 Route::get('users/{user}', [UserController::class, 'show']);
 
-
+// Orders
 Route::get('orders/{id}', [OrderController::class, 'show']);
-Route::get('orders/{id}/items', [OrderController::class, 'items']);
+
+
 
 
 

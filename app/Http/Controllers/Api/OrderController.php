@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\User;
+use App\Models\Product;
 use App\Models\OrderItem;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrderItemResource;
+use stdClass;
 
 class OrderController extends Controller
 {
@@ -50,7 +53,37 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        return new OrderResource(Order::findOrFail($id));
+        $order = Order::findOrFail($id);
+        $user = User::findOrFail($order->customer->id);
+        $orderToSend = new stdClass();
+
+        $orderToSend->id = $order->id;
+        $orderToSend->customer_name = $user->name;
+        $orderToSend->notes = $order->notes;
+        $orderToSend->opened_at = $order->opened_at;
+        $orderToSend->date = $order->date;
+        $orderToSend->status = $order->status;
+        $orderToSend->total_price = $order->total_price;
+        $orderToSend->preparation_time = $order->preparation_time;
+        $orderToSend->prepared_by = $order->prepared_by;
+        $orderToSend->delivery_time = $order->delivery_time;
+        $orderToSend->delivered_by = $order->delivered_by;
+        $orderToSend->total_time = $order->total_time;
+        $orderItems = [];
+        foreach($order->orderItems as $item){
+            $itemToSend = new stdClass();
+
+            $product = Product::find($item->product_id);
+            $itemToSend->name = $product->name;
+            $itemToSend->photo_url = $product->photo_url;
+            $itemToSend->quantity = $item->quantity;
+            $itemToSend->sub_total_price = $item->sub_total_price;
+
+            array_push($orderItems, $itemToSend);
+        }
+        $orderToSend->orderItems = $orderItems;
+
+        return new OrderResource($orderToSend);
     }
 
     /**
@@ -85,11 +118,5 @@ class OrderController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function items($id)
-    {
-        $items=OrderItem::where('order_id',$id)->get();
-        return OrderItemResource::collection($items);
     }
 }

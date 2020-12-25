@@ -29,11 +29,13 @@
         <label for="total_time" class="lead font-weight-bold">Total time: </label>
         <span id="total_time" class="lead font-weight">{{order.total_time ? getTime(order.total_time) : "-"}}</span>
         <h1>Itens List</h1>
+        <itemsTable :items="order.orderItems"/>
   </div>
 </template>
 
 <script>
 import navbar from "./navbar.vue";
+import itemsTable from "./items_table.vue";
 export default {
     data(){
         return{
@@ -46,6 +48,7 @@ export default {
     created(){
         axios.get(`api/orders/${this.$route.params.id}`).then((response)=>{
             this.order=response.data.data
+            console.log(this.order)
             if(this.order.prepared_by){
                 axios.get(`api/users/${this.order.prepared_by}`).then((response)=>{
                     this.cooker=`${response.data.data.name} (${response.data.data.email})`
@@ -56,13 +59,6 @@ export default {
                     this.deliver=`${response.data.data.name} (${response.data.data.email})`
                 })
             }
-            axios.get(`api/orders/${this.$route.params.id}/items`).then((response)=>{
-                this.orderItens=response.data.data
-                this.orderItens.forEach(item=>{
-                    
-                })
-            })
-            console.log("teste1")
         })
     },
     methods:{
@@ -92,7 +88,7 @@ export default {
             return hours+':'+minutes+':'+seconds;
         }
     },
-    components: { navbar}
+    components: { navbar,itemsTable}
 }
 </script>
 
