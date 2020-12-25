@@ -2,9 +2,18 @@ require('./bootstrap')
 
 window.Vue = require('vue')
 
-
+// Router
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
+
+// Websockets
+import VueSocketIO from "vue-socket.io"
+Vue.use(
+    new VueSocketIO({
+            debug: true,
+            connection: "http://127.0.0.1:8080"
+        })
+    )
 
 // VUEX
 import store from './stores/global-store'

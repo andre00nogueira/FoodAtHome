@@ -88,8 +88,10 @@ export default {
         });
     },
   },
-  mounted() {
-    this.getCurrentOrder(3);
+  sockets: {
+    order_id_message(payload){
+      this.getCurrentOrder(payload.orderId)
+  }
   },
   components: { navbar },
 };
