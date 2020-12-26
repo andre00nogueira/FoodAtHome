@@ -18,6 +18,10 @@ Vue.use(
 // VUEX
 import store from './stores/global-store'
 
+// Toasted
+import Toasted from 'vue-toasted';
+Vue.use(Toasted)
+
 import AppComponent from './App.vue'
 import ProductsComponent from './components/products.vue'
 import CustomerComponent from './components/create_customer.vue'
@@ -56,5 +60,11 @@ const app = new Vue({
     store,
     mounted() {
         store.dispatch('loadUserLogged')
-    }
+    },
+    sockets: {
+        order_id_message(orderID){
+          console.log("receiving" + orderID)
+          //this.getCurrentOrder(orderID)
+        }
+      },
 })
