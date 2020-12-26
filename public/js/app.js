@@ -2547,51 +2547,50 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      orders: [],
-      ordersData: {},
-      ordersClosed: [],
-      ordersClosedData: {}
+      openOrders: [],
+      openOrdersData: {},
+      closedOrders: [],
+      closedOpenOrdersData: {}
     };
   },
   created: function created() {
     var _this = this;
 
-    console.log("teste");
-    axios.get("api/users/orders/".concat(this.$route.params.id)).then(function (response) {
-      _this.ordersData = response.data;
-      _this.orders = _this.ordersData.data;
+    axios.get("api/customers/orders/".concat(this.$route.params.id, "/open")).then(function (response) {
+      _this.openOrdersData = response.data;
+      _this.openOrders = _this.openOrdersData.data;
     });
-    axios.get("api/users/orders/".concat(this.$route.params.id, "/closed")).then(function (response) {
-      _this.ordersClosedData = response.data;
-      _this.ordersClosed = _this.ordersClosedData.data;
+    axios.get("api/customers/orders/".concat(this.$route.params.id, "/closed")).then(function (response) {
+      _this.closedOpenOrdersData = response.data;
+      _this.closedOrders = _this.closedOpenOrdersData.data;
     });
   },
   methods: {
-    getResultsClosed: function getResultsClosed() {
+    getClosedResults: function getClosedResults() {
       var _this2 = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      var url = "api/users/orders/".concat(this.$route.params.id, "/closed");
+      var url = "api/customers/orders/".concat(this.$route.params.id, "/closed");
 
       if (page != 0) {
         url += "?page=".concat(page);
         axios.get(url).then(function (response) {
-          _this2.ordersClosedData = response.data;
-          _this2.ordersClosed = _this2.ordersClosedData.data;
+          _this2.closedOpenOrdersData = response.data;
+          _this2.closedOrders = _this2.closedOpenOrdersData.data;
         });
       }
     },
-    getResults: function getResults() {
+    getOpenResults: function getOpenResults() {
       var _this3 = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      var url = "api/users/orders/".concat(this.$route.params.id);
+      var url = "api/customers/orders/".concat(this.$route.params.id, "/open");
 
       if (page != 0) {
         url += "?page=".concat(page);
         axios.get(url).then(function (response) {
-          _this3.ordersData = response.data;
-          _this3.orders = _this3.ordersData.data;
+          _this3.openOrdersData = response.data;
+          _this3.openOrders = _this3.openOrdersData.data;
         });
       }
     }
@@ -2847,7 +2846,6 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       order: {},
-      orderItens: [],
       cooker: "",
       deliver: ""
     };
@@ -2857,7 +2855,6 @@ __webpack_require__.r(__webpack_exports__);
 
     axios.get("api/orders/".concat(this.$route.params.id)).then(function (response) {
       _this.order = response.data.data;
-      console.log(_this.order);
 
       if (_this.order.prepared_by) {
         axios.get("api/users/".concat(_this.order.prepared_by)).then(function (response) {
@@ -41965,12 +41962,12 @@ var render = function() {
         [
           _c("h4", [_vm._v("My Ongoing Orders")]),
           _vm._v(" "),
-          _c("orderTable", { attrs: { orders: _vm.orders } }),
+          _c("orderTable", { attrs: { orders: _vm.openOrders } }),
           _vm._v(" "),
-          _vm.orders.length > 0
+          _vm.openOrders.length > 0
             ? _c("pagination", {
-                attrs: { data: _vm.ordersData },
-                on: { "pagination-change-page": _vm.getResults }
+                attrs: { data: _vm.openOrdersData },
+                on: { "pagination-change-page": _vm.getOpenResults }
               })
             : _vm._e()
         ],
@@ -41982,12 +41979,12 @@ var render = function() {
         [
           _c("h4", [_vm._v("My Closed Orders")]),
           _vm._v(" "),
-          _c("orderTable", { attrs: { orders: _vm.ordersClosed } }),
+          _c("orderTable", { attrs: { orders: _vm.closedOrders } }),
           _vm._v(" "),
-          _vm.ordersClosed.length > 0
+          _vm.closedOrders.length > 0
             ? _c("pagination", {
-                attrs: { data: _vm.ordersClosedData },
-                on: { "pagination-change-page": _vm.getResultsClosed }
+                attrs: { data: _vm.closedOpenOrdersData },
+                on: { "pagination-change-page": _vm.getClosedResults }
               })
             : _vm._e()
         ],
@@ -42484,7 +42481,7 @@ var render = function() {
         ]
       ),
       _vm._v(" "),
-      _c("h1", [_vm._v("Itens List")]),
+      _c("h1", [_vm._v("Items List")]),
       _vm._v(" "),
       _c("itemsTable", { attrs: { items: _vm.order.orderItems } })
     ],
