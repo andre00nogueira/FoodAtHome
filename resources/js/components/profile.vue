@@ -1,5 +1,5 @@
 <template>
-    <div class="jumbotron">
+    <div v-if="!isFetching" class="jumbotron">
     <navbar />
     <h2>User Details</h2>
         <p style="text-align:center">
@@ -23,7 +23,8 @@
                 </div>
             </div>
 
-            <router-link :to="`/customers/edit/${this.user.id}`">Edit User</router-link>
+            <router-link :to="`/users/${this.user.id}/edit`">Edit User</router-link>
+            <router-link :to="`/users/${this.user.id}/password`">Change Password</router-link>
     </div>
 </template>
 
@@ -33,19 +34,26 @@ export default {
     data(){
         return{
             customer:{},
-            user:{}
+            user:{},
+            isFetching: true
         }
     },
   created(){
-      this.user = this.$store.state.user
+      const userID = this.$route.params.id;
+        axios.get(`/api/users/${userID}`).then((response) => {
+      this.user = response.data.data;
       console.log(this.user)
             if(typeof this.user !== 'undefined' && this.user.type == 'C'){
                 axios.get(`api/customers/${this.user.id}`).then((response)=>{
                     this.customer = response.data.data
+                    this.isFetching = false;
                 }).catch((error)=>{
                     console.log(error)
                 })
+            }else{
+                this.isFetching = false;
             }
+        })
             
           },
    components: { navbar }

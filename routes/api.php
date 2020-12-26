@@ -58,8 +58,10 @@ Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']
 
 //user
 Route::get('users/{user}', [UserController::class, 'show']);
+Route::post('users/{user}/password',[UserController::class,'changePassword']);
 Route::patch('users/{user}', [UserController::class, 'updateLoggedAt']);
 Route::put('users/{user}',[UserController::class,'update']);
+
 
 // Orders
 Route::get('orders/{id}', [OrderController::class, 'show']);

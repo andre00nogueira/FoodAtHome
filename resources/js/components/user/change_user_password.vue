@@ -4,22 +4,41 @@
     <form v-if="user" @submit.prevent="changePassword">
         <div class="form-group">
             <label for="password">Current Password</label>
-            <input type="password" class="form-control" name="password" id="password" v-model="user.password"/>
-             <span v-show="errors.has('password')" class="is-danger">{{ errors.first('password') }}</span>
+            <input type="password" class="form-control" name="currentPassword" id="currentPassword" v-model="currentPassword"/>
+             <div v-if="errors && errors.currentPassword" class="text-danger">
+          {{ errors.currentPassword[0] }}
         </div>
-        <div class="form-group" :class="{ error: errors.has('newPassword') }">
+        </div>
+        <div class="form-group">
             <label for="password">New Password</label>
-            <input type="password" class="form-control" name="newPassword" id="newPassword" v-model="newPassword"/>
-             <span v-show="errors.has('newPassword')" class="is-danger">{{ errors.first('newPassword') }}</span>
+            <input type="password" class="form-control" name="password" id="password" v-model="password"/>
+           <div v-if="errors && errors.password" class="text-danger">
+          {{ errors.password[0] }}
         </div>
-        <div class="field" :class="{ error: errors.has('confirmPassword') }">
+        </div>
+        <div class="field">
             <label>Confirm Password</label>
-            <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" v-model="confirmPassword" v-validate="'required|confirmed:newPassword'">
-            <span v-show="errors.has('confirmPassword')" class="is-danger">{{ errors.first('confirmPassword') }}</span>
+            <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" v-model="password_confirmation">
+           <div v-if="errors && errors.password_confirmation" class="text-danger">
+          {{ errors.password_confirmation[0] }}
+        </div>
         </div>
         
-        <button type="submit" class="ui button primary" :disabled="!isFormValid">Change password</button>
+        <div class="form-group">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a class="btn btn-danger" href="#/index">Cancel</a>
+        </div>
     </form>
+    <div
+      class="alert"
+      :class="{ 'alert-success': successMessage }"
+      v-if="successMessage"
+    >
+      <button type="button" class="close-btn" @click="closeMessage()">
+        &times;
+      </button>
+      <strong>{{ successMessage }}</strong>
+    </div>
     </div>
 </template>
 <script>
@@ -27,27 +46,27 @@ export default {
     data: function(){
         return{
             user:undefined,
+            currentPassword: '',
             password: '',
-            newPassword: '',
-            confirmPassword: '',
+            password_confirmation: '',
+            successMessage: "",
             errors:{}
         }
     },
-    computed: {
-        isFormValid () {
-        return Object.keys(this.fields).every(key => this.fields[key].valid)
-      },
-    },
+
     methods: {
         changePassword: function(){
-            axios.patch(`api/users/${this.user.id}`, this.user).then(result=>{
-                user.password = this.newPassword = this.confirmPassword
+            axios.post(`api/users/${this.user.id}/password`, {
+                currentPassword: this.currentPassword,
+                password: this.password,
+                password_confirmation: this.password_confirmation
+            }).then(result=>{
+                 this.successMessage = "User Password Changed";
             }).catch(error =>{
                  if (error.response.status === 422) {
                     this.errors = error.response.data.errors || {};
                 }
-                user.password = this.newPassword = this.confirmPassword = ''
-                
+                    this.successMessage = "";
             })
         }
     },

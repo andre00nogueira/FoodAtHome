@@ -25,15 +25,15 @@
         </template>
         <template v-else>
           <li class="nav-item">
-            <img id="userPhoto" :src="`storage/fotos/${user.photo_url}`" />
+            <img id="userPhoto" class="img-profile rounded-circle" style="width: 100px; height: 100px;" :src="`storage/fotos/${user.photo_url}`" />
+             <router-link :to="`/users/${user.id}`" class="btn btn-primary"
+              >{{user.name}}</router-link
+            >
             <router-link
               v-if="$store.state.user.type == 'C'"
               to="/cart"
               class="btn btn-primary"
               >Cart</router-link
-            >
-            <router-link :to="`/users/${user.id}`" class="btn btn-primary"
-              >{{user.name}}</router-link
             >
             <a href="#" @click.prevent="logout" class="btn btn-secondary"
               >Logout</a

@@ -3,9 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+//use App\Rules\MatchOldPassword;
 
-class UpdateUserRequest extends FormRequest
+class PasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,8 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'name' => 'required|regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/',
-            'email' => ['required','email',Rule::unique('users')->ignore($this->user->id)], //unique:users
-            'photo_url' => 'nullable|mimes:jpeg,png'
-        ];
+    return [//'currentPassword' => ['required', 'string','min:3'/*, new MatchOldPassword*/], 
+                'password' => ['required', 'string', 'min:3', 'confirmed']  
+          ];
     }
 }

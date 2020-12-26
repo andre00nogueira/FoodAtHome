@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Resources\User as UserResource;
+use App\Http\Resources\UserResource as UserResource;
 use App\Http\Resources\OrderResource as OrderResource; 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserLoggedAtRequest;
@@ -13,6 +13,9 @@ use App\Models\User;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use phpDocumentor\Reflection\Types\Null_;
+use App\Http\Requests\PasswordRequest;
+use Illuminate\Support\Facades\Hash;
+use App\Rules\MatchOldPassword;
 
 class UserController extends Controller
 {
@@ -126,7 +129,18 @@ class UserController extends Controller
         return response()->json($totalEmail == 0);
     }
 
-    public function changePassword(User $user){
+    public function changePassword($id, Request $request){
+        $user=User::findOrFail($id);
+        $request->validate(['currentPassword' => ['required', 'string','min:3'/*, new MatchOldPassword($user->password)*/], 'password' => ['required', 'string', 'min:3', 'confirmed']]);
+      // $request->validated();   
+
+        if(Hash::make($request->currentPassword)!=$user->password){
+
+        }
+        $user->password= Hash::make($request->password);             
+        $user->save();
         
+        
+        return new UserResource($user);
     }
 }
