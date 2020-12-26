@@ -67,12 +67,6 @@ export default {
         });
     },
   },
-  sockets: {
-    order_id_message(orderID){
-      console.log("receiving")
-      this.getCurrentOrder(orderID)
-    }
-  },
   components: { navbar ,itemsTable},
 };
 </script>
