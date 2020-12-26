@@ -106,19 +106,4 @@ class UserController extends Controller
         }
         return response()->json($totalEmail == 0);
     }
-
-    public function orders(Request $request)
-    {
-        $orders = Order::where('customer_id',$request->userID)->whereNotIn('status', ["D","C"])->orderBy('date', 'desc')->paginate(10);
-        //$orders = Order::find(1);
-        return OrderResource::collection($orders);
-        //return response()->json($orders,200);
-    }
-    public function ordersClosed(Request $request)
-    {
-        $orders = Order::where('customer_id',$request->userID)->whereIn('status', ["D","C"])->orderBy('date', 'desc')->paginate(10);
-        //$orders = Order::find(1);
-        return OrderResource::collection($orders);
-        //return response()->json($orders,200);
-    } 
 }

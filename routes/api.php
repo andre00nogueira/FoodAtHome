@@ -35,6 +35,8 @@ Route::get('products/types/{type_name}', [ProductController::class, 'productByTy
 
 //customers
 Route::post('customers',[CustomerController::class, 'store']);
+Route::get('customers/orders/{customer}/open', [CustomerController::class, 'openOrders']);
+Route::get('customers/orders/{customer}/closed', [CustomerController::class, 'closedOrders']);
 
 
 
@@ -50,10 +52,6 @@ Route::post('cart/checkout', [CartController::class,'checkout']);
 //current user
 Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']);
 
-
-//orders
-Route::get('users/orders/{userID}', [UserController::class, 'orders']);
-Route::get('users/orders/{userID}/closed', [UserController::class, 'ordersClosed']);
 //user
 Route::get('users/{user}', [UserController::class, 'show']);
 
