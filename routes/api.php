@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\OrderItemsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +39,10 @@ Route::get('products/types/{type_name}', [ProductController::class, 'productByTy
 
 //customers
 Route::post('customers',[CustomerController::class, 'store']);
+Route::get('customers/orders/{customer}/open', [CustomerController::class, 'openOrders']);
+Route::get('customers/orders/{customer}/closed', [CustomerController::class, 'closedOrders']);
+
+
 
 //login/logout
 Route::post('login', [AuthController::class, 'login']);
@@ -46,8 +52,19 @@ Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logou
 //cart
 Route::post('cart/checkout', [CartController::class,'checkout']);
 
+
 //current user
 Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']);
 
-Route::get('users/{user}',[UserController::class,'show']);
+//user
+Route::get('users/{user}', [UserController::class, 'show']);
+Route::patch('users/{user}', [UserController::class, 'updateLoggedAt']);
 Route::put('users/{user}',[UserController::class,'update']);
+
+// Orders
+Route::get('orders/{id}', [OrderController::class, 'show']);
+
+
+
+
+

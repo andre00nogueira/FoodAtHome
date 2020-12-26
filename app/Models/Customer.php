@@ -14,4 +14,14 @@ class Customer extends Model
         'phone',
         'nif'
     ];
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'customer_id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(User::class, 'id', 'id');
+    }
 }

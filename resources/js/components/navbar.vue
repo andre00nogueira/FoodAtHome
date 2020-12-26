@@ -1,6 +1,18 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <router-link class="navbar-brand" to="/">Food@Home</router-link>
+    <router-link
+      v-if="$store.state.user && $store.state.user.type == 'C'"
+      class="navbar-brand"
+      :to="`/customer/${$store.state.user.id}/dashboard`"
+      >Dashboard</router-link
+    >
+    <router-link
+      v-if="$store.state.user && $store.state.user.type == 'EC'"
+      class="navbar-brand"
+      :to="`/cook/${$store.state.user.id}/dashboard`"
+      >Dashboard</router-link
+    >
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <template v-if="!$store.state.user">
@@ -45,8 +57,16 @@ export default {
           // This updates the store
           // And sets current user to NULL
           this.$store.commit("clearCart");
+          axios.patch(`/api/users/${this.$store.state.user.id}`, {
+              logged_in: new Boolean(false),
+            })
+            .then((response) => {
+              console.log(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
           this.$store.commit("clearUser");
-
           this.$router.push("/");
         })
         .catch((error) => {

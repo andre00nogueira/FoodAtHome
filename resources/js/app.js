@@ -2,12 +2,25 @@ require('./bootstrap')
 
 window.Vue = require('vue')
 
-
+// Router
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
+// Websockets
+import VueSocketIO from "vue-socket.io"
+Vue.use(
+    new VueSocketIO({
+            debug: true,
+            connection: "http://127.0.0.1:8080"
+        })
+    )
+
 // VUEX
 import store from './stores/global-store'
+
+// Toasted
+import Toasted from 'vue-toasted';
+Vue.use(Toasted)
 
 import AppComponent from './App.vue'
 import ProductsComponent from './components/products.vue'
@@ -19,6 +32,9 @@ import ProfileComponent from './components/profile.vue'
 import LoginComponent from'./components/login.vue'
 import ShoppingCartComponent from'./components/shopping_cart.vue'
 import CartCheckoutComponent from'./components/cart_checkout.vue'
+import CustomerDashboardComponent from'./components/customer_dashboard.vue'
+import OrderDetailsComponent from'./components/order_details.vue'
+import CookDashboardComponent from'./components/cook_dashboard.vue'
 
 
 Vue.component('pagination', require('laravel-vue-pagination'));
@@ -36,7 +52,10 @@ const routes = [
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
     { path: '/cart', component: ShoppingCartComponent },
-    { path: '/cart/checkout', component: CartCheckoutComponent}
+    { path: '/cart/checkout', component: CartCheckoutComponent},
+    { path: '/customer/:id/dashboard', component: CustomerDashboardComponent},
+    { path: '/orders/:id', component: OrderDetailsComponent},
+    { path: '/cook/:id/dashboard', component: CookDashboardComponent }
 ]
 
 const router = new VueRouter({
@@ -49,5 +68,11 @@ const app = new Vue({
     store,
     mounted() {
         store.dispatch('loadUserLogged')
-    }
+    },
+    sockets: {
+        order_id_message(orderID){
+          console.log("receiving" + orderID)
+          //this.getCurrentOrder(orderID)
+        }
+      },
 })

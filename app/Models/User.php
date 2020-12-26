@@ -20,7 +20,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'photo_url'
+        'photo_url',
+        'logged_at'
     ];
 
     /**
@@ -41,14 +42,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-/*
-    public function department()
+
+    public function customer()
     {
-        return $this->belongsTo(Department::class);
+        return $this->hasOne(Customer::class, 'id', 'id');
     }
-*/
-    public function userable()
-    {
-        return $this->morphTo();
-    }
+
 }

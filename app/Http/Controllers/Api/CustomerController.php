@@ -8,7 +8,9 @@ use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\User;
 use App\Models\Customer;
+use App\Models\Order;
 use App\Http\Resources\CustomerResource;
+use App\Http\Resources\OrderResource;
 
 class CustomerController extends Controller
 {
@@ -132,4 +134,14 @@ class CustomerController extends Controller
     {
         //
     }
+
+    public function openOrders(Request $request)
+    {
+        return OrderResource::collection(Customer::findOrFail($request->customer)->orders()->whereNotIn('status', ["D","C"])->orderBy('date', 'desc')->paginate(10));
+    }
+
+    public function closedOrders(Request $request)
+    {
+        return OrderResource::collection(Customer::findOrFail($request->customer)->orders()->whereIn('status', ["D","C"])->orderBy('date', 'desc')->paginate(10));
+    } 
 }

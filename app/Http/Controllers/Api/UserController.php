@@ -5,9 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\User as UserResource;
+use App\Http\Resources\OrderResource as OrderResource; 
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserLoggedAtRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use App\Models\Order;
+use Illuminate\Support\Facades\DB;
+use phpDocumentor\Reflection\Types\Null_;
 
 class UserController extends Controller
 {
@@ -41,6 +46,16 @@ class UserController extends Controller
         return new UserResource($user);
     }
 */
+
+    public function updateLoggedAt($id, Request $request){
+        if ($request->loggedin){
+            User::where('id', '=', $id)->update(['logged_at' => now()]);
+            return;
+        }
+        User::where('id', '=', $id)->update(['logged_at' => null]);
+        return;
+    }
+
     public function store(StoreUserRequest $request)
     {
         $user = new User();

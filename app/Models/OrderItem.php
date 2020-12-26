@@ -13,7 +13,7 @@ class OrderItem extends Model
 
     public function order()
     {
-        return $this->belongsTo('App\Order');
+        return $this->belongsTo(Order::class);
     }
 
     public function product()
