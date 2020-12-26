@@ -76,9 +76,9 @@ class CustomerController extends Controller
      * @return \Illuminate\Http\Response
      */
     
-    public function show(Customer $customer)
+    public function show($id)
     {
-        return new CustomerResource($customer);
+        return new CustomerResource(Customer::findOrFail($id));
     }
 
 /*

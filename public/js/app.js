@@ -2613,20 +2613,31 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   methods: {
     logout: function logout() {
       var _this = this;
 
-      axios.post('/api/logout').then(function (response) {
-        console.log('User has logged out'); // This updates the store
+      axios.post("/api/logout").then(function (response) {
+        console.log("User has logged out"); // This updates the store
         // And sets current user to NULL
 
-        _this.$store.commit('clearCart');
+        _this.$store.commit("clearCart");
 
-        _this.$store.commit('clearUser');
+        _this.$store.commit("clearUser");
 
-        _this.$router.push('/');
+        _this.$router.push("/");
       })["catch"](function (error) {
         console.log("Invalid Logout ".concat(error));
       });
@@ -2635,16 +2646,6 @@ __webpack_require__.r(__webpack_exports__);
   computed: {
     user: function user() {
       return this.$store.state.user;
-    }
-  },
-  created: function created() {
-    if (typeof this.user !== 'undefined' && this.user.type == 'C') {
-      axios.get("api/users/".concat(this.user.id)).then(function (response) {
-        console.log(response);
-        customer = response.data.data;
-      })["catch"](function (error) {
-        console.log(error);
-      });
     }
   }
 });
@@ -2846,6 +2847,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _navbar_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./navbar.vue */ "./resources/js/components/navbar.vue");
 //
 //
 //
@@ -2873,26 +2875,32 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      customer: {}
+      customer: {},
+      user: {}
     };
   },
-  computed: {
-    user: function user() {
-      return this.$store.state.user;
-    }
-  },
   created: function created() {
+    var _this = this;
+
+    this.user = this.$store.state.user;
+    console.log(this.user);
+
     if (typeof this.user !== 'undefined' && this.user.type == 'C') {
       axios.get("api/customers/".concat(this.user.id)).then(function (response) {
-        console.log(response);
-        customer = response.data.data;
+        _this.customer = response.data.data;
       })["catch"](function (error) {
         console.log(error);
       });
     }
+  },
+  components: {
+    navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   }
 });
 
@@ -7606,7 +7614,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.navbar{\n    margin-bottom: 5%;\n}\n", ""]);
+exports.push([module.i, "\n.navbar {\r\n  margin-bottom: 5%;\n}\r\n", ""]);
 
 // exports
 
@@ -42099,7 +42107,7 @@ var render = function() {
                       _c("img", {
                         attrs: {
                           id: "userPhoto",
-                          src: "storage/app/public/fotos/" + _vm.user.photo_url
+                          src: "storage/fotos/" + _vm.user.photo_url
                         }
                       }),
                       _vm._v(" "),
@@ -42118,9 +42126,9 @@ var render = function() {
                         "router-link",
                         {
                           staticClass: "btn btn-primary",
-                          attrs: { to: "/users/" + this.user.id }
+                          attrs: { to: "/users/" + _vm.user.id }
                         },
-                        [_vm._v("Profile")]
+                        [_vm._v(_vm._s(_vm.user.name))]
                       ),
                       _vm._v(" "),
                       _c(
@@ -42370,9 +42378,17 @@ var render = function() {
     "div",
     { staticClass: "jumbotron" },
     [
+      _c("navbar"),
+      _vm._v(" "),
       _c("h2", [_vm._v("User Details")]),
       _vm._v(" "),
-      _c("p", { staticStyle: { "text-align": "center" } }),
+      _c("p", { staticStyle: { "text-align": "center" } }, [
+        _c("img", {
+          staticClass: "img-profile rounded-circle",
+          staticStyle: { width: "100px", height: "100px" },
+          attrs: { src: "storage/fotos/" + _vm.user.photo_url }
+        })
+      ]),
       _c("div", { staticStyle: { "text-align": "center" } }, [
         _c("span", { staticClass: "lead font-weight-bold" }, [
           _vm._v("Name: " + _vm._s(_vm.user.name))
@@ -42385,26 +42401,24 @@ var render = function() {
         ])
       ]),
       _vm._v(" "),
-      _vm.user.type == "C"
-        ? _c("div", { staticStyle: { "text-align": "center" } }, [
-            _c("span", { staticClass: "lead" }, [
-              _vm._v("Address: " + _vm._s(_vm.user.address))
-            ])
-          ])
-        : _vm._e(),
-      _vm._v(" "),
-      _vm.user.type == "C"
-        ? _c("div", { staticStyle: { "text-align": "center" } }, [
-            _c("span", { staticClass: "lead" }, [
-              _vm._v("NIF: " + _vm._s(_vm.user.nif))
-            ])
-          ])
-        : _vm._e(),
-      _vm._v(" "),
-      _vm.user.type == "C"
-        ? _c("div", { staticStyle: { "text-align": "center" } }, [
-            _c("span", { staticClass: "lead" }, [
-              _vm._v("Phone: " + _vm._s(_vm.user.phone))
+      _vm.customer
+        ? _c("div", [
+            _c("div", { staticStyle: { "text-align": "center" } }, [
+              _c("span", { staticClass: "lead" }, [
+                _vm._v("Address: " + _vm._s(_vm.customer.address))
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticStyle: { "text-align": "center" } }, [
+              _c("span", { staticClass: "lead" }, [
+                _vm._v("NIF: " + _vm._s(_vm.customer.nif))
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticStyle: { "text-align": "center" } }, [
+              _c("span", { staticClass: "lead" }, [
+                _vm._v("Phone: " + _vm._s(_vm.customer.phone))
+              ])
             ])
           ])
         : _vm._e(),

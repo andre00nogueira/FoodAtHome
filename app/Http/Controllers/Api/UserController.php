@@ -30,9 +30,9 @@ class UserController extends Controller
         }*/
     }
 
-    public function show(User $user)
+    public function show($id)
     {
-        return new UserResource($user);
+        return new UserResource(User::findOrFail($id));
     }
 /*
     public function show(int $id)
@@ -109,5 +109,9 @@ class UserController extends Controller
             $totalEmail = User::where('email', '=', $request->email)->count();
         }
         return response()->json($totalEmail == 0);
+    }
+
+    public function changePassword(User $user){
+        
     }
 }
