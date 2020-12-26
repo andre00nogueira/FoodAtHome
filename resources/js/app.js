@@ -31,6 +31,7 @@ import CartCheckoutComponent from'./components/cart_checkout.vue'
 import CustomerDashboardComponent from'./components/customer_dashboard.vue'
 import OrderDetailsComponent from'./components/order_details.vue'
 import CookDashboardComponent from'./components/cook_dashboard.vue'
+import DeliverymanDashboardComponent from'./components/deliveryman_dashboard.vue'
 
 
 Vue.component('pagination', require('laravel-vue-pagination'));
@@ -47,7 +48,8 @@ const routes = [
     { path: '/cart/checkout', component: CartCheckoutComponent},
     { path: '/customer/:id/dashboard', component: CustomerDashboardComponent},
     { path: '/orders/:id', component: OrderDetailsComponent},
-    { path: '/cook/:id/dashboard', component: CookDashboardComponent }
+    { path: '/cook/:id/dashboard', component: CookDashboardComponent },
+    { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent }
 ]
 
 const router = new VueRouter({

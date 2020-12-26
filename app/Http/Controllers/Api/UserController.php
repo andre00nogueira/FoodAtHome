@@ -117,4 +117,9 @@ class UserController extends Controller
         }
         return response()->json($totalEmail == 0);
     }
+
+    public function deliverymanOrders(Request $request)
+    {
+        return OrderResource::collection(Order::where('delivered_by',$request->deliveryman)->where('status', 'R')->orderBy('current_status_at', 'desc')->paginate(10));
+    }
 }
