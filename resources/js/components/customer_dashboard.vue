@@ -43,8 +43,8 @@ export default {
           if(page!=0){
             url += `?page=${page}`;
             axios.get(url).then((response) => {
-                this.closedopenOrdersData = response.data;
-                this.closedOrders=this.closedopenOrdersData.data
+                this.closedOpenOrdersData = response.data;
+                this.closedOrders=this.closedOpenOrdersData.data
             });
           }
         },

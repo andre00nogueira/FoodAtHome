@@ -2581,8 +2581,8 @@ __webpack_require__.r(__webpack_exports__);
       if (page != 0) {
         url += "?page=".concat(page);
         axios.get(url).then(function (response) {
-          _this2.closedopenOrdersData = response.data;
-          _this2.closedOrders = _this2.closedopenOrdersData.data;
+          _this2.closedOpenOrdersData = response.data;
+          _this2.closedOrders = _this2.closedOpenOrdersData.data;
         });
       }
     },
@@ -2818,7 +2818,6 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       order: {},
-      orderItens: [],
       cooker: "",
       deliver: ""
     };
@@ -2828,7 +2827,6 @@ __webpack_require__.r(__webpack_exports__);
 
     axios.get("api/orders/".concat(this.$route.params.id)).then(function (response) {
       _this.order = response.data.data;
-      console.log(_this.order);
 
       if (_this.order.prepared_by) {
         axios.get("api/users/".concat(_this.order.prepared_by)).then(function (response) {
@@ -42452,7 +42450,7 @@ var render = function() {
         ]
       ),
       _vm._v(" "),
-      _c("h1", [_vm._v("Itens List")]),
+      _c("h1", [_vm._v("Items List")]),
       _vm._v(" "),
       _c("itemsTable", { attrs: { items: _vm.order.orderItems } })
     ],
