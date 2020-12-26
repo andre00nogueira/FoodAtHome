@@ -32,7 +32,13 @@ export default {
                     // This sets the current user
                     // To the logged in user
                     this.$store.commit('setUser', response.data)
-
+                    axios.patch(`/api/users/${response.data.id}`, {
+                        loggedin: new Boolean(true)
+                    }).then((response) => {
+                        console.log(response.data)
+                    }).catch((error) => {
+                        console.log(error)
+                    })
                     // Sends user to home page
                     this.$router.push('/') 
                 }).catch(error =>{

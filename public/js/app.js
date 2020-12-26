@@ -2696,8 +2696,15 @@ __webpack_require__.r(__webpack_exports__);
         axios.post('/api/login', _this.credentials).then(function (response) {
           // This sets the current user
           // To the logged in user
-          _this.$store.commit('setUser', response.data); // Sends user to home page
+          _this.$store.commit('setUser', response.data);
 
+          axios.patch("/api/users/".concat(response.data.id), {
+            loggedin: new Boolean(true)
+          }).then(function (response) {
+            console.log(response.data);
+          })["catch"](function (error) {
+            console.log(error);
+          }); // Sends user to home page
 
           _this.$router.push('/');
         })["catch"](function (error) {
@@ -2744,20 +2751,47 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   methods: {
     logout: function logout() {
       var _this = this;
 
-      axios.post('/api/logout').then(function (response) {
-        console.log('User has logged out'); // This updates the store
+      axios.post("/api/logout").then(function (response) {
+        console.log("User has logged out"); // This updates the store
         // And sets current user to NULL
 
-        _this.$store.commit('clearCart');
+        _this.$store.commit("clearCart");
 
-        _this.$store.commit('clearUser');
+        axios.patch("/api/users/".concat(_this.$store.state.user.id), {
+          logged_in: new Boolean(false)
+        }).then(function (response) {
+          console.log(response.data);
+        })["catch"](function (error) {
+          console.log(error);
+        });
 
-        _this.$router.push('/');
+        _this.$store.commit("clearUser");
+
+        _this.$router.push("/");
       })["catch"](function (error) {
         console.log("Invalid Logout ".concat(error));
       });
@@ -7749,7 +7783,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.navbar{\n    margin-bottom: 5%;\n}\n", ""]);
+exports.push([module.i, "\n.navbar {\r\n  margin-bottom: 5%;\n}\r\n", ""]);
 
 // exports
 
@@ -42191,7 +42225,10 @@ var render = function() {
       _vm.$store.state.user && _vm.$store.state.user.type == "EC"
         ? _c(
             "router-link",
-            { staticClass: "navbar-brand", attrs: { to: "/cook_dashboard" } },
+            {
+              staticClass: "navbar-brand",
+              attrs: { to: "/cook/" + _vm.$store.state.user.id + "/dashboard" }
+            },
             [_vm._v("Dashboard")]
           )
         : _vm._e(),
@@ -59507,7 +59544,7 @@ var routes = [{
   path: '/orders/:id',
   component: _components_order_details_vue__WEBPACK_IMPORTED_MODULE_10__["default"]
 }, {
-  path: '/cook_dashboard',
+  path: '/cook/:id/dashboard',
   component: _components_cook_dashboard_vue__WEBPACK_IMPORTED_MODULE_11__["default"]
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]({
@@ -60783,8 +60820,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! D:\DAD\FoodAtHome\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! D:\DAD\FoodAtHome\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\laragon\www\FoodAtHome\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\laragon\www\FoodAtHome\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

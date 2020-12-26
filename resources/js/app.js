@@ -43,7 +43,7 @@ const routes = [
     { path: '/cart/checkout', component: CartCheckoutComponent},
     { path: '/customer/:id/dashboard', component: CustomerDashboardComponent},
     { path: '/orders/:id', component: OrderDetailsComponent},
-    { path: '/cook_dashboard', component: CookDashboardComponent }
+    { path: '/cook/:id/dashboard', component: CookDashboardComponent }
 ]
 
 const router = new VueRouter({

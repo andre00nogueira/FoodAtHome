@@ -56,6 +56,7 @@ Route::get('users/orders/{userID}', [UserController::class, 'orders']);
 Route::get('users/orders/{userID}/closed', [UserController::class, 'ordersClosed']);
 //user
 Route::get('users/{user}', [UserController::class, 'show']);
+Route::patch('users/{user}', [UserController::class, 'updateLoggedAt']);
 
 // Orders
 Route::get('orders/{id}', [OrderController::class, 'show']);
