@@ -60,11 +60,11 @@ export default {
       console.log(orderId);
       if (orderId === "") {
         // TODO make available_at equal to current date
-        this.setCookAvailable(true)
+        //this.setCookAvailable(true);
         this.noOrder = true;
         return;
       }
-      this.setCookAvailable(false)
+      this.setCookAvailable(false);
       this.noOrder = false;
       axios
         .get(`api/orders/${orderId}`)
@@ -102,7 +102,7 @@ export default {
         })
         .then((response) => {
           if (value === "R") {
-            this.setCookAvailable(true)
+            this.setCookAvailable(true);
             this.noOrder = true;
             this.$toasted
               .show(`Order #${this.order.id} marked as ready!`, {
@@ -122,10 +122,15 @@ export default {
         });
     },
     setCookAvailable(value) {
-      axios.patch(`api/users/${this.$store.state.user.id}`, {
+      axios
+        .patch(`api/users/${this.$store.state.user.id}`, {
           available: new Boolean(value),
         })
         .then((response) => {
+          if (value === true) {
+            console.log(value)
+            this.$socket.emit("order_ready", this.$store.state.user.id);
+          }
           console.log(response.data);
         })
         .catch((error) => {

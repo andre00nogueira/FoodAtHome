@@ -2377,7 +2377,7 @@ __webpack_require__.r(__webpack_exports__);
 
       if (orderId === "") {
         // TODO make available_at equal to current date
-        this.setCookAvailable(true);
+        //this.setCookAvailable(true);
         this.noOrder = true;
         return;
       }
@@ -2441,9 +2441,17 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     setCookAvailable: function setCookAvailable(value) {
+      var _this4 = this;
+
       axios.patch("api/users/".concat(this.$store.state.user.id), {
         available: new Boolean(value)
       }).then(function (response) {
+        if (value === true) {
+          console.log(value);
+
+          _this4.$socket.emit("order_ready", _this4.$store.state.user.id);
+        }
+
         console.log(response.data);
       })["catch"](function (error) {
         console.log(error);
@@ -2742,12 +2750,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       credentials: {
-        email: '',
-        password: ''
+        email: "",
+        password: ""
       }
     };
   },
@@ -2755,26 +2777,72 @@ __webpack_require__.r(__webpack_exports__);
     login: function login() {
       var _this = this;
 
-      this.$store.commit('clearUser');
-      axios.get('/sanctum/csrf-cookie').then(function (response) {
-        axios.post('/api/login', _this.credentials).then(function (response) {
-          // This sets the current user
-          // To the logged in user
-          _this.$store.commit('setUser', response.data);
-
+      this.$store.commit("clearUser");
+      axios.get("/sanctum/csrf-cookie").then(function (response) {
+        axios.post("/api/login", _this.credentials).then(function (response) {
           axios.patch("/api/users/".concat(response.data.id), {
             loggedin: new Boolean(true)
           }).then(function (response) {
-            console.log(response.data);
+            var user = response.data;
+            console.log("PATCH LOGGEDIN RESPONSE = " + user);
+
+            switch (user.type) {
+              case "EC":
+                console.log("ENTERED EC");
+
+                _this.getCurrentOrderId(user);
+
+                break;
+
+              default:
+                console.log("ENTERED C");
+
+                _this.saveUserAndRedirect(user);
+
+                break;
+            }
           })["catch"](function (error) {
             console.log(error);
-          }); // Sends user to home page
-
-          _this.$router.push('/');
+          });
         })["catch"](function (error) {
-          console.log('Invalid Authentication');
+          console.log("Invalid Authentication");
         });
       });
+    },
+    getCurrentOrderId: function getCurrentOrderId(user) {
+      var _this2 = this;
+
+      console.log("CURRENT ORDER ID USER = " + user);
+      axios.get("api/cook/".concat(user.id, "/currentOrder")).then(function (response) {
+        var orderId = response.data;
+        console.log("CURRENT ORDER ORDER ID = " + orderId); // No order
+
+        if (orderId == "") {
+          console.log("NO ORDER, COOK IS AVAILABLE");
+
+          _this2.setCookAvailable(user);
+        } else {
+          console.log("THERE IS AN ORDER ALREADY");
+
+          _this2.saveUserAndRedirect(user);
+        }
+      });
+    },
+    setCookAvailable: function setCookAvailable(user) {
+      var _this3 = this;
+
+      axios.patch("api/users/".concat(user.id), {
+        available: new Boolean(true)
+      }).then(function (response) {
+        var user = response.data;
+        console.log("NO ORDER, WE SET COOK AVAILABLE = " + user);
+
+        _this3.saveUserAndRedirect(user);
+      });
+    },
+    saveUserAndRedirect: function saveUserAndRedirect(user) {
+      this.$store.commit("setUser", user);
+      this.$router.push("/");
     }
   }
 });
@@ -2846,7 +2914,8 @@ __webpack_require__.r(__webpack_exports__);
         _this.$store.commit("clearCart");
 
         axios.patch("/api/users/".concat(_this.$store.state.user.id), {
-          loggedin: new Boolean(false)
+          loggedin: new Boolean(false),
+          available: new Boolean(false)
         }).then(function (response) {
           console.log(response.data);
         })["catch"](function (error) {
@@ -59677,15 +59746,17 @@ var app = new Vue({
   },
   sockets: {
     order_id_message: function order_id_message(orderID) {
+      var _this = this;
+
       axios.patch("api/orders/".concat(orderID), {
         prepared_by: this.$store.state.user.id
-      }).then(function (response) {//this.$store.commit('setCurrentOrder', orderID)
+      }).then(function (response) {
+        _this.$toasted.show("You've been assigned with a new order (".concat(orderID, ")"), {
+          type: 'info'
+        }).goAway(3500);
       })["catch"](function (error) {
         console.log(error);
       });
-      this.$toasted.show("You've been assigned with a new order (".concat(orderID, ")"), {
-        type: 'info'
-      }).goAway(3500);
     }
   },
   data: function data() {
