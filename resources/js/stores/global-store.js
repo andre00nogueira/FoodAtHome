@@ -7,6 +7,7 @@ export default new Vuex.Store({
     state: {
         user: null,
         cart: [],
+        //current_order: null,
     },
     mutations: {
         clearUser(state) {
@@ -84,7 +85,16 @@ export default new Vuex.Store({
             product.subtotal = price * quantity
 
             localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart))
-        }
+        },
+        /*clearCurrentOrder(state) {
+            state.order = null
+            localStorage.setItem('currentOrder' + state.current_order, null)
+
+        },
+        setCurrentOrder(state, current_order) {
+            state.current_order = current_order
+            localStorage.setItem('currentOrder' + current_order, state.current_order)
+        },*/
     },
     actions: {
         loadUserLogged(context) {

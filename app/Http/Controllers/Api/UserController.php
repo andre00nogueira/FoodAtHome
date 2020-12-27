@@ -5,18 +5,21 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\User as UserResource;
-use App\Http\Resources\OrderResource as OrderResource; 
+use App\Http\Resources\OrderResource as OrderResource;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserLoggedAtRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use phpDocumentor\Reflection\Types\Null_;
+use stdClass;
 
 class UserController extends Controller
 {
-    public function me(Request $request){
+    public function me(Request $request)
+    {
         return $request->user();
     }
 
@@ -40,14 +43,38 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
-    public function updateLoggedAt($id, Request $request){
-        if ($request->loggedin){
-            User::where('id', '=', $id)->update(['logged_at' => now()]);
-            return;
+    public function patchUser($id, Request $request)
+    {
+        $user = User::where('id', '=', $id);
+        if ($request->has('loggedin')) {
+            if ($request->loggedin) {
+                $user->update(['logged_at' => now()]);
+                return;
+            } else {
+                $user->update(['logged_at' => null]);
+            }
         }
-        User::where('id', '=', $id)->update(['logged_at' => null]);
+
+        // Available at
+        if ($request->has('available')) {
+            if ($request->available) {
+                $user->update(['available_at' => now()]);
+            } else {
+                $user->update(['available_at' => null]);
+            }
+        }
         return;
     }
+
+    public function getCurrentOrder($id)
+    {
+        $order =  Order::where('prepared_by', '=', $id)->where('status', '=', 'H')->orWhere('status', '=', 'P')->first();
+        if ($order == null) {
+            return null;
+        }
+        return $order->id;
+    }
+
 
     public function store(StoreUserRequest $request)
     {
