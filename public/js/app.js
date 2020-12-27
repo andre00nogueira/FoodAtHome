@@ -2356,48 +2356,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       order: undefined,
-      orderItems: [],
-      orderStatus: undefined,
-      isFetching: true,
-      noOrder: false
+      orderItems: []
     };
   },
   methods: {
     getCurrentOrder: function getCurrentOrder(orderId) {
       var _this = this;
 
-      console.log(orderId);
-
-      if (orderId === "") {
-        // TODO make available_at equal to current date
-        //this.setCookAvailable(true);
-        this.noOrder = true;
-        return;
-      }
-
-      this.setCookAvailable(false);
-      this.noOrder = false;
       axios.get("api/orders/".concat(orderId)).then(function (response) {
         _this.order = response.data.data;
-
-        switch (_this.order.status) {
-          case "H":
-            _this.orderStatus = "Holding";
-            break;
-
-          case "P":
-            _this.orderStatus = "Preparing";
-            break;
-        }
-
-        _this.isFetching = false;
       })["catch"](function (error) {
         console.log(error);
       });
@@ -2405,8 +2378,10 @@ __webpack_require__.r(__webpack_exports__);
     getCurrentOrderId: function getCurrentOrderId() {
       var _this2 = this;
 
-      axios.get("api/cook/".concat(this.$store.state.user.id, "/currentOrder")).then(function (response) {
-        _this2.getCurrentOrder(response.data);
+      axios.get("api/cook/".concat(this.$route.params.id, "/currentOrder")).then(function (response) {
+        if (response.data) {
+          _this2.order = response.data;
+        }
       });
     },
     markOrder: function markOrder(value) {
@@ -2421,10 +2396,10 @@ __webpack_require__.r(__webpack_exports__);
       axios.patch("api/orders/".concat(this.order.id), {
         status: value
       }).then(function (response) {
-        if (value === "R") {
-          _this3.setCookAvailable(true);
+        _this3.order.status = value;
 
-          _this3.noOrder = true;
+        if (value === "R") {
+          _this3.setCookAvailable();
 
           _this3.$toasted.show("Order #".concat(_this3.order.id, " marked as ready!"), {
             type: "success"
@@ -2432,25 +2407,21 @@ __webpack_require__.r(__webpack_exports__);
 
           return;
         } else {
-          _this3.orderStatus = "Preparing";
-
           _this3.$toasted.show("Order #".concat(_this3.order.id, " marked as preparing!"), {
             type: "success"
           }).goAway(3500);
         }
       });
     },
-    setCookAvailable: function setCookAvailable(value) {
+    setCookAvailable: function setCookAvailable() {
       var _this4 = this;
 
       axios.patch("api/users/".concat(this.$store.state.user.id), {
-        available: new Boolean(value)
+        available: new Boolean(true)
       }).then(function (response) {
-        if (value === true) {
-          console.log(value);
+        _this4.order = undefined;
 
-          _this4.$socket.emit("order_ready", _this4.$store.state.user.id);
-        }
+        _this4.$socket.emit("order_ready", _this4.$store.state.user.id);
 
         console.log(response.data);
       })["catch"](function (error) {
@@ -41692,16 +41663,10 @@ var render = function() {
       _vm._v(" "),
       _c("h2", [_vm._v("Cook Dashboard")]),
       _vm._v(" "),
-      _vm.noOrder
-        ? _c("div", { staticClass: "content" }, [
-            _c("h3", [_vm._v("Waiting for a new order to arrive!")])
-          ])
-        : _vm._e(),
-      _vm._v(" "),
-      !_vm.isFetching && !_vm.noOrder
+      _vm.order
         ? _c("div", { staticClass: "content" }, [
             _c("div", { staticClass: "buttons" }, [
-              _vm.orderStatus === "Holding"
+              _vm.order.status === "H"
                 ? _c(
                     "button",
                     {
@@ -41716,7 +41681,7 @@ var render = function() {
                   )
                 : _vm._e(),
               _vm._v(" "),
-              _vm.orderStatus === "Preparing"
+              _vm.order.status === "P"
                 ? _c(
                     "button",
                     {
@@ -41740,7 +41705,12 @@ var render = function() {
             _vm._v(" "),
             _c("h3", [_vm._v("Customer - " + _vm._s(_vm.order.customer_name))]),
             _vm._v(" "),
-            _c("h4", [_vm._v("Status - " + _vm._s(_vm.orderStatus))]),
+            _c("h4", [
+              _vm._v(
+                "Status - " +
+                  _vm._s(_vm.order.status == "H" ? "Holding" : "Preparing")
+              )
+            ]),
             _vm._v(" "),
             _c("h5", [
               _vm._v("Preparation Started - " + _vm._s(_vm.order.opened_at))
@@ -41750,9 +41720,12 @@ var render = function() {
               _vm._v("Price - " + _vm._s(_vm.order.total_price) + "€")
             ]),
             _vm._v(" "),
-            _vm.order.notes
-              ? _c("h6", [_vm._v("Notes - " + _vm._s(_vm.order.notes))])
-              : _c("h6", [_vm._v("Notes - No notes")]),
+            _c("h6", [
+              _vm._v(
+                "Notes - " +
+                  _vm._s(_vm.order.notes ? _vm.order.notes : "No notes")
+              )
+            ]),
             _vm._v(" "),
             _c(
               "div",
@@ -41765,7 +41738,9 @@ var render = function() {
               1
             )
           ])
-        : _vm._e()
+        : _c("div", { staticClass: "content" }, [
+            _c("h3", [_vm._v("Waiting for a new order to arrive!")])
+          ])
     ],
     1
   )
@@ -59751,9 +59726,17 @@ var app = new Vue({
       axios.patch("api/orders/".concat(orderID), {
         prepared_by: this.$store.state.user.id
       }).then(function (response) {
-        _this.$toasted.show("You've been assigned with a new order (".concat(orderID, ")"), {
-          type: 'info'
-        }).goAway(3500);
+        axios.patch("api/users/".concat(_this.$store.state.user.id), {
+          available: new Boolean(false)
+        }).then(function (response) {
+          console.log(response.data);
+
+          _this.$toasted.show("You've been assigned with a new order (".concat(orderID, ")"), {
+            type: 'info'
+          }).goAway(3500);
+        })["catch"](function (error) {
+          console.log(error);
+        });
       })["catch"](function (error) {
         console.log(error);
       });
@@ -61037,8 +61020,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\laragon\www\FoodAtHome\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\laragon\www\FoodAtHome\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! D:\DAD\FoodAtHome\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\DAD\FoodAtHome\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

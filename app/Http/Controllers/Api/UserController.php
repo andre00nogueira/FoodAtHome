@@ -72,7 +72,7 @@ class UserController extends Controller
         if ($order == null) {
             return null;
         }
-        return $order->id;
+        return $order;
     }
 
 

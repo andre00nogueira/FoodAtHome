@@ -66,7 +66,18 @@ const app = new Vue({
             axios.patch(`api/orders/${orderID}`, {
                 prepared_by: this.$store.state.user.id
             }).then((response) => {
-                this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
+                axios
+                    .patch(`api/users/${this.$store.state.user.id}`, {
+                        available: new Boolean(false),
+                    })
+                    .then((response) => {
+                        console.log(response.data);
+                        this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+                
             }).catch((error) => {
                 console.log(error)
             })
