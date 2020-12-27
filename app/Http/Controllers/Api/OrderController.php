@@ -70,7 +70,7 @@ class OrderController extends Controller
         $orderToSend->delivered_by = $order->delivered_by;
         $orderToSend->total_time = $order->total_time;
         $orderItems = [];
-        foreach($order->orderItems as $item){
+        foreach ($order->orderItems as $item) {
             $itemToSend = new stdClass();
 
             $product = Product::find($item->product_id);
@@ -84,6 +84,18 @@ class OrderController extends Controller
         $orderToSend->orderItems = $orderItems;
 
         return new OrderResource($orderToSend);
+    }
+
+
+    public function updatePreparedBy($id, Request $request)
+    {
+        if($request->has('prepared_by')){
+            Order::where('id', '=', $id)->update(['prepared_by' => $request->prepared_by]);
+        }else if($request->has('status')){
+            Order::where('id', '=', $id)->update(['status' => $request->status]);
+        }
+        
+        return;
     }
 
     /**

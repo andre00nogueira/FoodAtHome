@@ -10,10 +10,10 @@ Vue.use(VueRouter)
 import VueSocketIO from "vue-socket.io"
 Vue.use(
     new VueSocketIO({
-            debug: true,
-            connection: "http://127.0.0.1:8080"
-        })
-    )
+        debug: true,
+        connection: "http://127.0.0.1:8080"
+    })
+)
 
 // VUEX
 import store from './stores/global-store'
@@ -64,9 +64,20 @@ const app = new Vue({
         store.dispatch('loadUserLogged')
     },
     sockets: {
-        order_id_message(orderID){
-          console.log("receiving" + orderID)
-          //this.getCurrentOrder(orderID)
+        order_id_message(orderID) {
+            axios.patch(`api/orders/${orderID}`, { 
+                prepared_by: this.$store.state.user.id 
+            }).then((response) => {
+                //this.$store.commit('setCurrentOrder', orderID)
+            }).catch((error) => {
+                console.log(error)
+            })
+            this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
         }
-      },
+    },
+    data() {
+        return {
+            orderId: undefined
+        }
+    }
 })

@@ -54,13 +54,15 @@ Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']
 
 //user
 Route::get('users/{user}', [UserController::class, 'show']);
-Route::patch('users/{user}', [UserController::class, 'updateLoggedAt']);
+Route::patch('users/{user}', [UserController::class, 'patchUser']);
 
 //deliveryman
 Route::get('deliverymen/{deliveryman}/orders', [UserController::class, 'deliverymanOrders']);
 
 // Orders
 Route::get('orders/{id}', [OrderController::class, 'show']);
+Route::patch('orders/{id}', [OrderController::class, 'updatePreparedBy']);
+Route::get('cook/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
 
 
 

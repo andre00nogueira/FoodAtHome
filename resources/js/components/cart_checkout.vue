@@ -52,7 +52,7 @@ export default {
                     this.$store.commit("clearCart");
                     this.cart = this.$store.state.cart;
                     this.$socket.emit('order_checkout_request', result.data)
-                    this.$toasted.show('Order created successfully!', { type: 'info'})
+                    this.$toasted.show('Order created successfully!', { type: 'info'}).goAway(3500)
                     this.$router.push(`/customer/${this.$store.state.user.id}/dashboard`)
                 }).catch(error=>{
                     console.log(error)

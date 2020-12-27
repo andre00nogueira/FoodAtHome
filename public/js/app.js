@@ -2274,7 +2274,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
           _this2.$toasted.show('Order created successfully!', {
             type: 'info'
-          });
+          }).goAway(3500);
 
           _this2.$router.push("/customer/".concat(_this2.$store.state.user.id, "/dashboard"));
         })["catch"](function (error) {
@@ -2337,6 +2337,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2344,40 +2364,36 @@ __webpack_require__.r(__webpack_exports__);
     return {
       order: undefined,
       orderItems: [],
-      isFetching: true
+      orderStatus: undefined,
+      isFetching: true,
+      noOrder: false
     };
   },
   methods: {
     getCurrentOrder: function getCurrentOrder(orderId) {
       var _this = this;
 
+      console.log(orderId);
+
+      if (orderId === "") {
+        // TODO make available_at equal to current date
+        this.setCookAvailable(true);
+        this.noOrder = true;
+        return;
+      }
+
+      this.setCookAvailable(false);
+      this.noOrder = false;
       axios.get("api/orders/".concat(orderId)).then(function (response) {
         _this.order = response.data.data;
-        console.log(response.data.data);
 
         switch (_this.order.status) {
           case "H":
-            _this.order.status = "Holding";
+            _this.orderStatus = "Holding";
             break;
 
           case "P":
-            _this.order.status = "Preparing";
-            break;
-
-          case "R":
-            _this.order.status = "Ready";
-            break;
-
-          case "T":
-            _this.order.status = "In Transit";
-            break;
-
-          case "D":
-            _this.order.status = "Delivered";
-            break;
-
-          default:
-            _this.order.status = "Cancelled";
+            _this.orderStatus = "Preparing";
             break;
         }
 
@@ -2385,7 +2401,62 @@ __webpack_require__.r(__webpack_exports__);
       })["catch"](function (error) {
         console.log(error);
       });
+    },
+    getCurrentOrderId: function getCurrentOrderId() {
+      var _this2 = this;
+
+      axios.get("api/cook/".concat(this.$store.state.user.id, "/currentOrder")).then(function (response) {
+        _this2.getCurrentOrder(response.data);
+      });
+    },
+    markOrder: function markOrder(value) {
+      var _this3 = this;
+
+      // 1 - Preparing
+      // 2 - Ready
+      if (value != "P" && value != "R") {
+        return;
+      }
+
+      axios.patch("api/orders/".concat(this.order.id), {
+        status: value
+      }).then(function (response) {
+        if (value === "R") {
+          _this3.setCookAvailable(true);
+
+          _this3.noOrder = true;
+
+          _this3.$toasted.show("Order #".concat(_this3.order.id, " marked as ready!"), {
+            type: "success"
+          }).goAway(3500);
+
+          return;
+        } else {
+          _this3.orderStatus = "Preparing";
+
+          _this3.$toasted.show("Order #".concat(_this3.order.id, " marked as preparing!"), {
+            type: "success"
+          }).goAway(3500);
+        }
+      });
+    },
+    setCookAvailable: function setCookAvailable(value) {
+      axios.patch("api/users/".concat(this.$store.state.user.id), {
+        available: new Boolean(value)
+      }).then(function (response) {
+        console.log(response.data);
+      })["catch"](function (error) {
+        console.log(error);
+      });
     }
+  },
+  sockets: {
+    order_id_message: function order_id_message(orderID) {
+      this.getCurrentOrder(orderID);
+    }
+  },
+  mounted: function mounted() {
+    this.getCurrentOrderId();
   },
   components: {
     navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
@@ -2847,7 +2918,7 @@ __webpack_require__.r(__webpack_exports__);
         _this.$store.commit("clearCart");
 
         axios.patch("/api/users/".concat(_this.$store.state.user.id), {
-          logged_in: new Boolean(false)
+          loggedin: new Boolean(false)
         }).then(function (response) {
           console.log(response.data);
         })["catch"](function (error) {
@@ -41624,15 +41695,55 @@ var render = function() {
       _vm._v(" "),
       _c("h2", [_vm._v("Cook Dashboard")]),
       _vm._v(" "),
-      !_vm.isFetching
+      _vm.noOrder
         ? _c("div", { staticClass: "content" }, [
+            _c("h3", [_vm._v("Waiting for a new order to arrive!")])
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      !_vm.isFetching && !_vm.noOrder
+        ? _c("div", { staticClass: "content" }, [
+            _c("div", { staticClass: "buttons" }, [
+              _vm.orderStatus === "Holding"
+                ? _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary",
+                      on: {
+                        click: function($event) {
+                          return _vm.markOrder("P")
+                        }
+                      }
+                    },
+                    [_vm._v("\n        Mark Order as Preparing\n      ")]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.orderStatus === "Preparing"
+                ? _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary",
+                      on: {
+                        click: function($event) {
+                          return _vm.markOrder("R")
+                        }
+                      }
+                    },
+                    [_vm._v("\n        Mark Order as Ready\n      ")]
+                  )
+                : _vm._e()
+            ]),
+            _vm._v(" "),
+            _c("br"),
+            _vm._v(" "),
             _c("h3", [_vm._v("Current Order - #" + _vm._s(_vm.order.id))]),
             _vm._v(" "),
             _c("br"),
             _vm._v(" "),
             _c("h3", [_vm._v("Customer - " + _vm._s(_vm.order.customer_name))]),
             _vm._v(" "),
-            _c("h4", [_vm._v("Status - " + _vm._s(_vm.order.status))]),
+            _c("h4", [_vm._v("Status - " + _vm._s(_vm.orderStatus))]),
             _vm._v(" "),
             _c("h5", [
               _vm._v("Preparation Started - " + _vm._s(_vm.order.opened_at))
@@ -59712,8 +59823,21 @@ var app = new Vue({
   },
   sockets: {
     order_id_message: function order_id_message(orderID) {
-      console.log("receiving" + orderID); //this.getCurrentOrder(orderID)
+      axios.patch("api/orders/".concat(orderID), {
+        prepared_by: this.$store.state.user.id
+      }).then(function (response) {//this.$store.commit('setCurrentOrder', orderID)
+      })["catch"](function (error) {
+        console.log(error);
+      });
+      this.$toasted.show("You've been assigned with a new order (".concat(orderID, ")"), {
+        type: 'info'
+      }).goAway(3500);
     }
+  },
+  data: function data() {
+    return {
+      orderId: undefined
+    };
   }
 });
 
@@ -60929,7 +61053,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
 /* harmony default export */ __webpack_exports__["default"] = (new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store({
   state: {
     user: null,
-    cart: []
+    cart: [] //current_order: null,
+
   },
   mutations: {
     clearUser: function clearUser(state) {
@@ -61015,6 +61140,15 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
       product.subtotal = price * quantity;
       localStorage.setItem('cart' + state.user.id, JSON.stringify(state.cart));
     }
+    /*clearCurrentOrder(state) {
+        state.order = null
+        localStorage.setItem('currentOrder' + state.current_order, null)
+      },
+    setCurrentOrder(state, current_order) {
+        state.current_order = current_order
+        localStorage.setItem('currentOrder' + current_order, state.current_order)
+    },*/
+
   },
   actions: {
     loadUserLogged: function loadUserLogged(context) {
