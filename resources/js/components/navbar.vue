@@ -54,7 +54,7 @@ export default {
           // And sets current user to NULL
           this.$store.commit("clearCart");
           axios.patch(`/api/users/${this.$store.state.user.id}`, {
-              logged_in: new Boolean(false),
+              loggedin: new Boolean(false),
             })
             .then((response) => {
               console.log(response.data);
