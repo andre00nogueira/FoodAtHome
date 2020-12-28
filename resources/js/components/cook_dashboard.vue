@@ -27,6 +27,7 @@
       <h3>Customer - {{ order.customer_name }}</h3>
       <h4>Status - {{ order.status == "H" ? "Holding" : "Preparing" }}</h4>
       <h5>Preparation Started - {{ order.opened_at }}</h5>
+      <chronometer v-if="order.status == 'P'" :initial-time="order.current_status_at"/>
       <h6>Price - {{ order.total_price }}€</h6>
       <h6>Notes - {{ order.notes ? order.notes : "No notes" }}</h6>
       <div class="content">
@@ -43,6 +44,7 @@
 <script>
 import navbar from "./navbar.vue";
 import itemsTable from "./items_table.vue";
+import chronometer from './chronometer.vue';
 
 export default {
   data() {
@@ -130,7 +132,7 @@ export default {
   mounted() {
     this.getCurrentOrderId();
   },
-  components: { navbar, itemsTable },
+  components: { navbar, itemsTable, chronometer },
 };
 </script><style>
 .content {

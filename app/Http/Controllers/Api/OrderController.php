@@ -75,6 +75,7 @@ class OrderController extends Controller
         $orderToSend->status = $order->status;
         $orderToSend->total_price = $order->total_price;
         $orderToSend->preparation_time = $order->preparation_time;
+        $orderToSend->current_status_at = $order->current_status_at;
         $orderToSend->prepared_by = $order->prepared_by;
         $orderToSend->delivery_time = $order->delivery_time;
         $orderToSend->delivered_by = $order->delivered_by;
