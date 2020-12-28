@@ -91,11 +91,8 @@ export default {
           }
 
           this.$socket.emit("order_status", payload);
-          console.log("BEFORE = " + this.order.current_status_at)
           this.order.current_status_at = response.data.current_status_at
           this.order.status = value
-          console.log(response.data)
-          console.log("AFTER = " + this.order.current_status_at)
           if (value === "R") {
             this.setCookAvailable();
             this.$toasted
