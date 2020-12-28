@@ -13,6 +13,8 @@ class Order extends Model
         'notes'
     ];
 
+    protected $dates = ['current_status_at'];
+
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class, 'order_id');
@@ -23,4 +25,12 @@ class Order extends Model
         return $this->belongsTo(Customer::class, 'customer_id', 'id');
     }
     
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'current_status_at' => 'datetime',
+    ];
 }
