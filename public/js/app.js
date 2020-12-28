@@ -2396,6 +2396,14 @@ __webpack_require__.r(__webpack_exports__);
       axios.patch("api/orders/".concat(this.order.id), {
         status: value
       }).then(function (response) {
+        var payload = {
+          userId: _this3.order.customer_id,
+          status: value,
+          orderId: _this3.order.id
+        };
+
+        _this3.$socket.emit("order_status", payload);
+
         _this3.order.status = value;
 
         if (value === "R") {
@@ -2592,6 +2600,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2643,6 +2659,15 @@ __webpack_require__.r(__webpack_exports__);
           _this3.openOrders = _this3.openOrdersData.data;
         });
       }
+    }
+  },
+  sockets: {
+    order_status_changed: function order_status_changed(payload) {
+      var orderId = payload.orderId;
+      var status = payload.status;
+      this.openOrders.find(function (order) {
+        return order.id == orderId;
+      }).status = status;
     }
   },
   components: {
@@ -3179,6 +3204,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -3268,7 +3313,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     //#endregion
     addToCart: function addToCart(product, quantity) {
-      this.$store.commit('addItemToCart', product);
+      this.$store.commit("addItemToCart", product);
     }
   },
   components: {
@@ -42872,6 +42917,15 @@ var render = function() {
                         }
                       },
                       [_vm._v("\n              🛒\n            ")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-danger",
+                        staticStyle: { "margin-left": "2%" }
+                      },
+                      [_vm._v("\n              🗑️\n            ")]
                     )
                   ])
                 ])
@@ -59740,6 +59794,11 @@ var app = new Vue({
       })["catch"](function (error) {
         console.log(error);
       });
+    },
+    order_status_changed: function order_status_changed(payload) {
+      this.$toasted.show("Order #".concat(payload.orderId, " marked as ").concat(payload.status, "!"), {
+        type: "success"
+      }).goAway(3500);
     }
   },
   data: function data() {
@@ -61020,8 +61079,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! D:\DAD\FoodAtHome\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! D:\DAD\FoodAtHome\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\laragon\www\FoodAtHome\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\laragon\www\FoodAtHome\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

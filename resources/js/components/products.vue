@@ -47,7 +47,7 @@
           <td>{{ product.description.substring(0, 100) + "..." }}</td>
           <td>{{ product.price }}€</td>
           <td>
-            <div style="display:flex">
+            <div style="display: flex">
               <input
                 v-model="product.quantity"
                 type="number"
@@ -57,9 +57,29 @@
                 min="1"
                 max="10"
               />
-              <button class="btn btn-primary" style="margin-left: 2%" v-on:click="addToCart(product)">
+              <button
+                class="btn btn-primary"
+                style="margin-left: 2%"
+                v-on:click="addToCart(product)"
+              >
                 🛒
               </button>
+            
+              <button class="btn btn-danger" style="margin-left: 2%">
+                🗑️
+              </button>
+            <!--
+              <form
+                method="POST"
+                action="{{route('products.destroy',$product)}}"
+                onsubmit="return confirm('Are you sure you want to delete this record?');"
+              >
+                @csrf @method('DELETE')
+                <button type="submit" class="btn btn-xs btn-danger btn-p">
+                  Delete
+                </button>
+              </form>
+              -->
             </div>
           </td>
         </tr>
@@ -162,8 +182,8 @@ export default {
     //#endregion
 
     addToCart(product, quantity) {
-      this.$store.commit('addItemToCart', product)
-    }
+      this.$store.commit("addItemToCart", product);
+    },
   },
 
   components: { navbar },

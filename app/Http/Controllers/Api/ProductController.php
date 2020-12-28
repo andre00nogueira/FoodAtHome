@@ -27,4 +27,9 @@ class ProductController extends Controller
     {
         return ProductResource::collection(Product::where('type', $type_name)->get());
     }
+
+    public function destroy(Product $product){
+        $product->delete();
+        return redirect()->route('/')->('success','Product successfully deleted');
+    }
 }
