@@ -89,8 +89,13 @@ export default {
             status: value,
             orderId: this.order.id
           }
+
           this.$socket.emit("order_status", payload);
-          this.order.status=value
+          console.log("BEFORE = " + this.order.current_status_at)
+          this.order.current_status_at = response.data.current_status_at
+          this.order.status = value
+          console.log(response.data)
+          console.log("AFTER = " + this.order.current_status_at)
           if (value === "R") {
             this.setCookAvailable();
             this.$toasted
@@ -98,7 +103,6 @@ export default {
                 type: "success",
               })
               .goAway(3500);
-
             return;
           } else {
             this.$toasted
@@ -117,7 +121,6 @@ export default {
         .then((response) => {
           this.order=undefined
           this.$socket.emit("order_ready", this.$store.state.user.id);
-          console.log(response.data);
         })
         .catch((error) => {
           console.log(error);

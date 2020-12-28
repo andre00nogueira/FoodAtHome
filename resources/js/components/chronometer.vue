@@ -12,6 +12,7 @@ export default {
         }
     },
     created() {
+        console.log("INITIAL = " + this.initialTime)
         this.diff =  Math.abs(new Date() - new Date(this.initialTime))
         // New date starting from 00:00:00 + difference
         this.timeFormatted = new Date()

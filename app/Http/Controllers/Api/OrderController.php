@@ -123,7 +123,7 @@ class OrderController extends Controller
             $order->update(['status' => $request->status, 'current_status_at' => $now]);
         }
 
-        return;
+        return Order::findOrFail($id);
     }
 
     /**
