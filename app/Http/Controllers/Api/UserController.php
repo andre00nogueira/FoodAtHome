@@ -49,7 +49,6 @@ class UserController extends Controller
         if ($request->has('loggedin')) {
             if ($request->loggedin) {
                 $user->update(['logged_at' => now()]);
-                return;
             } else {
                 $user->update(['logged_at' => null]);
             }
@@ -63,7 +62,8 @@ class UserController extends Controller
                 $user->update(['available_at' => null]);
             }
         }
-        return;
+        
+        return User::findOrFail($id);
     }
 
     public function getCurrentOrder($id)
@@ -72,7 +72,7 @@ class UserController extends Controller
         if ($order == null) {
             return null;
         }
-        return $order->id;
+        return $order;
     }
 
 

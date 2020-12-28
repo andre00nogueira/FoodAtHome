@@ -65,14 +65,24 @@ const app = new Vue({
     },
     sockets: {
         order_id_message(orderID) {
-            axios.patch(`api/orders/${orderID}`, { 
-                prepared_by: this.$store.state.user.id 
+            axios.patch(`api/orders/${orderID}`, {
+                prepared_by: this.$store.state.user.id
             }).then((response) => {
-                //this.$store.commit('setCurrentOrder', orderID)
+                axios
+                    .patch(`api/users/${this.$store.state.user.id}`, {
+                        available: new Boolean(false),
+                    })
+                    .then((response) => {
+                        console.log(response.data);
+                        this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+                
             }).catch((error) => {
                 console.log(error)
             })
-            this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
         }
     },
     data() {
