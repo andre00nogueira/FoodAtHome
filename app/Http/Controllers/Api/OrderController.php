@@ -58,6 +58,7 @@ class OrderController extends Controller
         $orderToSend = new stdClass();
 
         $orderToSend->id = $order->id;
+        $orderToSend->customer_id = $order->customer_id;
         $orderToSend->customer_name = $user->name;
         $orderToSend->notes = $order->notes;
         $orderToSend->opened_at = $order->opened_at;

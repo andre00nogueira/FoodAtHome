@@ -59,6 +59,16 @@ export default {
           }
         }
     },
+    sockets: {
+        order_status_changed(payload) {
+            let orderId = payload.orderId
+            let status = payload.status
+
+            this.openOrders.find(order => order.id == orderId).status = status
+    
+            this.$toasted.show(`Order #${orderId} marked as ${status}!`, {type: "success",}).goAway(3500);
+        },
+    },
     components: { navbar, orderTable }
 }
 </script>
