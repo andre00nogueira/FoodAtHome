@@ -2875,6 +2875,62 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   methods: {
     logout: function logout() {
@@ -43041,24 +43097,6 @@ var render = function() {
                     "li",
                     { staticClass: "nav-item" },
                     [
-                      _c("img", {
-                        staticClass: "img-profile rounded-circle",
-                        staticStyle: { width: "100px", height: "100px" },
-                        attrs: {
-                          id: "userPhoto",
-                          src: "storage/fotos/" + _vm.user.photo_url
-                        }
-                      }),
-                      _vm._v(" "),
-                      _c(
-                        "router-link",
-                        {
-                          staticClass: "btn btn-primary",
-                          attrs: { to: "/users/" + _vm.user.id }
-                        },
-                        [_vm._v(_vm._s(_vm.user.name))]
-                      ),
-                      _vm._v(" "),
                       _vm.$store.state.user.type == "C"
                         ? _c(
                             "router-link",
@@ -43070,20 +43108,80 @@ var render = function() {
                           )
                         : _vm._e(),
                       _vm._v(" "),
-                      _c(
-                        "a",
-                        {
-                          staticClass: "btn btn-secondary",
-                          attrs: { href: "#" },
-                          on: {
-                            click: function($event) {
-                              $event.preventDefault()
-                              return _vm.logout($event)
-                            }
-                          }
-                        },
-                        [_vm._v("Logout")]
-                      )
+                      _c("div", { staticClass: "container-fluid" }, [
+                        _c("ul", { staticClass: "navbar-nav" }, [
+                          _c("li", { staticClass: "nav-item dropdown" }, [
+                            _c(
+                              "a",
+                              {
+                                staticClass:
+                                  "nav-link dropdown-toggle d-flex align-items-center",
+                                attrs: {
+                                  href: "#",
+                                  id: "navbarDropdownMenuLink",
+                                  role: "button",
+                                  "data-mdb-toggle": "dropdown",
+                                  "aria-expanded": "false"
+                                }
+                              },
+                              [
+                                _c("img", {
+                                  staticClass: "rounded-circle",
+                                  attrs: {
+                                    src: "storage/fotos/" + _vm.user.photo_url,
+                                    height: "22",
+                                    alt: "",
+                                    loading: "lazy"
+                                  }
+                                })
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "ul",
+                              {
+                                staticClass: "dropdown-menu",
+                                attrs: {
+                                  "aria-labelledby": "navbarDropdownMenuLink"
+                                }
+                              },
+                              [
+                                _c(
+                                  "li",
+                                  [
+                                    _c(
+                                      "router-link",
+                                      {
+                                        staticClass: "dropdown-item",
+                                        attrs: { to: "/users/" + _vm.user.id }
+                                      },
+                                      [_vm._v("Profile")]
+                                    )
+                                  ],
+                                  1
+                                ),
+                                _vm._v(" "),
+                                _c("li", [
+                                  _c(
+                                    "a",
+                                    {
+                                      staticClass: "dropdown-item",
+                                      attrs: { href: "#" },
+                                      on: {
+                                        click: function($event) {
+                                          $event.preventDefault()
+                                          return _vm.logout($event)
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("Logout")]
+                                  )
+                                ])
+                              ]
+                            )
+                          ])
+                        ])
+                      ])
                     ],
                     1
                   )
