@@ -83,7 +83,10 @@ const app = new Vue({
             }).catch((error) => {
                 console.log(error)
             })
-        }
+        },
+        order_status_changed(payload) { 
+            this.$toasted.show(`Order #${payload.orderId} marked as ${payload.status}!`, {type: "success",}).goAway(3500);
+        },
     },
     data() {
         return {

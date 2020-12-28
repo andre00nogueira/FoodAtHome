@@ -82,6 +82,12 @@ export default {
           status: value,
         })
         .then((response) => {
+          let payload = {
+            userId: this.order.customer_id,
+            status: value,
+            orderId: this.order.id
+          }
+          this.$socket.emit("order_status", payload);
           this.order.status=value
           if (value === "R") {
             this.setCookAvailable();
