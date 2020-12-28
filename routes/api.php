@@ -37,6 +37,7 @@ Route::get('products/types/{type_name}', [ProductController::class, 'productByTy
 Route::post('customers',[CustomerController::class, 'store']);
 Route::get('customers/orders/{customer}/open', [CustomerController::class, 'openOrders']);
 Route::get('customers/orders/{customer}/closed', [CustomerController::class, 'closedOrders']);
+Route::get('customers/{customer}',[CustomerController::class, 'show']);
 
 
 

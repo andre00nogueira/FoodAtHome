@@ -2396,6 +2396,14 @@ __webpack_require__.r(__webpack_exports__);
       axios.patch("api/orders/".concat(this.order.id), {
         status: value
       }).then(function (response) {
+        var payload = {
+          userId: _this3.order.customer_id,
+          status: value,
+          orderId: _this3.order.id
+        };
+
+        _this3.$socket.emit("order_status", payload);
+
         _this3.order.status = value;
 
         if (value === "R") {
@@ -2592,6 +2600,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2645,6 +2661,15 @@ __webpack_require__.r(__webpack_exports__);
       }
     }
   },
+  sockets: {
+    order_status_changed: function order_status_changed(payload) {
+      var orderId = payload.orderId;
+      var status = payload.status;
+      this.openOrders.find(function (order) {
+        return order.id == orderId;
+      }).status = status;
+    }
+  },
   components: {
     navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
     orderTable: _order_table_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
@@ -2683,6 +2708,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2690,21 +2721,26 @@ __webpack_require__.r(__webpack_exports__);
     return {
       orders: [],
       ordersData: {},
+      client: undefined,
       currentOrder: undefined
     };
   },
   created: function created() {
     var _this = this;
 
-    axios.get("api/deliverymen/orders").then(function (response) {
-      _this.ordersData = response.data;
-      _this.orders = _this.ordersData.data;
-    });
     axios.get("api/deliverymen/".concat(this.$route.params.id, "/order")).then(function (response) {
-      console.log(response.data.data);
+      console.log(response.data);
 
-      if (response.data.data.length > 0) {
+      if (response.data) {
         _this.currentOrder = response.data.data;
+        axios.get("api/customer/".concat(_this.currentOrder)).then(function (response) {
+          _this.client = response.data.data;
+        });
+      } else {
+        axios.get("api/deliverymen/orders").then(function (response) {
+          _this.ordersData = response.data;
+          _this.orders = _this.ordersData.data;
+        });
       }
     });
   },
@@ -2722,6 +2758,17 @@ __webpack_require__.r(__webpack_exports__);
           _this2.orders = _this2.ordersData.data;
         });
       }
+    },
+    deliverOrder: function deliverOrder(orderID) {
+      var order = orders.find(function (order) {
+        return order.id === orderID;
+      });
+      var payload = {
+        userId: order.customer_id,
+        status: value,
+        orderId: order.id
+      };
+      this.$socket.emit("order_status", payload);
     }
   },
   components: {
@@ -3148,8 +3195,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['orders'],
+  props: ['orders', 'toDelivery'],
   methods: {
     getStatus: function getStatus(status) {
       switch (status) {
@@ -3171,6 +3219,9 @@ __webpack_require__.r(__webpack_exports__);
         default:
           return "Cancelled";
       }
+    },
+    deliverOrder: function deliverOrder(orderID) {
+      this.$emit('assignOrder', orderID);
     }
   }
 });
@@ -42261,32 +42312,68 @@ var render = function() {
     [
       _c("navbar"),
       _vm._v(" "),
-      _c("div", [
-        _c("h4", [_vm._v("Current Order")]),
-        _vm._v(" "),
-        _vm.currentOrder
-          ? _c("div")
-          : _c("div", { staticClass: "content" }, [
-              _c("h3", [_vm._v("You don't have any delivery assigned!")])
-            ])
-      ]),
-      _vm._v(" "),
-      _c(
-        "div",
-        [
-          _c("h4", [_vm._v("My Orders")]),
-          _vm._v(" "),
-          _c("orderTable", { attrs: { orders: _vm.orders } }),
-          _vm._v(" "),
-          _vm.orders.length > 0
-            ? _c("pagination", {
-                attrs: { data: _vm.ordersData },
-                on: { "pagination-change-page": _vm.getResults }
-              })
-            : _vm._e()
-        ],
-        1
-      )
+      _vm.currentOrder
+        ? _c("div", [
+            _c("h4", [_vm._v("Current Delivery")]),
+            _vm._v(" "),
+            _c("h3", [_vm._v("Current Order - #" + _vm._s(_vm.order.id))]),
+            _vm._v(" "),
+            _c("br"),
+            _vm._v(" "),
+            _c("h3", [_vm._v("Customer - " + _vm._s(_vm.order.customer_name))]),
+            _vm._v(" "),
+            _c("h4", [
+              _vm._v(
+                "Status - " +
+                  _vm._s(_vm.order.status == "H" ? "Holding" : "Preparing")
+              )
+            ]),
+            _vm._v(" "),
+            _c("h5", [
+              _vm._v("Preparation Started - " + _vm._s(_vm.order.opened_at))
+            ]),
+            _vm._v(" "),
+            _c("h6", [
+              _vm._v("Price - " + _vm._s(_vm.order.total_price) + "€")
+            ]),
+            _vm._v(" "),
+            _c("h6", [
+              _vm._v(
+                "Notes - " +
+                  _vm._s(_vm.order.notes ? _vm.order.notes : "No notes")
+              )
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "content" },
+              [
+                _c("h2", [_vm._v("Items")]),
+                _vm._v(" "),
+                _c("itemsTable", { attrs: { items: _vm.order.orderItems } })
+              ],
+              1
+            )
+          ])
+        : _c(
+            "div",
+            [
+              _c("h4", [_vm._v("My Orders")]),
+              _vm._v(" "),
+              _c("orderTable", {
+                attrs: { orders: _vm.orders, "to-delivery": true },
+                on: { assignOrder: _vm.deliverOrder }
+              }),
+              _vm._v(" "),
+              _vm.orders.length > 0
+                ? _c("pagination", {
+                    attrs: { data: _vm.ordersData },
+                    on: { "pagination-change-page": _vm.getResults }
+                  })
+                : _vm._e()
+            ],
+            1
+          )
     ],
     1
   )
@@ -42841,17 +42928,32 @@ var render = function() {
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(order.date))]),
                   _vm._v(" "),
-                  _c(
-                    "td",
-                    [
-                      _c(
-                        "router-link",
-                        { attrs: { to: "/orders/" + order.id } },
-                        [_vm._v("Details")]
+                  !_vm.toDelivery
+                    ? _c(
+                        "td",
+                        [
+                          _c(
+                            "router-link",
+                            { attrs: { to: "/orders/" + order.id } },
+                            [_vm._v("Details")]
+                          )
+                        ],
+                        1
                       )
-                    ],
-                    1
-                  )
+                    : _c("td", [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-link",
+                            on: {
+                              click: function($event) {
+                                return _vm.deliverOrder(order.id)
+                              }
+                            }
+                          },
+                          [_vm._v("Deliver Order")]
+                        )
+                      ])
                 ])
               }),
               0
@@ -59900,6 +60002,11 @@ var app = new Vue({
       })["catch"](function (error) {
         console.log(error);
       });
+    },
+    order_status_changed: function order_status_changed(payload) {
+      this.$toasted.show("Order #".concat(payload.orderId, " marked as ").concat(payload.status, "!"), {
+        type: "success"
+      }).goAway(3500);
     }
   },
   data: function data() {

@@ -152,6 +152,42 @@ class UserController extends Controller
 
     public function deliverymanCurrentOrder($id)
     {
-        return OrderResource::collection(Order::where('prepared_by', $id)->whereIn('status', ['R','T'])->get());
+        $order =  Order::where('delivered_by', '=', $id)->whereIn('status', ['R','T'])->first();
+        if ($order == null) {
+            return null;
+        }
+        $orderToSend = new stdClass();
+
+        // ORDER
+        $orderToSend->id = $order->id;
+        $orderToSend->notes = $order->notes;
+        $orderToSend->opened_at = $order->opened_at;
+        $orderToSend->date = $order->date;
+        $orderToSend->status = $order->status;
+        $orderToSend->total_price = $order->total_price;
+        $orderToSend->preparation_time = $order->preparation_time;
+        $orderToSend->prepared_by = $order->prepared_by;
+        $orderToSend->delivery_time = $order->delivery_time;
+        $orderToSend->delivered_by = $order->delivered_by;
+        $orderToSend->total_time = $order->total_time;
+
+        // ORDER ITEMS
+        $orderItems = [];
+        foreach ($order->orderItems as $item) {
+            // We create a new stdClass, which allow us to create a new object
+            // with the attributes we want
+            $itemToSend = new stdClass();
+
+            $product = Product::find($item->product_id);
+            $itemToSend->name = $product->name;
+            $itemToSend->photo_url = $product->photo_url;
+            $itemToSend->quantity = $item->quantity;
+            $itemToSend->sub_total_price = $item->sub_total_price;
+
+            array_push($orderItems, $itemToSend);
+        }
+        $orderToSend->orderItems = $orderItems;
+
+        return new OrderResource($orderToSend);
     }
 }

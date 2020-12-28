@@ -14,7 +14,8 @@
               <td>{{getStatus(order.status)}}</td>
               <td>{{ order.total_price }}€</td>
               <td>{{order.date}}</td>
-              <td><router-link :to="`/orders/${order.id}`">Details</router-link></td>
+              <td v-if="!toDelivery"><router-link :to="`/orders/${order.id}`">Details</router-link></td>
+              <td v-else><button class="btn btn-link" @click="deliverOrder(order.id)">Deliver Order</button></td>
             </tr>
           </tbody>
         </table>
@@ -24,7 +25,7 @@
 
 <script>
 export default {
-    props:['orders'],
+    props:['orders','toDelivery'],
     methods:{
         getStatus(status){
             switch(status){
@@ -41,6 +42,9 @@ export default {
                 default:
                     return "Cancelled";
             }
+        },
+        deliverOrder(orderID){
+          this.$emit('assignOrder',orderID)
         }
   }
 }

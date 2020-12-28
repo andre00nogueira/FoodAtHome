@@ -74,7 +74,17 @@ class CustomerController extends Controller
      */
     public function show($id)
     {
-        //
+        $customer = Customer::findOrFail($id);
+        $userData=$customer->user();
+        $customerToSend =  new stdClass();
+        $customerToSend->id=$customer->id;
+        $customerToSend->name=$userData->name;
+        $customerToSend->email=$userData->email;
+        $customerToSend->address=$customer->address;
+        $customerToSend->phone=$customer->phone;
+        $customerToSend->nif=$customer->nif;
+        $customerToSend->photo_url=$userData->photo_url;
+        return new CustomerResource($customerToSend);
     }
 
     /**
