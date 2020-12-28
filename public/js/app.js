@@ -2678,21 +2678,34 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       orders: [],
-      ordersData: {}
+      ordersData: {},
+      currentOrder: undefined
     };
   },
   created: function created() {
     var _this = this;
 
-    axios.get("api/deliverymen/".concat(this.$route.params.id, "/orders")).then(function (response) {
+    axios.get("api/deliverymen/orders").then(function (response) {
       _this.ordersData = response.data;
       _this.orders = _this.ordersData.data;
+    });
+    axios.get("api/deliverymen/".concat(this.$route.params.id, "/order")).then(function (response) {
+      console.log(response.data.data);
+
+      if (response.data.data.length > 0) {
+        _this.currentOrder = response.data.data;
+      }
     });
   },
   methods: {
@@ -2700,7 +2713,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this2 = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      var url = "api/deliverymen/".concat(this.$route.params.id, "/orders");
+      var url = "api/deliverymen/orders";
 
       if (page != 0) {
         url += "?page=".concat(page);
@@ -42248,7 +42261,15 @@ var render = function() {
     [
       _c("navbar"),
       _vm._v(" "),
-      _vm._m(0),
+      _c("div", [
+        _c("h4", [_vm._v("Current Order")]),
+        _vm._v(" "),
+        _vm.currentOrder
+          ? _c("div")
+          : _c("div", { staticClass: "content" }, [
+              _c("h3", [_vm._v("You don't have any delivery assigned!")])
+            ])
+      ]),
       _vm._v(" "),
       _c(
         "div",
@@ -42270,14 +42291,7 @@ var render = function() {
     1
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", [_c("h4", [_vm._v("Current Order")])])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 

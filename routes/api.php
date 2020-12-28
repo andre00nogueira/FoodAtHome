@@ -57,7 +57,8 @@ Route::get('users/{user}', [UserController::class, 'show']);
 Route::patch('users/{user}', [UserController::class, 'patchUser']);
 
 //deliveryman
-Route::get('deliverymen/{deliveryman}/orders', [UserController::class, 'deliverymanOrders']);
+Route::get('deliverymen/orders', [UserController::class, 'deliverymanOrders']);
+Route::get('deliverymen/{deliveryman}/order', [UserController::class, 'deliverymanCurrentOrder']);
 
 // Orders
 Route::get('orders/{id}', [OrderController::class, 'show']);

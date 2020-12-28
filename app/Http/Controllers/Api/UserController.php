@@ -145,8 +145,13 @@ class UserController extends Controller
         return response()->json($totalEmail == 0);
     }
 
-    public function deliverymanOrders(Request $request)
+    public function deliverymanOrders()
     {
-        return OrderResource::collection(Order::where('delivered_by',$request->deliveryman)->where('status', 'R')->orderBy('current_status_at', 'desc')->paginate(10));
+        return OrderResource::collection(Order::where('status', 'R')->orderBy('current_status_at', 'desc')->paginate(10));
+    }
+
+    public function deliverymanCurrentOrder($id)
+    {
+        return OrderResource::collection(Order::where('prepared_by', $id)->whereIn('status', ['R','T'])->get());
     }
 }
