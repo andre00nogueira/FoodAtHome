@@ -68,11 +68,11 @@ class UserController extends Controller
 
     public function getCurrentOrder($id)
     {
-        $order =  Order::where('prepared_by', '=', $id)->where('status', '=', 'H')->orWhere('status', '=', 'P')->first();
+        $order = Order::where('prepared_by', '=', $id)->where('status', '=', 'H')->orWhere('status', '=', 'P')->first();
         if ($order == null) {
             return null;
         }
-        return $order;
+        return $order->id;
     }
 
 

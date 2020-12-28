@@ -69,7 +69,7 @@ export default {
         .get(`api/cook/${this.$route.params.id}/currentOrder`)
         .then((response) => {
           if (response.data) {
-            this.order = response.data;
+            this.getCurrentOrder(response.data)
           }
         });
     },
