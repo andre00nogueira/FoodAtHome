@@ -147,12 +147,12 @@ class UserController extends Controller
 
     public function deliverymanOrders()
     {
-        return OrderResource::collection(Order::where('status', 'R')->orderBy('current_status_at', 'desc')->paginate(10));
+        return OrderResource::collection(Order::where('status', 'R')->orderBy('current_status_at', 'asc')->paginate(10));
     }
 
     public function deliverymanCurrentOrder($id)
     {
-        $order =  Order::where('delivered_by', '=', $id)->whereIn('status', ['R','T'])->first();
+        $order =  Order::where('delivered_by', '=', $id)->where('status', 'T')->first();
         if ($order == null) {
             return null;
         }
@@ -172,6 +172,7 @@ class UserController extends Controller
         $orderToSend->total_time = $order->total_time;
         $orderToSend->customer_id = $order->customer_id;
         $orderToSend->customer_name = "";
+        $orderToSend->current_status_at = $order->current_status_at->format('Y-m-d H:i:s');
 
         // ORDER ITEMS
         $orderItems = [];

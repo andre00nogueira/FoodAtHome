@@ -37,6 +37,6 @@ class CartController extends Controller
             $orderItem->sub_total_price = $orderItem->quantity*$orderItem->unit_price;
             $orderItem->save();
         }
-        return response()->json(new OrderResource($order), 201);
+        return new OrderResource($order);
     }
 }

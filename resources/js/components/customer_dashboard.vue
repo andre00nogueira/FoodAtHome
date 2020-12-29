@@ -13,7 +13,7 @@
     </div>
     <div>
       <h4>My Closed Orders</h4>
-      <orderTable :orders="closedOrders" />
+      <orderTable :orders="closedOrders" :to-delivery="false" />
       <pagination
         v-if="closedOrders.length > 0"
         :data="closedOpenOrdersData"
@@ -72,7 +72,11 @@ export default {
     },
   },
   sockets: {
-    order_ready_to_deliver(payload) {
+    order_status_changed(payload) {
+      if(payload.status=='D'){
+        this.getOpenResults()
+        this.getClosedResults()
+      }
       let orderId = payload.orderId;
       let status = payload.status;
 

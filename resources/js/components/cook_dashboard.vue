@@ -94,6 +94,7 @@ export default {
           this.order.current_status_at = response.data.data.current_status_at
           this.order.status = value
           if (value === "R") {
+            console.log("entered R")
             this.setCookAvailable();
             this.$toasted
               .show(`Order #${this.order.id} marked as ready!`, {

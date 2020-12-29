@@ -3,24 +3,35 @@
     <navbar />
     <div v-if="currentOrder">
       <h4>Current Delivery</h4>
+      <div class="content" v-if="currentOrder">
+        <div class="buttons">
+            <button
+            class="btn btn-primary"
+            @click="completeOrder"
+            >
+            Mark Order as Delivered
+            </button>
+        </div>
       <h3>Current Order - #{{ currentOrder.id }}</h3>
       <br />
-      <div v-if="client">
-      <h3>Customer Data</h3>
-      <h5>Name - {{ client.name }}</h5>
-      <h5>Address - {{ client.address }}</h5>
-      <h5>Phone - {{ client.phone }}</h5>
-      <h5>Email - {{ client.email }}</h5>
-      <h5>Photo</h5>
-      </div>
+        <div v-if="client">
+            <h3>Customer Data</h3>
+            <h5>Name - {{ client.name }}</h5>
+            <h5>Address - {{ client.address }}</h5>
+            <h5>Phone - {{ client.phone }}</h5>
+            <h5>Email - {{ client.email }}</h5>
+            <h5>Photo</h5>
+        </div>
       <br />
       <h4>Status - {{ currentOrder.status }}</h4>
       <h5>Delivery Started - {{ currentOrder.current_status_at }}</h5>
+      <chronometer :initial-time="currentOrder.current_status_at"/>
       <h6>Price - {{ currentOrder.total_price }}€</h6>
       <h6>Notes - {{ currentOrder.notes ? order.notes : "No notes" }}</h6>
       <div class="content">
         <h2>Items</h2>
         <itemsTable :items="currentOrder.orderItems" />
+      </div>
       </div>
     </div>
     <div v-else>
@@ -43,6 +54,7 @@
 import navbar from "./navbar.vue";
 import orderTable from "./order_table.vue";
 import itemsTable from "./items_table.vue";
+import chronometer from './chronometer.vue';
 export default {
   data() {
     return {
@@ -58,12 +70,10 @@ export default {
       .then((response) => {
         if (response.data) {
           this.currentOrder = response.data.data;
-          this.getClient();
+          console.log(this.currentOrder)
+          this.getClient()
         } else {
-          axios.get(`api/deliverymen/orders`).then((response) => {
-            this.ordersData = response.data;
-            this.orders = this.ordersData.data;
-          });
+          this.getOrdersToDeliver()
         }
       });
   },
@@ -84,50 +94,37 @@ export default {
         this.client = response.data.data;
       });
     },
+    getOrdersToDeliver(){
+        axios.get(`api/deliverymen/orders`).then((response) => {
+            this.ordersData = response.data;
+            this.orders = this.ordersData.data;
+          });
+    },
     deliverOrder(orderID) {
-      console.log("before emit");
-      var order = this.orders.find((order) => {
-        return order.id === orderID;
-      });
-      let value = "";
-      if (order.status == "R") {
-        value = "T";
-      } else {
-        value = "D";
-      }
+        console.log("deliver order")
       axios
-        .patch(`api/orders/${order.id}`, {
-          status: value,
+        .patch(`api/orders/${orderID}`, {
+          status: 'T',
           delivered_by: this.$store.state.user.id,
         })
         .then((response) => {
-          this.currentOrder = response.data;
-          getClient()
+          this.currentOrder = response.data.data;
+          console.log("before get client")
+          console.log(this.currentOrder )
+          this.getClient()
           console.log(this.currentOrder);
           let payload = {
             userId: this.currentOrder.customer_id,
-            status: this.currentOrde.status,
+            status: this.currentOrder.status,
             orderId: this.currentOrder.id,
-          };
-          this.$socket.emit("order_status", payload);
-          if (value === "D") {
-            //todo set deliveryman available
-            this.setDeliverymanAvailable();
-            this.$toasted
-              .show(`Order #${this.currentOrder.id} marked as delivered!`, {
-                type: "success",
-              })
-              .goAway(3500);
-
-            return;
-          } else {
-            this.$toasted
-              .show(`Order #${this.currentOrder.id} marked as in transit!`, {
-                type: "success",
-              })
-              .goAway(3500);
           }
-        });
+          this.$socket.emit("order_status", payload)
+          this.$toasted
+              .show(`Order #${this.currentOrder.id} assigned to me and marked as in transit!`, {
+                type: "success",
+              })
+              .goAway(3500)
+        })
     },
     setDeliverymanAvailable() {
       axios
@@ -136,11 +133,34 @@ export default {
         })
         .then((response) => {
           this.currentOrder = undefined;
+          this.getOrdersToDeliver()
         })
         .catch((error) => {
           console.log(error);
         });
     },
+    completeOrder(){
+        console.log("complete order")
+        axios
+        .patch(`api/orders/${this.currentOrder.id}`, {
+          status:'D'
+        }).then((reponse)=>{
+            console.log(response)
+            this.currentOrder=response.data.data
+            let payload = {
+                userId: this.currentOrder.customer_id,
+                status: this.currentOrder.status,
+                orderId: this.currentOrder.id,
+            };
+            this.setDeliverymanAvailable();
+            this.$toasted
+              .show(`Order #${this.currentOrder.id} marked as delivered!`, {
+                type: "success",
+              })
+              .goAway(3500);
+          this.$socket.emit("order_status", payload)
+        })
+    }
   },
   sockets: {
     order_ready_to_deliver(orderID) {
@@ -153,7 +173,7 @@ export default {
       }
     },
   },
-  components: { navbar, orderTable, itemsTable },
+  components: { navbar, orderTable, itemsTable,chronometer },
 };
 </script>
 
