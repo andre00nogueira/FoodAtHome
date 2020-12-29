@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\OrderResource;
+use stdClass;
 
 class CustomerController extends Controller
 {
@@ -75,7 +76,7 @@ class CustomerController extends Controller
     public function show($id)
     {
         $customer = Customer::findOrFail($id);
-        $userData=$customer->user();
+        $userData= User::findOrFail($id);
         $customerToSend =  new stdClass();
         $customerToSend->id=$customer->id;
         $customerToSend->name=$userData->name;

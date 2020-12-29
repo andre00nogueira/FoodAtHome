@@ -2427,9 +2427,13 @@ __webpack_require__.r(__webpack_exports__);
       axios.patch("api/users/".concat(this.$store.state.user.id), {
         available: new Boolean(true)
       }).then(function (response) {
+        var payload = {
+          userId: _this4.$store.state.user.id,
+          orderId: _this4.order.id
+        };
         _this4.order = undefined;
 
-        _this4.$socket.emit("order_ready", _this4.$store.state.user.id);
+        _this4.$socket.emit("order_ready", payload);
 
         console.log(response.data);
       })["catch"](function (error) {
@@ -2662,7 +2666,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   sockets: {
-    order_status_changed: function order_status_changed(payload) {
+    order_ready_to_deliver: function order_ready_to_deliver(payload) {
       var orderId = payload.orderId;
       var status = payload.status;
       this.openOrders.find(function (order) {
@@ -2689,6 +2693,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _navbar_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./navbar.vue */ "./resources/js/components/navbar.vue");
 /* harmony import */ var _order_table_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./order_table.vue */ "./resources/js/components/order_table.vue");
+/* harmony import */ var _items_table_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./items_table.vue */ "./resources/js/components/items_table.vue");
 //
 //
 //
@@ -2714,6 +2719,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2729,13 +2751,10 @@ __webpack_require__.r(__webpack_exports__);
     var _this = this;
 
     axios.get("api/deliverymen/".concat(this.$route.params.id, "/order")).then(function (response) {
-      console.log(response.data);
-
       if (response.data) {
         _this.currentOrder = response.data.data;
-        axios.get("api/customer/".concat(_this.currentOrder)).then(function (response) {
-          _this.client = response.data.data;
-        });
+
+        _this.getClient();
       } else {
         axios.get("api/deliverymen/orders").then(function (response) {
           _this.ordersData = response.data;
@@ -2759,21 +2778,90 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
+    getClient: function getClient() {
+      var _this3 = this;
+
+      axios.get("api/customers/".concat(this.currentOrder.customer_id)).then(function (response) {
+        console.log(response.data);
+        _this3.client = response.data.data;
+      });
+    },
     deliverOrder: function deliverOrder(orderID) {
-      var order = orders.find(function (order) {
+      var _this4 = this;
+
+      console.log("before emit");
+      var order = this.orders.find(function (order) {
         return order.id === orderID;
       });
-      var payload = {
-        userId: order.customer_id,
+      var value = "";
+
+      if (order.status == "R") {
+        value = "T";
+      } else {
+        value = "D";
+      }
+
+      axios.patch("api/orders/".concat(order.id), {
         status: value,
-        orderId: order.id
-      };
-      this.$socket.emit("order_status", payload);
+        delivered_by: this.$store.state.user.id
+      }).then(function (response) {
+        _this4.currentOrder = response.data;
+        getClient();
+        console.log(_this4.currentOrder);
+        var payload = {
+          userId: _this4.currentOrder.customer_id,
+          status: _this4.currentOrde.status,
+          orderId: _this4.currentOrder.id
+        };
+
+        _this4.$socket.emit("order_status", payload);
+
+        if (value === "D") {
+          //todo set deliveryman available
+          _this4.setDeliverymanAvailable();
+
+          _this4.$toasted.show("Order #".concat(_this4.currentOrder.id, " marked as delivered!"), {
+            type: "success"
+          }).goAway(3500);
+
+          return;
+        } else {
+          _this4.$toasted.show("Order #".concat(_this4.currentOrder.id, " marked as in transit!"), {
+            type: "success"
+          }).goAway(3500);
+        }
+      });
+    },
+    setDeliverymanAvailable: function setDeliverymanAvailable() {
+      var _this5 = this;
+
+      axios.patch("api/users/".concat(this.$store.state.user.id), {
+        available: new Boolean(true)
+      }).then(function (response) {
+        _this5.currentOrder = undefined;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    }
+  },
+  sockets: {
+    order_ready_to_deliver: function order_ready_to_deliver(orderID) {
+      var _this6 = this;
+
+      console.log("received order ready to deliver");
+
+      if (!this.currentOrder) {
+        axios.get("api/deliverymen/orders").then(function (response) {
+          _this6.ordersData = response.data;
+          _this6.orders = _this6.ordersData.data;
+        });
+      }
     }
   },
   components: {
     navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    orderTable: _order_table_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+    orderTable: _order_table_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+    itemsTable: _items_table_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   }
 });
 
@@ -2881,13 +2969,20 @@ __webpack_require__.r(__webpack_exports__);
             loggedin: new Boolean(true)
           }).then(function (response) {
             var user = response.data;
-            console.log("PATCH LOGGEDIN RESPONSE = " + user);
+            console.log("PATCH LOGGEDIN RESPONSE = " + user.type);
 
             switch (user.type) {
               case "EC":
                 console.log("ENTERED EC");
 
-                _this.getCurrentOrderId(user);
+                _this.getCurrentOrder(user, "api/cook/".concat(user.id, "/currentOrder"));
+
+                break;
+
+              case "ED":
+                console.log("ENTERED ED");
+
+                _this.getCurrentOrder(user, "api/deliverymen/".concat(user.id, "/order"));
 
                 break;
 
@@ -2906,18 +3001,18 @@ __webpack_require__.r(__webpack_exports__);
         });
       });
     },
-    getCurrentOrderId: function getCurrentOrderId(user) {
+    getCurrentOrder: function getCurrentOrder(user, url) {
       var _this2 = this;
 
       console.log("CURRENT ORDER ID USER = " + user);
-      axios.get("api/cook/".concat(user.id, "/currentOrder")).then(function (response) {
+      axios.get(url).then(function (response) {
         var orderId = response.data;
         console.log("CURRENT ORDER ORDER ID = " + orderId); // No order
 
         if (orderId == "") {
-          console.log("NO ORDER, COOK IS AVAILABLE");
+          console.log("NO ORDER, Worker IS AVAILABLE");
 
-          _this2.setCookAvailable(user);
+          _this2.setAvailable(user);
         } else {
           console.log("THERE IS AN ORDER ALREADY");
 
@@ -2925,14 +3020,14 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    setCookAvailable: function setCookAvailable(user) {
+    setAvailable: function setAvailable(user) {
       var _this3 = this;
 
       axios.patch("api/users/".concat(user.id), {
         available: new Boolean(true)
       }).then(function (response) {
         var user = response.data;
-        console.log("NO ORDER, WE SET COOK AVAILABLE = " + user);
+        console.log("NO ORDER, WE SET WORKER AVAILABLE = " + user);
 
         _this3.saveUserAndRedirect(user);
       });
@@ -3221,6 +3316,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     deliverOrder: function deliverOrder(orderID) {
+      console.log("until emit");
       this.$emit('assignOrder', orderID);
     }
   }
@@ -42316,31 +42412,47 @@ var render = function() {
         ? _c("div", [
             _c("h4", [_vm._v("Current Delivery")]),
             _vm._v(" "),
-            _c("h3", [_vm._v("Current Order - #" + _vm._s(_vm.order.id))]),
+            _c("h3", [
+              _vm._v("Current Order - #" + _vm._s(_vm.currentOrder.id))
+            ]),
             _vm._v(" "),
             _c("br"),
             _vm._v(" "),
-            _c("h3", [_vm._v("Customer - " + _vm._s(_vm.order.customer_name))]),
+            _vm.client
+              ? _c("div", [
+                  _c("h3", [_vm._v("Customer Data")]),
+                  _vm._v(" "),
+                  _c("h5", [_vm._v("Name - " + _vm._s(_vm.client.name))]),
+                  _vm._v(" "),
+                  _c("h5", [_vm._v("Address - " + _vm._s(_vm.client.address))]),
+                  _vm._v(" "),
+                  _c("h5", [_vm._v("Phone - " + _vm._s(_vm.client.phone))]),
+                  _vm._v(" "),
+                  _c("h5", [_vm._v("Email - " + _vm._s(_vm.client.email))]),
+                  _vm._v(" "),
+                  _c("h5", [_vm._v("Photo")])
+                ])
+              : _vm._e(),
             _vm._v(" "),
-            _c("h4", [
+            _c("br"),
+            _vm._v(" "),
+            _c("h4", [_vm._v("Status - " + _vm._s(_vm.currentOrder.status))]),
+            _vm._v(" "),
+            _c("h5", [
               _vm._v(
-                "Status - " +
-                  _vm._s(_vm.order.status == "H" ? "Holding" : "Preparing")
+                "Delivery Started - " +
+                  _vm._s(_vm.currentOrder.current_status_at)
               )
             ]),
             _vm._v(" "),
-            _c("h5", [
-              _vm._v("Preparation Started - " + _vm._s(_vm.order.opened_at))
-            ]),
-            _vm._v(" "),
             _c("h6", [
-              _vm._v("Price - " + _vm._s(_vm.order.total_price) + "€")
+              _vm._v("Price - " + _vm._s(_vm.currentOrder.total_price) + "€")
             ]),
             _vm._v(" "),
             _c("h6", [
               _vm._v(
                 "Notes - " +
-                  _vm._s(_vm.order.notes ? _vm.order.notes : "No notes")
+                  _vm._s(_vm.currentOrder.notes ? _vm.order.notes : "No notes")
               )
             ]),
             _vm._v(" "),
@@ -42350,7 +42462,9 @@ var render = function() {
               [
                 _c("h2", [_vm._v("Items")]),
                 _vm._v(" "),
-                _c("itemsTable", { attrs: { items: _vm.order.orderItems } })
+                _c("itemsTable", {
+                  attrs: { items: _vm.currentOrder.orderItems }
+                })
               ],
               1
             )

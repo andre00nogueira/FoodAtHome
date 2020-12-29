@@ -44,6 +44,7 @@ export default {
             }
         },
         deliverOrder(orderID){
+          console.log("until emit")
           this.$emit('assignOrder',orderID)
         }
   }

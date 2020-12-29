@@ -51,11 +51,15 @@ export default {
               })
               .then((response) => {
                 let user = response.data
-                console.log("PATCH LOGGEDIN RESPONSE = " + user);
+                console.log("PATCH LOGGEDIN RESPONSE = " + user.type);
                 switch (user.type) {
                   case "EC":
                     console.log("ENTERED EC");
-                    this.getCurrentOrderId(user);
+                    this.getCurrentOrder(user,`api/cook/${user.id}/currentOrder`);
+                    break;
+                  case "ED":
+                    console.log("ENTERED ED");
+                    this.getCurrentOrder(user,`api/deliverymen/${user.id}/order`);
                     break;
                   default:
                     console.log("ENTERED C");
@@ -72,31 +76,31 @@ export default {
           });
       });
     },
-    getCurrentOrderId(user) {
+    getCurrentOrder(user,url) {
       console.log("CURRENT ORDER ID USER = " + user);
       axios
-        .get(`api/cook/${user.id}/currentOrder`)
+        .get(url)
         .then((response) => {
           let orderId = response.data;
           console.log("CURRENT ORDER ORDER ID = " + orderId);
           // No order
           if (orderId == "") {
-            console.log("NO ORDER, COOK IS AVAILABLE");
-            this.setCookAvailable(user);
+            console.log("NO ORDER, Worker IS AVAILABLE");
+            this.setAvailable(user);
           } else {
             console.log("THERE IS AN ORDER ALREADY");
             this.saveUserAndRedirect(user);
           }
         });
     },
-    setCookAvailable(user) {
+    setAvailable(user) {
       axios
         .patch(`api/users/${user.id}`, {
           available: new Boolean(true),
         })
         .then((response) => {
           let user = response.data;
-          console.log("NO ORDER, WE SET COOK AVAILABLE = " + user);
+          console.log("NO ORDER, WE SET WORKER AVAILABLE = " + user);
           this.saveUserAndRedirect(user);
         });
     },

@@ -72,7 +72,7 @@ export default {
     },
   },
   sockets: {
-    order_status_changed(payload) {
+    order_ready_to_deliver(payload) {
       let orderId = payload.orderId;
       let status = payload.status;
 

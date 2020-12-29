@@ -170,6 +170,8 @@ class UserController extends Controller
         $orderToSend->delivery_time = $order->delivery_time;
         $orderToSend->delivered_by = $order->delivered_by;
         $orderToSend->total_time = $order->total_time;
+        $orderToSend->customer_id = $order->customer_id;
+        $orderToSend->customer_name = "";
 
         // ORDER ITEMS
         $orderItems = [];

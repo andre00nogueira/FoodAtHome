@@ -63,7 +63,7 @@ Route::get('deliverymen/{deliveryman}/order', [UserController::class, 'deliverym
 
 // Orders
 Route::get('orders/{id}', [OrderController::class, 'show']);
-Route::patch('orders/{id}', [OrderController::class, 'patchOrder']);
+Route::patch('orders/{id}', [OrderController::class, 'update']);
 Route::get('cook/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
 
 
