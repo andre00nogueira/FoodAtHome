@@ -3,7 +3,7 @@
     <navbar />
 
     <h2>Menu</h2>
-
+    <router-link to="/products/create">Create</router-link>
     <div id="filterArea">
       <input
         class="form-control"
