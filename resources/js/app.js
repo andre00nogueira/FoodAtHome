@@ -85,7 +85,16 @@ const app = new Vue({
             })
         },
         order_status_changed(payload) { 
-            this.$toasted.show(`Order #${payload.orderId} marked as ${payload.status}!`, {type: "success",}).goAway(3500);
+            let status = ""
+            switch(payload.status){
+                case 'P':
+                    status = "Preparing"
+                    break
+                case 'R':
+                    status = "Ready"
+                    break
+            }
+            this.$toasted.show(`Order #${payload.orderId} marked as ${status}!`, {type: "success",}).goAway(3500);
         },
     },
     data() {
