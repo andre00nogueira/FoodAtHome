@@ -43,7 +43,7 @@ class CustomerController extends Controller
     {
         $request->validated();
         $user = new User();
-        $user->name =$request->name;
+        $user->name=$request->name;
         $user->email=$request->email;
         $user->password= bcrypt($request->password);
         if($request->has('photo_url')){
