@@ -65,7 +65,7 @@
                 🛒
               </button>
             
-              <button class="btn btn-danger" style="margin-left: 2%">
+              <button class="btn btn-danger" style="margin-left: 2%" @click.prevent="deleteProduct(product)">
                 🗑️
               </button>
             <!--
@@ -183,6 +183,16 @@ export default {
 
     addToCart(product, quantity) {
       this.$store.commit("addItemToCart", product);
+    },
+
+    deleteProduct(product){
+      axios.delete(`api/products/${product.id}`).then((result)=>{
+        let productDeletedIndex=this.products.findIndex((p)=>p.id==product.id)
+        this.products.splice(productDeletedIndex,1)
+        this.$toasted.show(`Product ${product.name} deleted!`, {type: "success",}).goAway(3500);
+      }).catch((error)=>{
+        console.log(error)
+      })
     },
   },
 
