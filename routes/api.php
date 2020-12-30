@@ -53,8 +53,12 @@ Route::post('cart/checkout', [CartController::class,'checkout']);
 Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']);
 
 //user
+Route::get('users', [UserController::class, 'index']);
+Route::get('users/types', [UserController::class, 'types']);
+Route::get('users/types/{type_name}', [UserController::class, 'usersByType']);
 Route::get('users/{user}', [UserController::class, 'show']);
 Route::patch('users/{user}', [UserController::class, 'patchUser']);
+Route::delete('users/{user}', [UserController::class, 'destroy']);
 
 // Orders
 Route::get('orders/{id}', [OrderController::class, 'show']);

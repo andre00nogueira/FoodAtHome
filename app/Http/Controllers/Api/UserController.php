@@ -5,16 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\User as UserResource;
-use App\Http\Resources\OrderResource as OrderResource;
 use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserLoggedAtRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserTypesResource;
 use App\Models\User;
 use App\Models\Order;
-use App\Models\Product;
-use Illuminate\Support\Facades\DB;
-use phpDocumentor\Reflection\Types\Null_;
-use stdClass;
 
 class UserController extends Controller
 {
@@ -26,16 +21,14 @@ class UserController extends Controller
     public function index(Request $request)
     {
         if ($request->has('page')) {
-            return UserResource::collection(User::paginate(5));
+            return UserResource::collection(User::paginate(10));
         } else {
             return UserResource::collection(User::all());
         }
-        /*Caso não se pretenda fazer uso de Eloquent API Resources (https://laravel.com/docs/5.5/eloquent-resources), é possível implementar com esta abordagem:
-        if ($request->has('page')) {
-            return User::with('department')->paginate(5);;
-        } else {
-            return User::with('department')->get();;
-        }*/
+    }
+
+    public function types(){
+        return UserTypesResource::collection(User::select('type')->distinct('type')->get());
     }
 
     public function show(User $user)
@@ -75,6 +68,11 @@ class UserController extends Controller
         return $order->id;
     }
 
+
+    public function usersByType(string $type_name)
+    {
+        return UserResource::collection(User::where('type', $type_name)->get());
+    }
 
     public function store(StoreUserRequest $request)
     {
@@ -123,8 +121,9 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        $removedUser = $user;
         $user->delete();
-        return response()->json(null, 204);
+        return new UserResource($removedUser);
     }
     // public function destroy($id)
     // {

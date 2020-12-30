@@ -13,6 +13,12 @@
       :to="`/cook/${$store.state.user.id}/dashboard`"
       >Dashboard</router-link
     >
+    <router-link
+      v-if="$store.state.user && $store.state.user.type == 'EM'"
+      class="navbar-brand"
+      :to="`/users`"
+      >Users List</router-link
+    >
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <template v-if="!$store.state.user">
