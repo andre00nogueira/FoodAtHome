@@ -126,7 +126,6 @@ export default {
       await axios.get(url).then((response) => {
         this.users = response.data.data;
         let myIndex = this.users.findIndex(u => u.id == this.$store.state.user.id)
-        console.log(myIndex)
         this.users.splice(myIndex , 1)
         this.usersData = response.data;
       });
