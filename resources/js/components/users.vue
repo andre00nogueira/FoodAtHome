@@ -46,6 +46,14 @@
           <td>
             <div style="display: flex">
               <button
+                v-if="user.type != 'C'"
+                class="btn btn-info"
+                style="margin-left: 2%"
+                v-on:click="editUser(user)"
+              >
+                🗑️
+              </button>
+              <button
                 class="btn btn-danger"
                 style="margin-left: 2%"
                 v-on:click="deleteUser(user)"
@@ -70,8 +78,6 @@ import navbar from "./navbar.vue";
 export default {
   data() {
     return {
-      //allUsers: [],
-      //allUsersData: {},
       users: [],
       usersData: {},
       types: [],
@@ -147,18 +153,22 @@ export default {
       axios
         .delete(`api/users/${user.id}`)
         .then((response) => {
-          console.log("ENTRIU");
-          let removedUserIndex = this.allUsers.findIndex(
-            (u) => u.id == user.id
-          );
-          if (removedUserIndex == -1) {
-            removedUserIndex = this.users.findIndex((u) => u.id == user.id);
-            this.users.splice(removedUserIndex, 1);
-            return;
-          }
-          this.allUsers.splice(removedUserIndex, 1);
+          let removedUserIndex = this.users.findIndex((u) => u.id == user.id);
+          this.users.splice(removedUserIndex, 1);
+          this.$toasted
+            .show(`User ${user.name} removed successfully!`, {
+              type: "success",
+            })
+            .goAway(3500);
         })
-        .catch((error) => {});
+        .catch((error) => {
+          console.log(error);
+          this.$toasted
+            .show(`There was an error while removing user #${user.name}!`, {
+              type: "error",
+            })
+            .goAway(3500);
+        });
     },
   },
   components: { navbar },

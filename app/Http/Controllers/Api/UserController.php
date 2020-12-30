@@ -122,7 +122,11 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $removedUser = $user;
+        if($user->type == 'C'){
+            $user->customer()->delete();
+        }
         $user->delete();
+        $user->save();
         return new UserResource($removedUser);
     }
     // public function destroy($id)
