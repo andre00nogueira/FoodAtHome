@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserTypesResource;
 use App\Models\User;
 use App\Models\Order;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -79,7 +80,13 @@ class UserController extends Controller
         $user = new User();
         $user->fill($request->validated());
         $user->password = bcrypt($user->password);
-        
+        if($request->hasFile('photo_url')){
+            $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
+            $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
+            $user->photo_url=$generated_new_name;
+        }else{
+            $user->photo_url='default_avatar.jpg';
+        }
         $user->save();
         return new UserResource($user);
     }

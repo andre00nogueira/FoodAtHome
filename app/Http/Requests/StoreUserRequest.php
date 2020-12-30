@@ -28,6 +28,7 @@ class StoreUserRequest extends FormRequest
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
             'type' => 'required|in:EM,EC,ED,C',
+            'photo_url' => 'nullable|image',
         ];
     }
 }

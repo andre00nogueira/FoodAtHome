@@ -43,11 +43,10 @@
             >
               {{ type.name }}
             </option>
-           
           </select>
-           <div v-if="errors && errors.type" class="text-danger">
-              {{ errors.type[0] }}
-            </div>
+          <div v-if="errors && errors.type" class="text-danger">
+            {{ errors.type[0] }}
+          </div>
         </div>
 
         <div class="form-group">
@@ -118,8 +117,17 @@ export default {
   },
   methods: {
     createUser() {
+      const data = new FormData();
+      if (this.user.photo_url) {
+        data.append("photo_url", this.user.photo_url);
+      }
+      data.append("name", this.user.name);
+      data.append("email", this.user.email);
+      data.append("type", this.user.type);
+      data.append("password", this.user.password);
+      data.append("password_confirmation", this.user.password_confirmation);
       axios
-        .post("api/users", this.user)
+        .post("api/users", data)
         .then((result) => {
           this.$toasted
             .show(`User ${this.user.name} created successfully!`, {
