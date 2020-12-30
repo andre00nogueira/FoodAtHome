@@ -79,8 +79,9 @@ class UserController extends Controller
         $user = new User();
         $user->fill($request->validated());
         $user->password = bcrypt($user->password);
+        
         $user->save();
-        return response()->json(new UserResource($user), 201);
+        return new UserResource($user);
     }
     /* SEM StoreUserRequest */
     // public function store(Request $request)

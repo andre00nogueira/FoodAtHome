@@ -59,6 +59,8 @@ Route::get('users/types/{type_name}', [UserController::class, 'usersByType']);
 Route::get('users/{user}', [UserController::class, 'show']);
 Route::patch('users/{user}', [UserController::class, 'patchUser']);
 Route::delete('users/{user}', [UserController::class, 'destroy']);
+Route::post('users',[UserController::class, 'store']);
+
 
 // Orders
 Route::get('orders/{id}', [OrderController::class, 'show']);

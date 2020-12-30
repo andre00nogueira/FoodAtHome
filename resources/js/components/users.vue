@@ -2,7 +2,11 @@
   <div>
     <navbar />
     <h2>User List</h2>
-
+    <router-link
+      v-if="$store.state.user && $store.state.user.type == 'EM'"
+      class="btn btn-primary"
+      :to="`users/create`"
+      >Create User</router-link>
     <div id="filterArea">
       <input
         class="form-control"
@@ -51,7 +55,7 @@
                 style="margin-left: 2%"
                 v-on:click="editUser(user)"
               >
-                🗑️
+                ✏️
               </button>
               <button
                 class="btn btn-danger"
@@ -114,18 +118,21 @@ export default {
     },
   },
   methods: {
-    getUsers(page = 1) {
+    async getUsers(page = 1) {
       let url = `api/users`;
       if (page != 0) {
         url += `?page=${page}`;
       }
-      axios.get(url).then((response) => {
+      await axios.get(url).then((response) => {
         this.users = response.data.data;
+        let myIndex = this.users.findIndex(u => u.id == this.$store.state.user.id)
+        console.log(myIndex)
+        this.users.splice(myIndex , 1)
         this.usersData = response.data;
       });
     },
 
-    //#region GET FOOD BY TYPE
+    //#region GET USERS BY TYPE
     getUsersByType(event) {
       this.selectedTypeValue = event.target.value;
       if (this.selectedTypeValue == "") {

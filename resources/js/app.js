@@ -25,6 +25,7 @@ Vue.use(Toasted)
 import AppComponent from './App.vue'
 import ProductsComponent from './components/products.vue'
 import CustomerComponent from './components/create_customer.vue'
+import CreateUserComponent from './components/create_user.vue'
 import LoginComponent from './components/login.vue'
 import ShoppingCartComponent from './components/shopping_cart.vue'
 import CartCheckoutComponent from './components/cart_checkout.vue'
@@ -42,6 +43,7 @@ const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
     { path: '/customers/create', component: CustomerComponent },
+    { path: '/users/create', component: CreateUserComponent },
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
     { path: '/cart', component: ShoppingCartComponent },
