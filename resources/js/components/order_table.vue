@@ -10,12 +10,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="order of orders" :key="order.id">
+            <tr v-for="(order,index) of orders" :key="order.id">
               <td>{{getStatus(order.status)}}</td>
               <td>{{ order.total_price }}€</td>
               <td>{{order.date}}</td>
               <td v-if="!toDelivery"><router-link :to="`/orders/${order.id}`">Details</router-link></td>
-              <td v-else><button class="btn btn-link" @click="deliverOrder(order.id)">Deliver Order</button></td>
+              <td v-else><button v-if="index==0 && page==1" class="btn btn-link" @click="deliverOrder(order.id)">Deliver Order</button></td>
             </tr>
           </tbody>
         </table>
@@ -25,7 +25,7 @@
 
 <script>
 export default {
-    props:['orders','toDelivery'],
+    props:['orders','toDelivery','page'],
     methods:{
         getStatus(status){
             switch(status){

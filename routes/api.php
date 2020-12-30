@@ -59,13 +59,16 @@ Route::patch('users/{user}', [UserController::class, 'patchUser']);
 
 //deliveryman
 Route::get('deliverymen/orders', [UserController::class, 'deliverymanOrders']);
-Route::get('deliverymen/{deliveryman}/order', [UserController::class, 'deliverymanCurrentOrder']);
 
 // Orders
+Route::get('orders/preparation/queue', [OrderController::class, 'nextOrderToPrepare']);
 Route::get('orders/{id}', [OrderController::class, 'show']);
 Route::patch('orders/{id}', [OrderController::class, 'update']);
-Route::get('cook/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
 
+
+
+//employees
+Route::get('employee/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
 
 
 

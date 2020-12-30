@@ -45,34 +45,76 @@ class UserController extends Controller
 
     public function patchUser($id, Request $request)
     {
-        $user = User::where('id', '=', $id);
+        $user = User::findOrFail($id);
+        $now= now();
         if ($request->has('loggedin')) {
             if ($request->loggedin) {
-                $user->update(['logged_at' => now()]);
+                $user->logged_at = $now;
             } else {
-                $user->update(['logged_at' => null]);
+                $user->logged_at = null;
             }
         }
 
         // Available at
         if ($request->has('available')) {
             if ($request->available) {
-                $user->update(['available_at' => now()]);
+                $user->available_at = $now;
             } else {
-                $user->update(['available_at' => null]);
+                $user->available_at = null;
             }
         }
-        
-        return User::findOrFail($id);
+        $user->save();
+        return $user;
     }
 
     public function getCurrentOrder($id)
     {
-        $order = Order::where('prepared_by', '=', $id)->where('status', '=', 'H')->orWhere('status', '=', 'P')->first();
+        $user=User::findOrFail($id);
+        if($user->type=='EC'){
+            $query=Order::where('prepared_by', $user->id)->whereIn('status', ['H','P']);
+        }else{
+            $query=Order::where('delivered_by', $user->id)->where('status', 'T');
+        }
+        $order =  $query->first();
         if ($order == null) {
             return null;
         }
-        return $order->id;
+        $orderToSend = new stdClass();
+
+        // ORDER
+        $orderToSend->id = $order->id;
+        $orderToSend->notes = $order->notes;
+        $orderToSend->opened_at = $order->opened_at;
+        $orderToSend->date = $order->date;
+        $orderToSend->status = $order->status;
+        $orderToSend->total_price = $order->total_price;
+        $orderToSend->preparation_time = $order->preparation_time;
+        $orderToSend->prepared_by = $order->prepared_by;
+        $orderToSend->delivery_time = $order->delivery_time;
+        $orderToSend->delivered_by = $order->delivered_by;
+        $orderToSend->total_time = $order->total_time;
+        $orderToSend->customer_id = $order->customer_id;
+        $orderToSend->customer_name = "";
+        $orderToSend->current_status_at = $order->current_status_at->format('Y-m-d H:i:s');
+
+        // ORDER ITEMS
+        $orderItems = [];
+        foreach ($order->orderItems as $item) {
+            // We create a new stdClass, which allow us to create a new object
+            // with the attributes we want
+            $itemToSend = new stdClass();
+
+            $product = Product::find($item->product_id);
+            $itemToSend->name = $product->name;
+            $itemToSend->photo_url = $product->photo_url;
+            $itemToSend->quantity = $item->quantity;
+            $itemToSend->sub_total_price = $item->sub_total_price;
+
+            array_push($orderItems, $itemToSend);
+        }
+        $orderToSend->orderItems = $orderItems;
+
+        return new OrderResource($orderToSend);
     }
 
 
@@ -150,47 +192,4 @@ class UserController extends Controller
         return OrderResource::collection(Order::where('status', 'R')->orderBy('current_status_at', 'asc')->paginate(10));
     }
 
-    public function deliverymanCurrentOrder($id)
-    {
-        $order =  Order::where('delivered_by', '=', $id)->where('status', 'T')->first();
-        if ($order == null) {
-            return null;
-        }
-        $orderToSend = new stdClass();
-
-        // ORDER
-        $orderToSend->id = $order->id;
-        $orderToSend->notes = $order->notes;
-        $orderToSend->opened_at = $order->opened_at;
-        $orderToSend->date = $order->date;
-        $orderToSend->status = $order->status;
-        $orderToSend->total_price = $order->total_price;
-        $orderToSend->preparation_time = $order->preparation_time;
-        $orderToSend->prepared_by = $order->prepared_by;
-        $orderToSend->delivery_time = $order->delivery_time;
-        $orderToSend->delivered_by = $order->delivered_by;
-        $orderToSend->total_time = $order->total_time;
-        $orderToSend->customer_id = $order->customer_id;
-        $orderToSend->customer_name = "";
-        $orderToSend->current_status_at = $order->current_status_at->format('Y-m-d H:i:s');
-
-        // ORDER ITEMS
-        $orderItems = [];
-        foreach ($order->orderItems as $item) {
-            // We create a new stdClass, which allow us to create a new object
-            // with the attributes we want
-            $itemToSend = new stdClass();
-
-            $product = Product::find($item->product_id);
-            $itemToSend->name = $product->name;
-            $itemToSend->photo_url = $product->photo_url;
-            $itemToSend->quantity = $item->quantity;
-            $itemToSend->sub_total_price = $item->sub_total_price;
-
-            array_push($orderItems, $itemToSend);
-        }
-        $orderToSend->orderItems = $orderItems;
-
-        return new OrderResource($orderToSend);
-    }
 }

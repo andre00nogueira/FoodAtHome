@@ -51,8 +51,15 @@ export default {
                 }).then(result=>{
                     this.$store.commit("clearCart");
                     this.cart = this.$store.state.cart;
-                    console.log(result.data)
-                    this.$socket.emit('order_checkout_request', result.data.data.id)
+                    let order = result.data.data;
+                    console.log(order)
+                    if(order.prepared_by){
+                        let payload = {
+                            cookID: order.prepared_by,
+                            orderID: order.id
+                        }
+                        this.$socket.emit('new_order_request', payload)
+                    }
                     this.$toasted.show('Order created successfully!', { type: 'info'}).goAway(3500)
                     this.$router.push(`/customer/${this.$store.state.user.id}/dashboard`)
                 }).catch(error=>{

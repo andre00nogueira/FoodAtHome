@@ -180,4 +180,12 @@ class OrderController extends Controller
     {
         //
     }
+
+    public function nextOrderToPrepare(){
+        $nextOrder = Order::where('status','H')->whereNull('prepared_by')->orderBy('current_status_at','asc')->first();
+        if($nextOrder){
+            return new OrderResource($nextOrder);
+        }
+        return null;
+    }
 }

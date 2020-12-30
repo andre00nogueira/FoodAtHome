@@ -17,7 +17,11 @@
           <h5>Address - {{ client.address }}</h5>
           <h5>Phone - {{ client.phone }}</h5>
           <h5>Email - {{ client.email }}</h5>
-          <h5>Photo</h5>
+          <img
+          class="img-profile rounded-circle"
+          style="width: 100px; height: 100px"
+          :src="`storage/fotos/${client.photo_url|| 'default_avatar.jpg'}`"
+        />
         </div>
         <br />
         <h4>Status - {{ currentOrder.status }}</h4>
@@ -39,6 +43,7 @@
       <orderTable
         :orders="orders"
         :to-delivery="true"
+        :page="page"
         @assignOrder="deliverOrder"
       />
       <pagination
@@ -62,12 +67,14 @@ export default {
       ordersData: {},
       client: undefined,
       currentOrder: undefined,
+      page: 1
     };
   },
   created() {
     axios
-      .get(`api/deliverymen/${this.$route.params.id}/order`)
+      .get(`api/employee/${this.$route.params.id}/currentOrder`)
       .then((response) => {
+        console.log(response)
         if (response.data) {
           this.currentOrder = response.data.data;
           console.log(this.currentOrder);
@@ -81,6 +88,7 @@ export default {
     getResults(page = 1) {
       let url = `api/deliverymen/orders`;
       if (page != 0) {
+        this.page=page;
         url += `?page=${page}`;
         axios.get(url).then((response) => {
           this.ordersData = response.data;
@@ -111,7 +119,7 @@ export default {
         })
         .then((response) => {
           axios
-            .get(`api/deliverymen/${this.$route.params.id}/order`)
+            .get(`api/employee/${this.$route.params.id}/currentOrder`)
             .then((response) => {
               this.currentOrder = response.data.data;
               this.getClient();
