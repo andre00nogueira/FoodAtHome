@@ -2860,27 +2860,26 @@ __webpack_require__.r(__webpack_exports__);
 
       console.log("deliver order");
       axios.patch("api/orders/".concat(orderID), {
-        status: 'T',
+        status: "T",
         delivered_by: this.$store.state.user.id
       }).then(function (response) {
-        _this5.currentOrder = response.data.data;
-        console.log("before get client");
-        console.log(_this5.currentOrder);
+        axios.get("api/deliverymen/".concat(_this5.$route.params.id, "/order")).then(function (response) {
+          _this5.currentOrder = response.data.data;
 
-        _this5.getClient();
+          _this5.getClient();
 
-        console.log(_this5.currentOrder);
-        var payload = {
-          userId: _this5.currentOrder.customer_id,
-          status: _this5.currentOrder.status,
-          orderId: _this5.currentOrder.id
-        };
+          var payload = {
+            userId: _this5.currentOrder.customer_id,
+            status: _this5.currentOrder.status,
+            orderId: _this5.currentOrder.id
+          };
 
-        _this5.$socket.emit("order_status", payload);
+          _this5.$socket.emit("order_status", payload);
 
-        _this5.$toasted.show("Order #".concat(_this5.currentOrder.id, " assigned to me and marked as in transit!"), {
-          type: "success"
-        }).goAway(3500);
+          _this5.$toasted.show("Order #".concat(_this5.currentOrder.id, " assigned to me and marked as in transit!"), {
+            type: "success"
+          }).goAway(3500);
+        });
       });
     },
     setDeliverymanAvailable: function setDeliverymanAvailable() {
@@ -2901,8 +2900,8 @@ __webpack_require__.r(__webpack_exports__);
 
       console.log("complete order");
       axios.patch("api/orders/".concat(this.currentOrder.id), {
-        status: 'D'
-      }).then(function (reponse) {
+        status: "D"
+      }).then(function (response) {
         console.log(response);
         _this7.currentOrder = response.data.data;
         var payload = {
@@ -42545,7 +42544,7 @@ var render = function() {
                         },
                         [
                           _vm._v(
-                            "\n          Mark Order as Delivered\n          "
+                            "\n          Mark Order as Delivered\n        "
                           )
                         ]
                       )
@@ -42623,9 +42622,11 @@ var render = function() {
                       [
                         _c("h2", [_vm._v("Items")]),
                         _vm._v(" "),
-                        _c("itemsTable", {
-                          attrs: { items: _vm.currentOrder.orderItems }
-                        })
+                        _vm.currentOrder.orderItems
+                          ? _c("itemsTable", {
+                              attrs: { items: _vm.currentOrder.orderItems }
+                            })
+                          : _vm._e()
                       ],
                       1
                     )
