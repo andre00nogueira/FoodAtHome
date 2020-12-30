@@ -27,7 +27,10 @@
       <h3>Customer - {{ order.customer_name }}</h3>
       <h4>Status - {{ order.status == "H" ? "Holding" : "Preparing" }}</h4>
       <h5>Preparation Started - {{ order.opened_at }}</h5>
-      <chronometer v-if="order.status == 'P'" :initial-time="order.current_status_at"/>
+      <chronometer
+        v-if="order.status == 'P'"
+        :initial-time="order.current_status_at"
+      />
       <h6>Price - {{ order.total_price }}€</h6>
       <h6>Notes - {{ order.notes ? order.notes : "No notes" }}</h6>
       <div class="content">
@@ -44,13 +47,13 @@
 <script>
 import navbar from "./navbar.vue";
 import itemsTable from "./items_table.vue";
-import chronometer from './chronometer.vue';
+import chronometer from "./chronometer.vue";
 
 export default {
   data() {
     return {
       order: undefined,
-      orderItems: []
+      orderItems: [],
     };
   },
   methods: {
@@ -66,10 +69,11 @@ export default {
     },
     getCurrentOrderId() {
       axios
-        .get(`api/cook/${this.$route.params.id}/currentOrder`)
+        .get(`api/employee/${this.$route.params.id}/currentOrder`)
         .then((response) => {
+          console.log(response);
           if (response.data) {
-            this.getCurrentOrder(response.data)
+            this.getCurrentOrder(response.data.data.id);
           }
         });
     },
@@ -87,19 +91,42 @@ export default {
           let payload = {
             userId: this.order.customer_id,
             status: value,
-            orderId: this.order.id
-          }
+            orderId: this.order.id,
+          };
 
           this.$socket.emit("order_status", payload);
-          this.order.current_status_at = response.data.current_status_at
-          this.order.status = value
+          this.order.current_status_at = response.data.data.current_status_at;
+          this.order.status = value;
           if (value === "R") {
-            this.setCookAvailable();
+            console.log("entered R");
             this.$toasted
               .show(`Order #${this.order.id} marked as ready!`, {
                 type: "success",
               })
               .goAway(3500);
+            axios.get("api/orders/preparation/queue").then((response) => {
+              if (response.data.data) {
+                let order = response.data.data;
+                axios
+                  .patch(`api/orders/${order.id}`, {
+                    prepared_by: this.$store.state.user.id,
+                  })
+                  .then((response) => {
+                    console.log(response)
+                    this.$toasted
+                      .show(
+                        `You've been assigned with a new order (${order.id})`,
+                        {
+                          type: "info",
+                        }
+                      )
+                      .goAway(3500);
+                    this.getCurrentOrder(response.data.data.id);
+                  });
+              } else {
+                this.setCookAvailable();
+              }
+            });
             return;
           } else {
             this.$toasted
@@ -116,8 +143,13 @@ export default {
           available: new Boolean(true),
         })
         .then((response) => {
-          this.order=undefined
-          this.$socket.emit("order_ready", this.$store.state.user.id);
+          let payload = {
+            userId: this.$store.state.user.id,
+            orderId: this.order.id,
+          };
+          this.order = undefined;
+          this.$socket.emit("order_ready", payload);
+          console.log(response.data);
         })
         .catch((error) => {
           console.log(error);
@@ -125,7 +157,7 @@ export default {
     },
   },
   sockets: {
-    order_id_message(orderID) {
+    new_order(orderID) {
       this.getCurrentOrder(orderID);
     },
   },

@@ -50,12 +50,16 @@ export default {
                 loggedin: new Boolean(true),
               })
               .then((response) => {
-                let user = response.data
-                console.log("PATCH LOGGEDIN RESPONSE = " + user);
+                let user = response.data;
+                console.log("PATCH LOGGEDIN RESPONSE = " + user.type);
                 switch (user.type) {
                   case "EC":
                     console.log("ENTERED EC");
-                    this.getCurrentOrderId(user);
+                    this.getCurrentOrder(user);
+                    break;
+                  case "ED":
+                    console.log("ENTERED ED");
+                    this.getCurrentOrder(user);
                     break;
                   default:
                     console.log("ENTERED C");
@@ -68,35 +72,59 @@ export default {
               });
           })
           .catch((error) => {
-            console.log("Invalid Authentication");
+            this.$toasted
+            .show(`Invalid Authentication`, {
+              type: "error",
+            })
+            .goAway(3500);
           });
       });
     },
-    getCurrentOrderId(user) {
-      console.log("CURRENT ORDER ID USER = " + user);
-      axios
-        .get(`api/cook/${user.id}/currentOrder`)
-        .then((response) => {
-          let orderId = response.data;
-          console.log("CURRENT ORDER ORDER ID = " + orderId);
-          // No order
-          if (orderId == "") {
-            console.log("NO ORDER, COOK IS AVAILABLE");
-            this.setCookAvailable(user);
-          } else {
-            console.log("THERE IS AN ORDER ALREADY");
-            this.saveUserAndRedirect(user);
-          }
-        });
+    getCurrentOrder(user) {
+      //console.log("CURRENT ORDER ID USER = " + user);
+      console.log(user);
+      axios.get(`api/employee/${user.id}/currentOrder`).then((response) => {
+        // Already have order
+        if (response.data.data) {
+          console.log("THERE IS AN ORDER ALREADY");
+          console.log(response.data.data.id);
+          this.saveUserAndRedirect(user);
+        } else {
+          console.log("NO ORDER, EMPLOYEE IS AVAILABLE");
+          axios.get("api/orders/preparation/queue").then((response) => {
+            console.log(response.data);
+            if (response.data != "") {
+              console.log("entrou");
+              let order = response.data.data;
+              axios
+                .patch(`api/orders/${order.id}`, {
+                  prepared_by: user.id,
+                })
+                .then((response) => {
+                  this.setAvailable(user, false);
+                });
+              this.$toasted
+                .show(`You've been assigned with a new order (${order.id})`, {
+                  type: "info",
+                })
+                .goAway(3500);
+            } else {
+              console.log("else");
+              this.setAvailable(user, true);
+            }
+          });
+        }
+      });
     },
-    setCookAvailable(user) {
+    setAvailable(user, value) {
       axios
         .patch(`api/users/${user.id}`, {
-          available: new Boolean(true),
+          available: new Boolean(value),
         })
         .then((response) => {
           let user = response.data;
-          console.log("NO ORDER, WE SET COOK AVAILABLE = " + user);
+          console.log(user);
+          console.log("NO ORDER, WE SET EMPLOYEE AVAILABLE = " + user);
           this.saveUserAndRedirect(user);
         });
     },

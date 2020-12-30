@@ -37,6 +37,7 @@ Route::get('products/types/{type_name}', [ProductController::class, 'productByTy
 Route::post('customers',[CustomerController::class, 'store']);
 Route::get('customers/orders/{customer}/open', [CustomerController::class, 'openOrders']);
 Route::get('customers/orders/{customer}/closed', [CustomerController::class, 'closedOrders']);
+Route::get('customers/{customer}',[CustomerController::class, 'show']);
 
 
 
@@ -62,11 +63,18 @@ Route::delete('users/{user}', [UserController::class, 'destroy']);
 Route::post('users',[UserController::class, 'store']);
 
 
-// Orders
-Route::get('orders/{id}', [OrderController::class, 'show']);
-Route::patch('orders/{id}', [OrderController::class, 'patchOrder']);
-Route::get('cook/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
+//deliveryman
+Route::get('deliverymen/orders', [UserController::class, 'deliverymanOrders']);
 
+// Orders
+Route::get('orders/preparation/queue', [OrderController::class, 'nextOrderToPrepare']);
+Route::get('orders/{id}', [OrderController::class, 'show']);
+Route::patch('orders/{id}', [OrderController::class, 'update']);
+
+
+
+//employees
+Route::get('employee/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
 
 
 

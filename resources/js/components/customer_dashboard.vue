@@ -13,7 +13,7 @@
     </div>
     <div>
       <h4>My Closed Orders</h4>
-      <orderTable :orders="closedOrders" />
+      <orderTable :orders="closedOrders" :to-delivery="false" />
       <pagination
         v-if="closedOrders.length > 0"
         :data="closedOpenOrdersData"
@@ -73,10 +73,17 @@ export default {
   },
   sockets: {
     order_status_changed(payload) {
+      if (payload.status == "D") {
+        this.getOpenResults();
+        this.getClosedResults();
+      }
       let orderId = payload.orderId;
       let status = payload.status;
 
-      this.openOrders.find((order) => order.id == orderId).status = status;
+      let index = this.openOrders.findIndex((order) => order.id == orderId);
+      if (index!=-1) {
+        this.openOrders[index].status = status;
+      }
     },
   },
   components: { navbar, orderTable },

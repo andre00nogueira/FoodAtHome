@@ -33,6 +33,7 @@ import CustomerDashboardComponent from './components/customer_dashboard.vue'
 import OrderDetailsComponent from './components/order_details.vue'
 import CookDashboardComponent from './components/cook_dashboard.vue'
 import UsersComponent from './components/users.vue'
+import DeliverymanDashboardComponent from './components/deliveryman_dashboard.vue'
 
 
 Vue.component('pagination', require('laravel-vue-pagination'));
@@ -51,7 +52,8 @@ const routes = [
     { path: '/customer/:id/dashboard', component: CustomerDashboardComponent },
     { path: '/orders/:id', component: OrderDetailsComponent },
     { path: '/cook/:id/dashboard', component: CookDashboardComponent },
-    { path: '/users', component: UsersComponent }
+    { path: '/users', component: UsersComponent },
+    { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent }
 ]
 
 const router = new VueRouter({
@@ -66,7 +68,7 @@ const app = new Vue({
         store.dispatch('loadUserLogged')
     },
     sockets: {
-        order_id_message(orderID) {
+        /*order_id_message(orderID) {
             axios.patch(`api/orders/${orderID}`, {
                 prepared_by: this.$store.state.user.id
             }).then((response) => {
@@ -85,6 +87,12 @@ const app = new Vue({
             }).catch((error) => {
                 console.log(error)
             })
+        },*/
+        new_order(orderID) {
+            debugger
+            if (orderID) {
+                this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
+            }
         },
         order_status_changed(payload) {
             let status = ""

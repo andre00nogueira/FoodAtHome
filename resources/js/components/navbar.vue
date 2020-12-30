@@ -19,6 +19,14 @@
       :to="`/users`"
       >Users List</router-link
     >
+
+    <router-link
+      v-if="$store.state.user && $store.state.user.type == 'ED'"
+      class="navbar-brand"
+      :to="`/deliveryman/${$store.state.user.id}/dashboard`"
+      >Dashboard</router-link
+    >
+
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <template v-if="!$store.state.user">
@@ -59,9 +67,10 @@ export default {
           // This updates the store
           // And sets current user to NULL
           this.$store.commit("clearCart");
-          axios.patch(`/api/users/${this.$store.state.user.id}`, {
+          axios
+            .patch(`/api/users/${this.$store.state.user.id}`, {
               loggedin: new Boolean(false),
-              available: new Boolean(false)
+              available: new Boolean(false),
             })
             .then((response) => {
               console.log(response.data);
