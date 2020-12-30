@@ -13,7 +13,6 @@ use App\Models\User;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use phpDocumentor\Reflection\Types\Null_;
-use App\Http\Requests\PasswordRequest;
 use Illuminate\Support\Facades\Hash;
 use App\Rules\MatchOldPassword;
 
@@ -131,12 +130,7 @@ class UserController extends Controller
 
     public function changePassword($id, Request $request){
         $user=User::findOrFail($id);
-        $request->validate(['currentPassword' => ['required', 'string','min:3'/*, new MatchOldPassword($user->password)*/], 'password' => ['required', 'string', 'min:3', 'confirmed']]);
-      // $request->validated();   
-
-        if(Hash::make($request->currentPassword)!=$user->password){
-
-        }
+        $request->validate(['currentPassword' => ['required', 'string','min:3', new MatchOldPassword($user->password)], 'password' => ['required', 'string', 'min:3', 'confirmed']]);
         $user->password= Hash::make($request->password);             
         $user->save();
         

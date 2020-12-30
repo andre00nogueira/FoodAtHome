@@ -2908,29 +2908,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   methods: {
     logout: function logout() {
@@ -3380,11 +3357,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      customer: {},
+      customer: undefined,
       user: {},
       isFetching: true
     };
@@ -3397,7 +3383,7 @@ __webpack_require__.r(__webpack_exports__);
       _this.user = response.data.data;
       console.log(_this.user);
 
-      if (typeof _this.user !== 'undefined' && _this.user.type == 'C') {
+      if (typeof _this.user !== "undefined" && _this.user.type == "C") {
         axios.get("api/customers/".concat(_this.user.id)).then(function (response) {
           _this.customer = response.data.data;
           _this.isFetching = false;
@@ -8348,7 +8334,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.navbar {\r\n  margin-bottom: 5%;\n}\r\n", ""]);
+exports.push([module.i, "\n.navbar {\r\n  margin-bottom: 5%;\n}\n.rounded_circle {\r\n  vertical-align: middle;\r\n  border-radius: 50%;\n}\n.dropdown-toggle{\r\n  text-align: right;\n}\r\n", ""]);
 
 // exports
 
@@ -43030,31 +43016,29 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "nav",
-    { staticClass: "navbar navbar-expand-lg navbar-dark bg-dark" },
+    { staticClass: "navbar navbar-dark bg-dark navbar-expand-sm" },
     [
       _c("router-link", { staticClass: "navbar-brand", attrs: { to: "/" } }, [
         _vm._v("Food@Home")
       ]),
       _vm._v(" "),
-      _vm.$store.state.user && _vm.$store.state.user.type == "C"
+      _vm.user && _vm.user.type == "C"
         ? _c(
             "router-link",
             {
               staticClass: "navbar-brand",
-              attrs: {
-                to: "/customer/" + _vm.$store.state.user.id + "/dashboard"
-              }
+              attrs: { to: "/customer/" + _vm.user.id + "/dashboard" }
             },
             [_vm._v("Dashboard")]
           )
         : _vm._e(),
       _vm._v(" "),
-      _vm.$store.state.user && _vm.$store.state.user.type == "EC"
+      _vm.user && _vm.user.type == "EC"
         ? _c(
             "router-link",
             {
               staticClass: "navbar-brand",
-              attrs: { to: "/cook/" + _vm.$store.state.user.id + "/dashboard" }
+              attrs: { to: "/cook/" + _vm.user.id + "/dashboard" }
             },
             [_vm._v("Dashboard")]
           )
@@ -43065,7 +43049,7 @@ var render = function() {
           "ul",
           { staticClass: "navbar-nav ml-auto mt-2 mt-lg-0" },
           [
-            !_vm.$store.state.user
+            !_vm.user
               ? [
                   _c(
                     "li",
@@ -43094,51 +43078,43 @@ var render = function() {
                 ]
               : [
                   _c(
-                    "li",
-                    { staticClass: "nav-item" },
+                    "div",
+                    {
+                      staticClass: "collapse navbar-collapse",
+                      attrs: { id: "navbar-list-4" }
+                    },
                     [
-                      _vm.$store.state.user.type == "C"
-                        ? _c(
-                            "router-link",
-                            {
-                              staticClass: "btn btn-primary",
-                              attrs: { to: "/cart" }
-                            },
-                            [_vm._v("Cart")]
-                          )
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "container-fluid" }, [
-                        _c("ul", { staticClass: "navbar-nav" }, [
-                          _c("li", { staticClass: "nav-item dropdown" }, [
-                            _c(
-                              "a",
-                              {
-                                staticClass:
-                                  "nav-link dropdown-toggle d-flex align-items-center",
-                                attrs: {
-                                  href: "#",
-                                  id: "navbarDropdownMenuLink",
-                                  role: "button",
-                                  "data-mdb-toggle": "dropdown",
-                                  "aria-expanded": "false"
-                                }
-                              },
-                              [
-                                _c("img", {
-                                  staticClass: "rounded-circle",
-                                  attrs: {
-                                    src: "storage/fotos/" + _vm.user.photo_url,
-                                    height: "22",
-                                    alt: "",
-                                    loading: "lazy"
-                                  }
-                                })
-                              ]
-                            ),
+                      _c("ul", { staticClass: "navbar-nav" }, [
+                        _c(
+                          "li",
+                          {
+                            staticClass: "nav-item dropdown",
+                            staticStyle: { display: "flex" }
+                          },
+                          [
+                            _c("img", {
+                              staticClass: "rounded-circle",
+                              staticStyle: { width: "40px", height: "auto" },
+                              attrs: {
+                                src:
+                                  "storage/fotos/" +
+                                  (_vm.user.photo_url || "default_avatar.jpg")
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("a", {
+                              staticClass: "nav-link dropdown-toggle",
+                              attrs: {
+                                href: "#",
+                                role: "button",
+                                "data-toggle": "dropdown",
+                                "aria-haspopup": "true",
+                                "aria-expanded": "false"
+                              }
+                            }),
                             _vm._v(" "),
                             _c(
-                              "ul",
+                              "div",
                               {
                                 staticClass: "dropdown-menu",
                                 attrs: {
@@ -43147,43 +43123,60 @@ var render = function() {
                               },
                               [
                                 _c(
-                                  "li",
-                                  [
-                                    _c(
+                                  "router-link",
+                                  {
+                                    staticClass: "dropdown-item",
+                                    attrs: {
+                                      to:
+                                        "/customer/" +
+                                        _vm.user.id +
+                                        "/dashboard"
+                                    }
+                                  },
+                                  [_vm._v("Dashboard")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "router-link",
+                                  {
+                                    staticClass: "dropdown-item",
+                                    attrs: { to: "/users/" + _vm.user.id }
+                                  },
+                                  [_vm._v("Profile")]
+                                ),
+                                _vm._v(" "),
+                                _vm.user.type == "C"
+                                  ? _c(
                                       "router-link",
                                       {
                                         staticClass: "dropdown-item",
-                                        attrs: { to: "/users/" + _vm.user.id }
+                                        attrs: { to: "/cart" }
                                       },
-                                      [_vm._v("Profile")]
+                                      [_vm._v("Cart")]
                                     )
-                                  ],
-                                  1
-                                ),
+                                  : _vm._e(),
                                 _vm._v(" "),
-                                _c("li", [
-                                  _c(
-                                    "a",
-                                    {
-                                      staticClass: "dropdown-item",
-                                      attrs: { href: "#" },
-                                      on: {
-                                        click: function($event) {
-                                          $event.preventDefault()
-                                          return _vm.logout($event)
-                                        }
+                                _c(
+                                  "a",
+                                  {
+                                    staticClass: "dropdown-item",
+                                    attrs: { href: "#" },
+                                    on: {
+                                      click: function($event) {
+                                        $event.preventDefault()
+                                        return _vm.logout($event)
                                       }
-                                    },
-                                    [_vm._v("Logout")]
-                                  )
-                                ])
-                              ]
+                                    }
+                                  },
+                                  [_vm._v("Logout")]
+                                )
+                              ],
+                              1
                             )
-                          ])
-                        ])
+                          ]
+                        )
                       ])
-                    ],
-                    1
+                    ]
                   )
                 ]
           ],
@@ -43679,71 +43672,82 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return !_vm.isFetching
-    ? _c(
-        "div",
-        { staticClass: "jumbotron" },
-        [
-          _c("navbar"),
-          _vm._v(" "),
-          _c("h2", [_vm._v("User Details")]),
-          _vm._v(" "),
-          _c("p", { staticStyle: { "text-align": "center" } }, [
-            _c("img", {
-              staticClass: "img-profile rounded-circle",
-              staticStyle: { width: "100px", height: "100px" },
-              attrs: { src: "storage/fotos/" + _vm.user.photo_url }
-            })
-          ]),
-          _c("div", { staticStyle: { "text-align": "center" } }, [
-            _c("span", { staticClass: "lead font-weight-bold" }, [
-              _vm._v("Name: " + _vm._s(_vm.user.name))
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticStyle: { "text-align": "center" } }, [
-            _c("span", { staticClass: "lead" }, [
-              _vm._v("Email: " + _vm._s(_vm.user.email))
-            ])
-          ]),
-          _vm._v(" "),
-          _vm.customer
-            ? _c("div", [
-                _c("div", { staticStyle: { "text-align": "center" } }, [
-                  _c("span", { staticClass: "lead" }, [
-                    _vm._v("Address: " + _vm._s(_vm.customer.address))
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticStyle: { "text-align": "center" } }, [
-                  _c("span", { staticClass: "lead" }, [
-                    _vm._v("NIF: " + _vm._s(_vm.customer.nif))
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticStyle: { "text-align": "center" } }, [
-                  _c("span", { staticClass: "lead" }, [
-                    _vm._v("Phone: " + _vm._s(_vm.customer.phone))
-                  ])
+  return _c(
+    "div",
+    [
+      _c("navbar"),
+      _vm._v(" "),
+      !_vm.isFetching
+        ? _c(
+            "div",
+            { staticClass: "jumbotron" },
+            [
+              _c("h2", [_vm._v("User Details")]),
+              _vm._v(" "),
+              _c("p", { staticStyle: { "text-align": "center" } }, [
+                _c("img", {
+                  staticClass: "img-profile rounded-circle",
+                  staticStyle: { width: "100px", height: "100px" },
+                  attrs: {
+                    src:
+                      "storage/fotos/" +
+                      (_vm.user.photo_url || "default_avatar.jpg")
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticStyle: { "text-align": "center" } }, [
+                _c("span", { staticClass: "lead font-weight-bold" }, [
+                  _vm._v("Name: " + _vm._s(_vm.user.name))
                 ])
-              ])
-            : _vm._e(),
-          _vm._v(" "),
-          _c(
-            "router-link",
-            { attrs: { to: "/users/" + this.user.id + "/edit" } },
-            [_vm._v("Edit User")]
-          ),
-          _vm._v(" "),
-          _c(
-            "router-link",
-            { attrs: { to: "/users/" + this.user.id + "/password" } },
-            [_vm._v("Change Password")]
+              ]),
+              _vm._v(" "),
+              _c("div", { staticStyle: { "text-align": "center" } }, [
+                _c("span", { staticClass: "lead" }, [
+                  _vm._v("Email: " + _vm._s(_vm.user.email))
+                ])
+              ]),
+              _vm._v(" "),
+              _vm.customer
+                ? _c("div", [
+                    _c("div", { staticStyle: { "text-align": "center" } }, [
+                      _c("span", { staticClass: "lead" }, [
+                        _vm._v("Address: " + _vm._s(_vm.customer.address))
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticStyle: { "text-align": "center" } }, [
+                      _c("span", { staticClass: "lead" }, [
+                        _vm._v("NIF: " + _vm._s(_vm.customer.nif))
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticStyle: { "text-align": "center" } }, [
+                      _c("span", { staticClass: "lead" }, [
+                        _vm._v("Phone: " + _vm._s(_vm.customer.phone))
+                      ])
+                    ])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c(
+                "router-link",
+                { attrs: { to: "/users/" + this.user.id + "/edit" } },
+                [_vm._v("Edit User")]
+              ),
+              _vm._v(" "),
+              _c(
+                "router-link",
+                { attrs: { to: "/users/" + this.user.id + "/password" } },
+                [_vm._v("Change Password")]
+              )
+            ],
+            1
           )
-        ],
-        1
-      )
-    : _vm._e()
+        : _vm._e()
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -62626,8 +62630,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\laragon\www\FoodAtHome\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\laragon\www\FoodAtHome\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! D:\DAD\FoodAtHome\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\DAD\FoodAtHome\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

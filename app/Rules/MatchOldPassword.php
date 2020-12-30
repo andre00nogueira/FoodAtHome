@@ -15,7 +15,7 @@ class MatchOldPassword implements Rule
      */
     public function __construct($password)
     {
-        $this->oldPassword = $password
+        $this->oldPassword = $password;
     }
 
 
