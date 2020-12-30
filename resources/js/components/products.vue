@@ -64,10 +64,14 @@
               >
                 🛒
               </button>
-            
+              
+              <router-link class="btn btn-warning" style="margin-left: 2%" :to="`/products/${product.id}/edit`">🔨</router-link>
+
               <button class="btn btn-danger" style="margin-left: 2%" @click.prevent="deleteProduct(product)">
                 🗑️
               </button>
+              
+            
             <!--
               <form
                 method="POST"

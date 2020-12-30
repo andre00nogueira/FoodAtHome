@@ -32,7 +32,7 @@ import CustomerDashboardComponent from './components/customer_dashboard.vue'
 import OrderDetailsComponent from './components/order_details.vue'
 import CookDashboardComponent from './components/cook_dashboard.vue'
 import CreateProductComponent from './components/create_product.vue'
-
+import EditProductComponent from './components/edit_product.vue'
 
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('app', AppComponent)
@@ -49,7 +49,8 @@ const routes = [
     { path: '/customer/:id/dashboard', component: CustomerDashboardComponent },
     { path: '/orders/:id', component: OrderDetailsComponent },
     { path: '/cook/:id/dashboard', component: CookDashboardComponent },
-    { path: '/products/create', component: CreateProductComponent}
+    { path: '/products/create', component: CreateProductComponent},
+    { path: '/products/:id/edit', component: EditProductComponent}
 ]
 
 const router = new VueRouter({

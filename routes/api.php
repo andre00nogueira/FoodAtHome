@@ -35,6 +35,7 @@ Route::get('products/types/{type_name}', [ProductController::class, 'productByTy
 Route::delete('products/{product}',[ProductController::class,'destroy']);
 Route::post('products',[ProductController::class,'store']);
 Route::put('products/{product}',[ProductController::class,'update']);
+Route::get('products/{product}',[ProductController::class,'show']);
 
 //customers
 Route::post('customers',[CustomerController::class, 'store']);

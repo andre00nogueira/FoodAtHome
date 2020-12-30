@@ -8,6 +8,7 @@ use App\Http\Resources\Product as ProductResource;
 use App\Http\Resources\ProductTypeResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 
 class ProductController extends Controller
 {
@@ -29,6 +30,10 @@ class ProductController extends Controller
         return ProductResource::collection(Product::where('type', $type_name)->get());
     }
 
+    public function show(Product $product){
+        return new ProductResource($product);
+    }
+
     public function store(StoreProductRequest $request){
         $request->validated();
         $product = new Product();
@@ -36,14 +41,13 @@ class ProductController extends Controller
         $product->type=$request->type;
         $product->description=$request->description;
         $product->price=$request->price;
-        if($request->has('photo_url')){
-            /*
+        //$product->photo_url=$request->photo_url;
+        /*
             $upload_path = public_path('foto');
             $file_name = $request->photo_url->getClientOriginalName();
             $generated_new_name = time() . '.' . $request->photo_url->getClientOriginalExtension();
             $request->file->move($upload_path, $generated_new_name);
-            $user->photo_url=$file_name;*/
-        }
+            $product->photo_url=$file_name;*/
         $product->save();
         return response()->json(new ProductResource($product), 201);
     }

@@ -11,11 +11,16 @@
                 </div>
                 <div class="form-group">
                     <label for="productType">Product Type</label>
-                    <select name="productType" id="productType" v-model="product.type">
-                        <option value="hotDish">hot dish</option>
-                        <option value="coldDish">cold dish</option>
-                        <option value="dessert">dessert</option>
-                        <option value="drink">drink</option>
+                    <select
+                        class="custom-select"
+                        name="productType"
+                        id="productType"
+                        v-model="product.type"
+                    >
+                        <option value="">Choose Type...</option>
+                        <option v-for="(type, index) in types" :key="index" :value="type.name">
+                        {{ type.name }}
+                        </option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -25,8 +30,13 @@
                 </div>
                 <div class="form-group">
                     <label for="price">Price</label>
-                    <input type="number" class="form-control" name="price" id="price" v-model="product.price"/>
+                    <input type="number" step="0.01" class="form-control" name="price" id="price" v-model="product.price"/>
                     <div v-if="errors && errors.name" class="text-danger">{{ errors.price[0] }}</div>
+                </div>
+                <div class="form-group">
+                    <label for="photo_url">Photo</label>
+                    <input type="file" ref="file" class="form-control" name="photo_url" id="photo_url"  v-on:change="handlePhotoUpload"/>
+                    <div v-if="errors && errors.photo_url" class="text-danger">{{ errors.photo_url[0] }}</div>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Create</button>
@@ -47,8 +57,12 @@ export default {
         return{
             product:{},
             successMessage:'',
-            errors:{}
+            errors:{},
+            types: []
         }
+    },
+    mounted(){
+        this.getTypes();
     },
     methods:{
         createProduct: function (){
@@ -64,6 +78,16 @@ export default {
         },
         closeMessage: function (){
             this.successMessage = ''
+        },
+        getTypes() {
+            let url = `api/products/types`;
+            axios.get(url).then((response) => {
+                this.types = response.data.data;
+            });
+        },
+        handlePhotoUpload(event){
+            this.product.photo_url = event.target.files[0]
+            console.log(this.product)
         }
     },
     components: { navbar }
