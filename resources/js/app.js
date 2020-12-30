@@ -81,14 +81,14 @@ const app = new Vue({
                     .catch((error) => {
                         console.log(error);
                     });
-                
+
             }).catch((error) => {
                 console.log(error)
             })
         },
-        order_status_changed(payload) { 
+        order_status_changed(payload) {
             let status = ""
-            switch(payload.status){
+            switch (payload.status) {
                 case 'P':
                     status = "Preparing"
                     break
@@ -96,7 +96,7 @@ const app = new Vue({
                     status = "Ready"
                     break
             }
-            this.$toasted.show(`Order #${payload.orderId} marked as ${status}!`, {type: "success",}).goAway(3500);
+            this.$toasted.show(`Order #${payload.orderId} marked as ${status}!`, { type: "success", }).goAway(3500);
         },
     },
     data() {

@@ -98,10 +98,6 @@
         <button type="submit" class="btn btn-primary">Create</button>
         <router-link to="/users" class="btn btn-secondary">Cancel</router-link>
       </form>
-
-      <button type="button" class="close-btn" @click="closeMessage()">
-        &times;
-      </button>
     </div>
   </div>
 </template>

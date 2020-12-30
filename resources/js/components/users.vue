@@ -1,12 +1,13 @@
 <template>
-  <div>
+  <div v-if="user">
     <navbar />
     <h2>User List</h2>
     <router-link
-      v-if="$store.state.user && $store.state.user.type == 'EM'"
+      v-if="user.type == 'EM'"
       class="btn btn-primary"
       :to="`users/create`"
-      >Create User</router-link>
+      >Create User</router-link
+    >
     <div id="filterArea">
       <input
         class="form-control"
@@ -116,6 +117,9 @@ export default {
         }
       }
     },
+    async user() {
+      return await this.$store.state.user;
+    },
   },
   methods: {
     async getUsers(page = 1) {
@@ -125,8 +129,10 @@ export default {
       }
       await axios.get(url).then((response) => {
         this.users = response.data.data;
-        let myIndex = this.users.findIndex(u => u.id == this.$store.state.user.id)
-        this.users.splice(myIndex , 1)
+        let myIndex = this.users.findIndex(
+          (u) => u.id == this.user.id
+        );
+        this.users.splice(myIndex, 1);
         this.usersData = response.data;
       });
     },
