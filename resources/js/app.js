@@ -33,6 +33,12 @@ import OrderDetailsComponent from './components/order_details.vue'
 import CookDashboardComponent from './components/cook_dashboard.vue'
 import CreateProductComponent from './components/create_product.vue'
 import EditProductComponent from './components/edit_product.vue'
+import DeliverymanDashboardComponent from './components/deliveryman_dashboard.vue'
+import EditUserComponent from './components/edit_user.vue'
+import EditCustomerComponent from './components/edit_customer.vue'
+import ProfileComponent from './components/profile.vue'
+import ChangeUserPasswordComponent from'./components/change_user_password.vue'
+
 
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('app', AppComponent)
@@ -42,6 +48,10 @@ const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
     { path: '/customers/create', component: CustomerComponent },
+    { path: '/users/:id/edit', component: EditUserComponent },
+    { path: '/customers/edit/:id', component: EditCustomerComponent },
+    { path: '/users/:id', component: ProfileComponent },
+    { path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
     { path: '/cart', component: ShoppingCartComponent },
@@ -50,7 +60,9 @@ const routes = [
     { path: '/orders/:id', component: OrderDetailsComponent },
     { path: '/cook/:id/dashboard', component: CookDashboardComponent },
     { path: '/products/create', component: CreateProductComponent},
-    { path: '/products/:id/edit', component: EditProductComponent}
+    { path: '/products/:id/edit', component: EditProductComponent},
+    { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
+    { path: '/users/:id/password', component: ChangeUserPasswordComponent}
 ]
 
 const router = new VueRouter({
@@ -65,7 +77,7 @@ const app = new Vue({
         store.dispatch('loadUserLogged')
     },
     sockets: {
-        order_id_message(orderID) {
+        /*order_id_message(orderID) {
             axios.patch(`api/orders/${orderID}`, {
                 prepared_by: this.$store.state.user.id
             }).then((response) => {
@@ -84,9 +96,23 @@ const app = new Vue({
             }).catch((error) => {
                 console.log(error)
             })
+        },*/
+        new_order(orderID) {
+            if (orderID) {
+                this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
+            }
         },
-        order_status_changed(payload) { 
-            this.$toasted.show(`Order #${payload.orderId} marked as ${payload.status}!`, {type: "success",}).goAway(3500);
+        order_status_changed(payload) {
+            let status = ""
+            switch (payload.status) {
+                case 'P':
+                    status = "Preparing"
+                    break
+                case 'R':
+                    status = "Ready"
+                    break
+            }
+            this.$toasted.show(`Order #${payload.orderId} marked as ${status}!`, { type: "success", }).goAway(3500);
         },
     },
     data() {

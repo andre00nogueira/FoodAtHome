@@ -30,6 +30,9 @@ use App\Http\Controllers\Api\OrderItemsController;
 
 //products
 Route::get('products', [ProductController::class, 'index']);
+Route::post('customers',[CustomerController::class, 'store']);
+Route::get('customers/{customer}',[CustomerController::class,'show']);
+Route::put('customers/{customer}',[CustomerController::class, 'update']);
 Route::get('products/types', [ProductController::class, 'types']);
 Route::get('products/types/{type_name}', [ProductController::class, 'productByType']);
 Route::delete('products/{product}',[ProductController::class,'destroy']);
@@ -37,10 +40,12 @@ Route::post('products',[ProductController::class,'store']);
 Route::put('products/{product}',[ProductController::class,'update']);
 Route::get('products/{product}',[ProductController::class,'show']);
 
+
 //customers
 Route::post('customers',[CustomerController::class, 'store']);
 Route::get('customers/orders/{customer}/open', [CustomerController::class, 'openOrders']);
 Route::get('customers/orders/{customer}/closed', [CustomerController::class, 'closedOrders']);
+Route::get('customers/{customer}',[CustomerController::class, 'show']);
 
 
 
@@ -58,13 +63,26 @@ Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']
 
 //user
 Route::get('users/{user}', [UserController::class, 'show']);
+Route::post('users/{user}/password',[UserController::class,'changePassword']);
 Route::patch('users/{user}', [UserController::class, 'patchUser']);
+Route::put('users/{user}',[UserController::class,'update']);
+
+
+
+//deliveryman
+Route::get('deliverymen/orders', [UserController::class, 'deliverymanOrders']);
+
+
 
 // Orders
+Route::get('orders/preparation/queue', [OrderController::class, 'nextOrderToPrepare']);
 Route::get('orders/{id}', [OrderController::class, 'show']);
-Route::patch('orders/{id}', [OrderController::class, 'updatePreparedBy']);
-Route::get('cook/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
+Route::patch('orders/{id}', [OrderController::class, 'update']);
 
+
+
+//employees
+Route::get('employee/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
 
 
 

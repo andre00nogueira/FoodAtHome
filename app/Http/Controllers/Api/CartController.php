@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Http\Resources\OrderResource;
 
@@ -14,7 +15,7 @@ class CartController extends Controller
     public function checkout(Request $request)
     {
         if(empty($request->cart)){
-            return response()->json("Cart is empty", 400);
+            return null;
         }
         $order = new Order();
         $now = Carbon::now();
@@ -27,6 +28,12 @@ class CartController extends Controller
         $order->status = "H";
         $order->opened_at = $now->format('Y-m-d H:i:s');
         $order->current_status_at = $order->opened_at;
+        $availableCook=User::where('type','EC')->whereNotNull('available_at')->orderBy('available_at', 'asc')->first();
+        if($availableCook){
+            $order->prepared_by=$availableCook->id;
+            $availableCook->available_at=null;
+            $availableCook->save();
+        }
         $order->save();
         foreach($request->cart as $item ){
             $orderItem = new OrderItem();
@@ -37,6 +44,6 @@ class CartController extends Controller
             $orderItem->sub_total_price = $orderItem->quantity*$orderItem->unit_price;
             $orderItem->save();
         }
-        return response()->json(new OrderResource($order), 201);
+        return new OrderResource($order);
     }
 }

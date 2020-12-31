@@ -10,6 +10,8 @@ use App\Models\Product;
 use App\Models\OrderItem;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrderItemResource;
+use Carbon\Carbon;
+use DateTime;
 use stdClass;
 
 class OrderController extends Controller
@@ -53,25 +55,43 @@ class OrderController extends Controller
      */
     public function show($id)
     {
+        // Find order by the ID
         $order = Order::findOrFail($id);
+
+        // Find the user by the customer ID,
+        // We need this to get the customer name associated with the order
         $user = User::findOrFail($order->customer->id);
+
+
+        // We create a new stdClass, which allow us to create a new object
+        // with the attributes we want
         $orderToSend = new stdClass();
 
+        // ORDER
         $orderToSend->id = $order->id;
-        $orderToSend->customer_id = $order->customer_id;
-        $orderToSend->customer_name = $user->name;
         $orderToSend->notes = $order->notes;
         $orderToSend->opened_at = $order->opened_at;
         $orderToSend->date = $order->date;
         $orderToSend->status = $order->status;
         $orderToSend->total_price = $order->total_price;
         $orderToSend->preparation_time = $order->preparation_time;
+        $orderToSend->current_status_at = $order->current_status_at;
         $orderToSend->prepared_by = $order->prepared_by;
         $orderToSend->delivery_time = $order->delivery_time;
         $orderToSend->delivered_by = $order->delivered_by;
         $orderToSend->total_time = $order->total_time;
+
+
+        // CUSTOMER
+        $orderToSend->customer_id = $order->customer_id;
+        $orderToSend->customer_name = $user->name;
+
+
+        // ORDER ITEMS
         $orderItems = [];
         foreach ($order->orderItems as $item) {
+            // We create a new stdClass, which allow us to create a new object
+            // with the attributes we want
             $itemToSend = new stdClass();
 
             $product = Product::find($item->product_id);
@@ -85,18 +105,6 @@ class OrderController extends Controller
         $orderToSend->orderItems = $orderItems;
 
         return new OrderResource($orderToSend);
-    }
-
-
-    public function updatePreparedBy($id, Request $request)
-    {
-        if($request->has('prepared_by')){
-            Order::where('id', '=', $id)->update(['prepared_by' => $request->prepared_by]);
-        }else if($request->has('status')){
-            Order::where('id', '=', $id)->update(['status' => $request->status]);
-        }
-        
-        return;
     }
 
     /**
@@ -119,7 +127,47 @@ class OrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $order = Order::findOrFail($id);
+        if ($request->has('prepared_by')) {
+            $order->prepared_by = $request->prepared_by;
+        }
+        if ($request->has('delivered_by')) {
+            $order->delivered_by = $request->delivered_by;
+        }
+        if ($request->has('status')) {
+            $now = now();
+            if($request->status == 'R'){
+                $preparationStarted = $order->current_status_at;
+                $elapsedTime =  $preparationStarted->diffInSeconds($now);
+                $order->preparation_time = $elapsedTime;
+            }
+            if($request->status == 'D'){
+                $deliveryStarted = $order->current_status_at;
+                $elapsedTime =  $deliveryStarted->diffInSeconds($now);
+                $order->delivery_time = $elapsedTime;
+                $order->closed_at = $now;
+                $order->total_time = Carbon::parse($order->opened_at)->diffInSeconds($now);
+            }
+            $order->status = $request->status;
+            $order->current_status_at = $now;
+        }
+        $order->save();
+        /*$order = Order::where('id', '=', $id);
+        if ($request->has('delivered_by')) {
+            $order->update(['delivered_by' => $request->delivered_by]);
+        }else if ($request->has('prepared_by')) {
+            $order->update(['prepared_by' => $request->prepared_by]);
+        } else if ($request->has('status')) {
+            $now = now();
+            if($request->status == 'R'){
+                $preparationStarted = $order->first()->current_status_at;
+                $elapsedTime =  $preparationStarted->diffInSeconds($now);
+                $order->update(['preparation_time' => $elapsedTime]);
+            }
+            $order->update(['status' => $request->status, 'current_status_at' => $now]);
+        }*/
+
+        return new OrderResource($order);
     }
 
     /**
@@ -131,5 +179,13 @@ class OrderController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function nextOrderToPrepare(){
+        $nextOrder = Order::where('status','H')->whereNull('prepared_by')->orderBy('current_status_at','asc')->first();
+        if($nextOrder){
+            return new OrderResource($nextOrder);
+        }
+        return null;
     }
 }
