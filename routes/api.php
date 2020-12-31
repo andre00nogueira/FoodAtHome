@@ -30,8 +30,12 @@ use App\Http\Controllers\Api\OrderItemsController;
 
 //products
 Route::get('products', [ProductController::class, 'index']);
+Route::post('customers',[CustomerController::class, 'store']);
+Route::get('customers/{customer}',[CustomerController::class,'show']);
+Route::put('customers/{customer}',[CustomerController::class, 'update']);
 Route::get('products/types', [ProductController::class, 'types']);
 Route::get('products/types/{type_name}', [ProductController::class, 'productByType']);
+
 
 //customers
 Route::post('customers',[CustomerController::class, 'store']);
@@ -55,10 +59,16 @@ Route::middleware('auth:sanctum')->get('users/me', [UserController::class, 'me']
 
 //user
 Route::get('users/{user}', [UserController::class, 'show']);
+Route::post('users/{user}/password',[UserController::class,'changePassword']);
 Route::patch('users/{user}', [UserController::class, 'patchUser']);
+Route::put('users/{user}',[UserController::class,'update']);
+
+
 
 //deliveryman
 Route::get('deliverymen/orders', [UserController::class, 'deliverymanOrders']);
+
+
 
 // Orders
 Route::get('orders/preparation/queue', [OrderController::class, 'nextOrderToPrepare']);

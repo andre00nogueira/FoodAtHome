@@ -32,6 +32,10 @@ import CustomerDashboardComponent from './components/customer_dashboard.vue'
 import OrderDetailsComponent from './components/order_details.vue'
 import CookDashboardComponent from './components/cook_dashboard.vue'
 import DeliverymanDashboardComponent from './components/deliveryman_dashboard.vue'
+import EditUserComponent from './components/edit_user.vue'
+import EditCustomerComponent from './components/edit_customer.vue'
+import ProfileComponent from './components/profile.vue'
+import ChangeUserPasswordComponent from'./components/change_user_password.vue'
 
 
 Vue.component('pagination', require('laravel-vue-pagination'));
@@ -42,6 +46,10 @@ const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
     { path: '/customers/create', component: CustomerComponent },
+    { path: '/users/:id/edit', component: EditUserComponent },
+    { path: '/customers/edit/:id', component: EditCustomerComponent },
+    { path: '/users/:id', component: ProfileComponent },
+    { path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
     { path: '/cart', component: ShoppingCartComponent },
@@ -49,7 +57,8 @@ const routes = [
     { path: '/customer/:id/dashboard', component: CustomerDashboardComponent },
     { path: '/orders/:id', component: OrderDetailsComponent },
     { path: '/cook/:id/dashboard', component: CookDashboardComponent },
-    { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent }
+    { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
+    { path: '/users/:id/password', component: ChangeUserPasswordComponent}
 ]
 
 const router = new VueRouter({
