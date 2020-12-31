@@ -27,7 +27,7 @@ class StoreProductRequest extends FormRequest
             'name' => 'required|regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/',
             'type' => 'required|in:dessert,drink,hot dish,cold dish',
             'description' => 'required|min:3|max:500',
-            'price' =>'required|numeric|max:10',
+            'price' =>'required|numeric|max:1000',
             'photo_url' => 'required' //|mimes:jpeg,png
         ];
     }
