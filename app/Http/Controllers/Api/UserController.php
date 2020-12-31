@@ -69,6 +69,10 @@ class UserController extends Controller
                 $user->available_at = null;
             }
         }
+
+        if($request->has('blocked')){
+            $user->blocked = $request->blocked;
+        }
         $user->save();
         return $user;
     }

@@ -37,7 +37,7 @@ import DeliverymanDashboardComponent from './components/deliveryman_dashboard.vu
 import EditUserComponent from './components/edit_user.vue'
 import EditCustomerComponent from './components/edit_customer.vue'
 import ProfileComponent from './components/profile.vue'
-import ChangeUserPasswordComponent from'./components/change_user_password.vue'
+import ChangeUserPasswordComponent from './components/change_user_password.vue'
 
 
 Vue.component('pagination', require('laravel-vue-pagination'));
@@ -63,7 +63,7 @@ const routes = [
     { path: '/users', component: UsersComponent },
     { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
     { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
-    { path: '/users/:id/password', component: ChangeUserPasswordComponent}
+    { path: '/users/:id/password', component: ChangeUserPasswordComponent }
 ]
 
 const router = new VueRouter({
@@ -98,8 +98,36 @@ const app = new Vue({
                 console.log(error)
             })
         },*/
+        blocked(userID) {
+            if (userID) {
+                axios
+                    .post("/api/logout")
+                    .then((response) => {
+                        console.log("User has logged out");
+                        // This updates the store
+                        // And sets current user to NULL
+                        this.$store.commit("clearCart");
+                        axios
+                            .patch(`/api/users/${this.$store.state.user.id}`, {
+                                loggedin: new Boolean(false),
+                                available: new Boolean(false),
+                            })
+                            .then((response) => {
+                                console.log(response.data);
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            });
+                        this.$store.commit("clearUser");
+                        this.$router.push("/login");
+                    })
+                    .catch((error) => {
+                        console.log(`Invalid Logout ${error}`);
+                    });
+                this.$toasted.show(`You've been blocked by a manager!`, { type: 'error' }).goAway(3500)
+            }
+        },
         new_order(orderID) {
-            debugger
             if (orderID) {
                 this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
             }

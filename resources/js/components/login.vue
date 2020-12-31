@@ -51,6 +51,15 @@ export default {
               })
               .then((response) => {
                 let user = response.data;
+                if (user.blocked) {
+                  this.logout(user);
+                  this.$toasted
+                    .show(`You've been blocked by a manager!`, {
+                      type: "error",
+                    })
+                    .goAway(3500);
+                  return;
+                }
                 console.log("PATCH LOGGEDIN RESPONSE = " + user.type);
                 switch (user.type) {
                   case "EC":
@@ -73,10 +82,10 @@ export default {
           })
           .catch((error) => {
             this.$toasted
-            .show(`Invalid Authentication`, {
-              type: "error",
-            })
-            .goAway(3500);
+              .show(`Invalid Authentication`, {
+                type: "error",
+              })
+              .goAway(3500);
           });
       });
     },
@@ -131,6 +140,32 @@ export default {
     saveUserAndRedirect(user) {
       this.$store.commit("setUser", user);
       this.$router.push("/");
+    },
+    logout(user) {
+      axios
+        .post("/api/logout")
+        .then((response) => {
+          console.log("User has logged out");
+          // This updates the store
+          // And sets current user to NULL
+          this.$store.commit("clearCart");
+          axios
+            .patch(`/api/users/${user.id}`, {
+              loggedin: new Boolean(false),
+              available: new Boolean(false),
+            })
+            .then((response) => {
+              console.log(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          this.$store.commit("clearUser");
+          this.$router.push("/");
+        })
+        .catch((error) => {
+          console.log(`Invalid Logout ${error}`);
+        });
     },
   },
 };
