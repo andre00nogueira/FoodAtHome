@@ -1,137 +1,151 @@
 <template>
-  <div class="jumbotron">
-    <h2>Edit User</h2>
-    <form v-if="user" @submit.prevent="editUser">
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input
-          type="text"
-          class="form-control"
-          name="name"
-          id="name"
-          v-model="user.name"
-        />
-        <div v-if="errors && errors.name" class="text-danger">
-          {{ errors.name[0] }}
+  <div v-if="user">
+    <navbar />
+    <div class="jumbotron">
+      <h2>Edit User</h2>
+      <form @submit.prevent="editUser">
+        <div class="form-group">
+          <label for="photo_url">Photo</label>
+          <input
+            type="file"
+            ref="file"
+            class="form-control"
+            name="photo_url"
+            id="photo_url"
+            v-on:change="handlePhotoUpload"
+          />
+          <div v-if="errors && errors.photo_url" class="text-danger">
+            {{ errors.photo_url[0] }}
+          </div>
         </div>
-      </div>
-      <div class="form-group">
-        <label for="email">E-mail</label>
-        <input
-          type="email"
-          class="form-control"
-          name="email"
-          id="email"
-          v-model="user.email"
-        />
-        <div v-if="errors && errors.email" class="text-danger">
-          {{ errors.email[0] }}
+        <div class="form-group">
+          <p style="text-align: center">
+            <img
+              class="img-profile rounded-circle"
+              style="width: 100px; height: 100px"
+              :src="`storage/fotos/${user.photo_url || 'default_avatar.jpg'}`"
+            />
+            <button
+              type="button"
+              class="btn btn-danger"
+              style="align-self: right"
+              @click="removeProfilePhoto(user.id)"
+            >
+              Remove Photo
+            </button>
+          </p>
         </div>
-      </div>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input
+            type="text"
+            class="form-control"
+            name="name"
+            id="name"
+            v-model="user.name"
+          />
+          <div v-if="errors && errors.name" class="text-danger">
+            {{ errors.name[0] }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input
+            type="email"
+            class="form-control"
+            name="email"
+            id="email"
+            v-model="user.email"
+          />
+          <div v-if="errors && errors.email" class="text-danger">
+            {{ errors.email[0] }}
+          </div>
+        </div>
 
-      <div v-if="customer" class="form-group">
-        <label for="address">Address</label>
-        <input
-          type="text"
-          class="form-control"
-          name="address"
-          id="address"
-          v-model="customer.address"
-        />
-        <div v-if="errors && errors.address" class="text-danger">
-          {{ errors.address[0] }}
-        </div>
-      </div>
+        <edit-customer v-if="user.type == 'C'" />
 
-      <div v-if="customer" class="form-group">
-        <label for="phone">Phone</label>
-        <input
-          type="text"
-          class="form-control"
-          name="phone"
-          id="phone"
-          v-model="customer.phone"
-        />
-        <div v-if="errors && errors.phone" class="text-danger">
-          {{ errors.phone[0] }}
-        </div>
-      </div>
-
-      <div v-if="customer" class="form-group">
-        <label for="nif">NIF</label>
-        <input
-          type="text"
-          class="form-control"
-          name="nif"
-          id="nif"
-          v-model="customer.nif"
-        />
-        <div v-if="errors && errors.nif" class="text-danger">
-          {{ errors.nif[0] }}
-        </div>
-      </div>
-
-      <div class="form-group">
         <button class="btn btn-primary" type="submit">Save</button>
         <a class="btn btn-danger" href="#/index">Cancel</a>
-      </div>
-    </form>
-    <div
-      class="alert"
-      :class="{ 'alert-success': successMessage }"
-      v-if="successMessage"
-    >
-      <button type="button" class="close-btn" @click="closeMessage()">
-        &times;
-      </button>
-      <strong>{{ successMessage }}</strong>
+      </form>
     </div>
   </div>
 </template>  
 
 <script>
+import edit_customer from "./edit_customer.vue";
 export default {
-  data: function () {
+  data() {
     return {
       user: undefined,
       customer: undefined,
-      successMessage: "",
       errors: {},
     };
   },
   methods: {
-    editUser: function () {
+    editUser() {
+      const data = new FormData();
+      if (typeof this.user.photo_url != "string") {
+        data.append("photo_url", this.user.photo_url);
+      }
+      data.append("id", this.user.id);
+      data.append("name", this.user.name);
+      data.append("email", this.user.email);
+
+      // ENVIAMOS UM POST PORÉM O MÉTODO É PUT.
+      // ISTO ACONTECE DEVIDO A UM BUG, DESCRITO AQUI:
+      // https://stackoverflow.com/questions/61770340/vue-laravel-formdata-append-displaying-null-value-on-edit
+      data.append("_method", "PUT");
+      console.log(data);
       axios
-        .put(`api/users/${this.user.id}`, this.user)
+        .post(`api/users/${this.user.id}`, data)
         .then((result) => {
-          this.successMessage = "User Edited";
+          this.$toasted
+            .show(`User ${this.user.name} edited successfully`, {
+              type: "success",
+            })
+            .goAway(3500);
+          this.$router.push(`/users/${this.user.id}`);
           this.failMessage = "";
         })
         .catch((error) => {
           if (error.response.status === 422) {
             this.errors = error.response.data.errors || {};
           }
-          this.successMessage = "";
         });
 
       if (this.user.type == "C") {
         axios
           .put(`api/customers/${this.user.id}`, this.customer)
           .then((result) => {
-            this.successMessage = "Customer Edited";
             this.failMessage = "";
           })
           .catch((error) => {
             if (error.response.status === 422) {
               this.errors = error.response.data.errors || {};
             }
-            this.successMessage = "";
           });
       }
     },
-
+    removeProfilePhoto(userId) {
+      axios
+        .patch(`api/users/${userId}`, {
+          photo_url: "default_avatar.jpg",
+        })
+        .then((response) => {
+          this.user = response.data.data;
+          this.$toasted
+            .show(`Removed profile picture successfully`, {
+              type: "success",
+            })
+            .goAway(3500);
+        });
+    },
     closeMessage: function () {
       this.successMessage = "";
+    },
+    handlePhotoUpload(event) {
+      this.user.photo_url = event.target.files[0];
+      console.log(this.user);
     },
   },
   async created() {
@@ -139,7 +153,7 @@ export default {
     axios.get(`/api/users/${userID}`).then((response) => {
       this.user = response.data.data;
       console.log(this.user);
-      
+
       if (typeof this.user !== "undefined" && this.user.type == "C") {
         console.log("entrou");
         axios
@@ -156,6 +170,9 @@ export default {
     console.log(this.user);
   },
 };
+components: {
+  edit_customer;
+}
 </script>
 
 <style>

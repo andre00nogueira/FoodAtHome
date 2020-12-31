@@ -69,8 +69,15 @@ class UserController extends Controller
                 $user->available_at = null;
             }
         }
+
+        if($request->has('photo_url')){
+            if($request->photo_url == 'default_avatar.jpg' && $user->photo_url != 'default_avatar.jpg'){
+                Storage::delete("public/fotos/{$user->photo_url}");
+                $user->photo_url = 'default_avatar.jpg';
+            }
+        }
         $user->save();
-        return $user;
+        return new UserResource($user);
     }
 
     public function getCurrentOrder($id)
@@ -144,43 +151,25 @@ class UserController extends Controller
         $user->save();
         return new UserResource($user);
     }
-    /* SEM StoreUserRequest */
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'name' => 'required|regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/',
-    //         'email' => 'required|email|unique:users',
-    //         'password' => 'required|min:8|confirmed',
-    //         'age' => 'required|integer|min:18|max:75',
-    //         'department_id' => 'required|integer',
-    //     ]);
-    //     $user = new User();
-    //     $user->fill($request->all());
-    //     $user->password = Hash::make($user->password);
-    //     $user->save();
-    //     return response()->json(new UserResource($user), 201);
-    // }
+    
 
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(User $user, UpdateUserRequest $request)
     {
-        $user->update($request->validated());
+        $userOldPhoto = $user->photo_url;
+        $user->fill($request->validated());
+        
+        if($request->hasFile('photo_url')){
+            if($userOldPhoto != 'default_avatar.jpg'){
+                Storage::delete("public/fotos/{$userOldPhoto}");
+            }
+            $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
+            $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
+            $user->photo_url=$generated_new_name;
+        }
         $user->save();
         return new UserResource($user);
     }
-    /* SEM UpdateUserRequest */
-    // public function update(Request $request, $id)
-    // {
-    //     $request->validate([
-    //         'name' => 'required|regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/',
-    //         'email' => 'required|email|unique:users,email,' . $this->user->id,
-    //         'password' => 'nullable|string|min:6|confirmed',
-    //         'age' => 'required|integer|min:18|max:75',
-    //         'department_id' => 'required|integer',
-    //     ]);
-    //     $user = User::findOrFail($id);
-    //     $user->update($request->all());
-    //     return new UserResource($user);
-    // }
+    
 
     public function destroy(User $user)
     {
@@ -188,17 +177,13 @@ class UserController extends Controller
         if($user->type == 'C'){
             $user->customer()->delete();
         }
+        if($user->photo_url != 'default_avatar.jpg'){
+            Storage::delete("public/fotos/{$user->photo_url}");
+        }
         $user->delete();
         $user->save();
         return new UserResource($removedUser);
     }
-    // public function destroy($id)
-    // {
-    //     $user = User::findOrFail($id);
-    //     $user->delete();
-    //     return response()->json(null, 204);
-    // }
-
 
     public function emailAvailable(Request $request)
     {
