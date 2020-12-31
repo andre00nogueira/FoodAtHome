@@ -60293,6 +60293,17 @@ Vue.use(vue_toasted__WEBPACK_IMPORTED_MODULE_3___default.a);
 Vue.component('pagination', __webpack_require__(/*! laravel-vue-pagination */ "./node_modules/laravel-vue-pagination/dist/laravel-vue-pagination.common.js"));
 Vue.component('app', _App_vue__WEBPACK_IMPORTED_MODULE_4__["default"]);
 Vue.component('app', _components_create_customer_vue__WEBPACK_IMPORTED_MODULE_6__["default"]);
+/*function acessCustomerDashboard(to, from, next){
+    if(store.state.user.id==to.params.id){
+        console.log("1")
+        next()
+    }else {
+        next(`/customer/${store.state.user.id}/dashboard`)
+        
+    }
+    
+}*/
+
 var routes = [{
   path: '/',
   redirect: '/index'
@@ -60317,6 +60328,8 @@ var routes = [{
 }, {
   path: '/customer/:id/dashboard',
   component: _components_customer_dashboard_vue__WEBPACK_IMPORTED_MODULE_10__["default"]
+  /*, beforeEnter: acessCustomerDashboard*/
+
 }, {
   path: '/orders/:id',
   component: _components_order_details_vue__WEBPACK_IMPORTED_MODULE_11__["default"]
@@ -60329,6 +60342,9 @@ var routes = [{
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]({
   routes: routes
+});
+router.beforeEach(function (to, from, next) {
+  if (to.path !== '/login' && to.path !== '/index' && to.path !== '/menu' && to.path !== '/customers/create' && !_stores_global_store__WEBPACK_IMPORTED_MODULE_2__["default"].state.user) next('/login');else next();
 });
 var app = new Vue({
   el: '#app',

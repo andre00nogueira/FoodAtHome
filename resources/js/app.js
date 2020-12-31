@@ -38,15 +38,26 @@ Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('app', AppComponent)
 Vue.component('app', CustomerComponent)
 
+/*function acessCustomerDashboard(to, from, next){
+    if(store.state.user.id==to.params.id){
+        console.log("1")
+        next()
+    }else {
+        next(`/customer/${store.state.user.id}/dashboard`)
+        
+    }
+    
+}*/
+
 const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
     { path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
-    { path: '/cart', component: ShoppingCartComponent },
-    { path: '/cart/checkout', component: CartCheckoutComponent },
-    { path: '/customer/:id/dashboard', component: CustomerDashboardComponent },
+    { path: '/cart', component: ShoppingCartComponent},
+    { path: '/cart/checkout', component: CartCheckoutComponent},
+    { path: '/customer/:id/dashboard', component: CustomerDashboardComponent/*, beforeEnter: acessCustomerDashboard*/},
     { path: '/orders/:id', component: OrderDetailsComponent },
     { path: '/cook/:id/dashboard', component: CookDashboardComponent },
     { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent }
@@ -54,6 +65,11 @@ const routes = [
 
 const router = new VueRouter({
     routes: routes
+})
+
+router.beforeEach((to, from, next) => {
+    if (to.path !== '/login' && to.path !== '/index' && to.path !== '/menu' && to.path !== '/customers/create' && !store.state.user) next('/login')
+    else next()
 })
 
 const app = new Vue({
