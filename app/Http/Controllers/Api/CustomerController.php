@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreCustomerRequest;
+use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\User;
 use App\Models\Customer;
 use App\Models\Order;
@@ -21,7 +22,11 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        //
+        if ($request->has('page')) {
+            return CustomerResource::collection(Customer::paginate(5));
+        } else {
+            return CustomerResource::collection(Customer::all());
+        }
     }
 
     /**
@@ -73,6 +78,7 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    
     public function show($id)
     {
         $customer = Customer::findOrFail($id);
@@ -88,6 +94,22 @@ class CustomerController extends Controller
         return new CustomerResource($customerToSend);
     }
 
+/*
+
+    public function show(Request $customerID)
+    {
+        $user = User::findOrFail($customerID);
+        $customer = Customer::findOrFail($customerID);
+        $aux->id = $user->id;
+        $aux->name = $user->name;
+        $aux->email = $user->email;
+        $aux->nif = $customer->nif;
+        $aux->address = $customer->address;
+        $aux->phone = $customer->phone;
+        $aux->photo_url = $user->photo_url;
+        return new CustomerResource($customer);
+    }
+    */
     /**
      * Show the form for editing the specified resource.
      *
@@ -106,9 +128,11 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        //
+        $customer->update($request->validated());
+        $customer->save();
+        return new CustomerResource($customer);
     }
 
     /**

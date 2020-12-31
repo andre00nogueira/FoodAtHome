@@ -50,14 +50,12 @@
           <td>{{ user.type }}</td>
           <td>
             <div style="display: flex">
-              <button
+              <router-link
                 v-if="user.type != 'C'"
-                class="btn btn-info"
-                style="margin-left: 2%"
-                v-on:click="editUser(user)"
+                class="btn btn-primary"
+                :to="`users/${user.id}/edit`"
+                >✏️</router-link
               >
-                ✏️
-              </button>
               <button
                 class="btn btn-danger"
                 style="margin-left: 2%"
@@ -117,8 +115,8 @@ export default {
         }
       }
     },
-    async user() {
-      return await this.$store.state.user;
+    user() {
+      return this.$store.state.user;
     },
   },
   methods: {
@@ -129,9 +127,7 @@ export default {
       }
       await axios.get(url).then((response) => {
         this.users = response.data.data;
-        let myIndex = this.users.findIndex(
-          (u) => u.id == this.user.id
-        );
+        let myIndex = this.users.findIndex((u) => u.id == this.user.id);
         this.users.splice(myIndex, 1);
         this.usersData = response.data;
       });

@@ -4,16 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Resources\User as UserResource;
+use App\Http\Resources\UserResource as UserResource;
+use App\Http\Resources\OrderResource as OrderResource; 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
-use App\Http\Resources\OrderResource;
 use App\Http\Resources\UserTypesResource;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
 use stdClass;
+use Illuminate\Support\Facades\Hash;
+use App\Rules\MatchOldPassword;
 
 class UserController extends Controller
 {
@@ -35,10 +37,17 @@ class UserController extends Controller
         return UserTypesResource::collection(User::select('type')->distinct('type')->get());
     }
 
-    public function show(User $user)
+    public function show($id)
     {
+        return new UserResource(User::findOrFail($id));
+    }
+/*
+    public function show(int $id)
+    {
+        $user = User::findOrFail($id);
         return new UserResource($user);
     }
+*/
 
     public function patchUser($id, Request $request)
     {
@@ -155,6 +164,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $user->update($request->validated());
+        $user->save();
         return new UserResource($user);
     }
     /* SEM UpdateUserRequest */
@@ -206,4 +216,13 @@ class UserController extends Controller
         return OrderResource::collection(Order::where('status', 'R')->orderBy('current_status_at', 'asc')->paginate(10));
     }
 
+    public function changePassword($id, Request $request){
+        $user=User::findOrFail($id);
+        $request->validate(['currentPassword' => ['required', 'string','min:3', new MatchOldPassword($user->password)], 'password' => ['required', 'string', 'min:3', 'confirmed']]);
+        $user->password= Hash::make($request->password);             
+        $user->save();
+        
+        
+        return new UserResource($user);
+    }
 }
