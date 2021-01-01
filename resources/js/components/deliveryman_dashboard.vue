@@ -188,6 +188,12 @@ export default {
       }
     },
   },
+  beforeRouteUpdate(to, from, next){
+    if(to.path == `/deliveryman/${to.params.id}/dashboard` && to.params.id != this.$store.state.user.id){
+      return next(`/deliveryman/${this.$store.state.user.id}/dashboard`)
+    }
+    next()
+  },
   components: { navbar, orderTable, itemsTable, chronometer },
 };
 </script>
