@@ -87,10 +87,11 @@ const app = new Vue({
     el: '#app',
     router,
     store,
-    mounted() {
-        store.dispatch('loadUserLogged')
+    async mounted() {
+        await store.dispatch('loadUserLogged')
         router.beforeEach((to, from, next) => {
             if (to.path !== '/login' && to.path !== '/index' && to.path !== '/menu' && to.path !== '/customers/create' && !store.state.user) next('/login')
+            if (to.path == '/users' && store.state.user && store.state.user.type != 'EM') next('/')
             else next()
         })
     },
