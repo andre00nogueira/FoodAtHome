@@ -62,7 +62,7 @@
           </div>
         </div>
 
-        <edit-customer v-if="user.type == 'C'" />
+        <editcustomer v-if="user.type == 'C'" :customer="customer"/>
 
         <button class="btn btn-primary" type="submit">Save</button>
         <a class="btn btn-danger" href="#/index">Cancel</a>
@@ -72,7 +72,9 @@
 </template>  
 
 <script>
-import edit_customer from "./edit_customer.vue";
+import editcustomer from './edit_customer.vue';
+import navbar from "./navbar";
+
 export default {
   data() {
     return {
@@ -104,7 +106,7 @@ export default {
               type: "success",
             })
             .goAway(3500);
-          this.$router.push(`/users/${this.user.id}`);
+          this.$router.push(`/`);
           this.failMessage = "";
         })
         .catch((error) => {
@@ -112,7 +114,6 @@ export default {
             this.errors = error.response.data.errors || {};
           }
         });
-
       if (this.user.type == "C") {
         axios
           .put(`api/customers/${this.user.id}`, this.customer)
@@ -140,9 +141,6 @@ export default {
             .goAway(3500);
         });
     },
-    closeMessage: function () {
-      this.successMessage = "";
-    },
     handlePhotoUpload(event) {
       this.user.photo_url = event.target.files[0];
       console.log(this.user);
@@ -152,27 +150,24 @@ export default {
     const userID = this.$route.params.id;
     axios.get(`/api/users/${userID}`).then((response) => {
       this.user = response.data.data;
-      console.log(this.user);
 
       if (typeof this.user !== "undefined" && this.user.type == "C") {
         console.log("entrou");
         axios
           .get(`api/customers/${this.user.id}`)
           .then((response) => {
-            console.log(response);
             this.customer = response.data.data;
+            console.log(this.customer)
           })
           .catch((error) => {
             console.log(error);
           });
       }
     });
-    console.log(this.user);
   },
+  components: { navbar, editcustomer },
 };
-components: {
-  edit_customer;
-}
+
 </script>
 
 <style>

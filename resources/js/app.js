@@ -50,7 +50,7 @@ const routes = [
     { path: '/customers/create', component: CustomerComponent },
     { path: '/users/create', component: CreateUserComponent },
     { path: '/users/:id/edit', component: EditUserComponent },
-    { path: '/customers/edit/:id', component: EditCustomerComponent },
+    //{ path: '/customers/edit/:id', component: EditCustomerComponent },
     { path: '/users/:id', component: ProfileComponent },
     { path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
@@ -63,7 +63,7 @@ const routes = [
     { path: '/users', component: UsersComponent },
     { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
     { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
-    { path: '/users/:id/password', component: ChangeUserPasswordComponent}
+    { path: '/users/:id/password', component: ChangeUserPasswordComponent }
 ]
 
 const router = new VueRouter({

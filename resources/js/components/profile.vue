@@ -1,7 +1,7 @@
 <template>
   <div>
     <navbar />
-    <div v-if="!isFetching" class="jumbotron">
+    <div v-if="user" class="jumbotron">
       <h2>User Details</h2>
       <p style="text-align: center">
         <img
@@ -44,7 +44,6 @@ export default {
     return {
       customer: undefined,
       user: {},
-      isFetching: true,
     };
   },
   created() {
@@ -57,15 +56,15 @@ export default {
           .get(`api/customers/${this.user.id}`)
           .then((response) => {
             this.customer = response.data.data;
-            this.isFetching = false;
           })
           .catch((error) => {
             console.log(error);
           });
-      } else {
-        this.isFetching = false;
       }
     });
+  },
+  computed() {
+    return this.$store.state.user.id
   },
   components: { navbar },
 };

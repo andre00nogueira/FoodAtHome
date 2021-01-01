@@ -50,7 +50,7 @@ export default {
                 loggedin: new Boolean(true),
               })
               .then((response) => {
-                let user = response.data;
+                let user = response.data.data;
                 console.log("PATCH LOGGEDIN RESPONSE = " + user.type);
                 switch (user.type) {
                   case "EC":
