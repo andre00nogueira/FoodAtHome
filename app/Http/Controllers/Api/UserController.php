@@ -76,6 +76,10 @@ class UserController extends Controller
                 $user->photo_url = 'default_avatar.jpg';
             }
         }
+        
+        if($request->has('blocked')){
+            $user->blocked = $request->blocked;
+        }
         $user->save();
         return new UserResource($user);
     }

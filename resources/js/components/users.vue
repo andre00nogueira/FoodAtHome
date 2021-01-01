@@ -63,6 +63,21 @@
               >
                 🗑️
               </button>
+              <button
+                v-if="user.blocked"
+                class="btn btn-success"
+                style="margin-left: 2%"
+                v-on:click="unblockUser(user)"
+              >
+                Unblock
+              </button>
+              <button v-else
+                class="btn btn-danger"
+                style="margin-left: 2%"
+                v-on:click="blockUser(user)"
+              >
+                Block
+              </button>
             </div>
           </td>
         </tr>
@@ -176,6 +191,39 @@ export default {
               type: "error",
             })
             .goAway(3500);
+        });
+    },
+    blockUser(user) {
+      axios
+        .patch(`api/users/${user.id}`, {
+          blocked: 1,
+        })
+        .then((response) => {
+          console.log(response.data)
+          user.blocked = response.data.data.blocked;
+          user.logged_at = response.data.data.logged_at;
+          this.$toasted
+              .show(`User: ${user.name} blocked successfully!`, {
+                type: "success",
+              })
+              .goAway(3500);
+          if(user.logged_at){
+            this.$socket.emit("blocked", user.id);
+          }
+        });
+    },
+    unblockUser(user) {
+      axios
+        .patch(`api/users/${user.id}`, {
+          blocked: 0,
+        })
+        .then((response) => {
+          user.blocked = response.data.data.blocked;
+          this.$toasted
+              .show(`User: ${user.name} unblocked successfully!`, {
+                type: "success",
+              })
+              .goAway(3500);
         });
     },
   },
