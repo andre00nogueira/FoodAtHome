@@ -25,13 +25,19 @@ Vue.use(Toasted)
 import AppComponent from './App.vue'
 import ProductsComponent from './components/products.vue'
 import CustomerComponent from './components/create_customer.vue'
+import CreateUserComponent from './components/create_user.vue'
 import LoginComponent from './components/login.vue'
 import ShoppingCartComponent from './components/shopping_cart.vue'
 import CartCheckoutComponent from './components/cart_checkout.vue'
 import CustomerDashboardComponent from './components/customer_dashboard.vue'
 import OrderDetailsComponent from './components/order_details.vue'
 import CookDashboardComponent from './components/cook_dashboard.vue'
+import UsersComponent from './components/users.vue'
 import DeliverymanDashboardComponent from './components/deliveryman_dashboard.vue'
+import EditUserComponent from './components/edit_user.vue'
+import EditCustomerComponent from './components/edit_customer.vue'
+import ProfileComponent from './components/profile.vue'
+import ChangeUserPasswordComponent from './components/change_user_password.vue'
 
 
 Vue.component('pagination', require('laravel-vue-pagination'));
@@ -53,6 +59,11 @@ const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
     { path: '/customers/create', component: CustomerComponent },
+    { path: '/users/create', component: CreateUserComponent },
+    { path: '/users/:id/edit', component: EditUserComponent },
+    //{ path: '/customers/edit/:id', component: EditCustomerComponent },
+    { path: '/users/:id', component: ProfileComponent },
+    { path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
     { path: '/cart', component: ShoppingCartComponent},
@@ -60,17 +71,17 @@ const routes = [
     { path: '/customer/:id/dashboard', component: CustomerDashboardComponent/*, beforeEnter: acessCustomerDashboard*/},
     { path: '/orders/:id', component: OrderDetailsComponent },
     { path: '/cook/:id/dashboard', component: CookDashboardComponent },
-    { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent }
+    { path: '/users', component: UsersComponent },
+    { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
+    { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
+    { path: '/users/:id/password', component: ChangeUserPasswordComponent }
 ]
 
 const router = new VueRouter({
     routes: routes
 })
 
-router.beforeEach((to, from, next) => {
-    if (to.path !== '/login' && to.path !== '/index' && to.path !== '/menu' && to.path !== '/customers/create' && !store.state.user) next('/login')
-    else next()
-})
+
 
 const app = new Vue({
     el: '#app',
@@ -78,28 +89,41 @@ const app = new Vue({
     store,
     mounted() {
         store.dispatch('loadUserLogged')
+        router.beforeEach((to, from, next) => {
+            if (to.path !== '/login' && to.path !== '/index' && to.path !== '/menu' && to.path !== '/customers/create' && !store.state.user) next('/login')
+            else next()
+        })
     },
     sockets: {
-        /*order_id_message(orderID) {
-            axios.patch(`api/orders/${orderID}`, {
-                prepared_by: this.$store.state.user.id
-            }).then((response) => {
+        blocked(userID) {
+            if (userID) {
                 axios
-                    .patch(`api/users/${this.$store.state.user.id}`, {
-                        available: new Boolean(false),
-                    })
+                    .post("/api/logout")
                     .then((response) => {
-                        console.log(response.data);
-                        this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
+                        console.log("User has logged out");
+                        // This updates the store
+                        // And sets current user to NULL
+                        this.$store.commit("clearCart");
+                        axios
+                            .patch(`/api/users/${this.$store.state.user.id}`, {
+                                loggedin: new Boolean(false),
+                                available: new Boolean(false),
+                            })
+                            .then((response) => {
+                                console.log(response.data);
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            });
+                        this.$store.commit("clearUser");
+                        this.$router.push("/login");
                     })
                     .catch((error) => {
-                        console.log(error);
+                        console.log(`Invalid Logout ${error}`);
                     });
-                
-            }).catch((error) => {
-                console.log(error)
-            })
-        },*/
+                this.$toasted.show(`You've been blocked by a manager!`, { type: 'error' }).goAway(3500)
+            }
+        },
         new_order(orderID) {
             if (orderID) {
                 this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)

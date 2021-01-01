@@ -27,8 +27,8 @@ class StoreUserRequest extends FormRequest
             'name' => 'required|regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
-            'age' => 'required|integer|min:18|max:75',
-            'department_id' => 'required|integer',
+            'type' => 'required|in:EM,EC,ED,C',
+            'photo_url' => 'nullable|image',
         ];
     }
 }

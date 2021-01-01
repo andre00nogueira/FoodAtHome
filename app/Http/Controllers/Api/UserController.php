@@ -4,17 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Resources\User as UserResource;
-use App\Http\Resources\OrderResource as OrderResource;
+use App\Http\Resources\UserResource as UserResource;
+use App\Http\Resources\OrderResource as OrderResource; 
 use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserLoggedAtRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserTypesResource;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
-use Illuminate\Support\Facades\DB;
-use phpDocumentor\Reflection\Types\Null_;
+use Illuminate\Support\Facades\Storage;
 use stdClass;
+use Illuminate\Support\Facades\Hash;
+use App\Rules\MatchOldPassword;
 
 class UserController extends Controller
 {
@@ -26,22 +27,27 @@ class UserController extends Controller
     public function index(Request $request)
     {
         if ($request->has('page')) {
-            return UserResource::collection(User::paginate(5));
+            return UserResource::collection(User::paginate(10));
         } else {
             return UserResource::collection(User::all());
         }
-        /*Caso não se pretenda fazer uso de Eloquent API Resources (https://laravel.com/docs/5.5/eloquent-resources), é possível implementar com esta abordagem:
-        if ($request->has('page')) {
-            return User::with('department')->paginate(5);;
-        } else {
-            return User::with('department')->get();;
-        }*/
     }
 
-    public function show(User $user)
+    public function types(){
+        return UserTypesResource::collection(User::select('type')->distinct('type')->get());
+    }
+
+    public function show($id)
     {
+        return new UserResource(User::findOrFail($id));
+    }
+/*
+    public function show(int $id)
+    {
+        $user = User::findOrFail($id);
         return new UserResource($user);
     }
+*/
 
     public function patchUser($id, Request $request)
     {
@@ -63,8 +69,19 @@ class UserController extends Controller
                 $user->available_at = null;
             }
         }
+
+        if($request->has('photo_url')){
+            if($request->photo_url == 'default_avatar.jpg' && $user->photo_url != 'default_avatar.jpg'){
+                Storage::delete("public/fotos/{$user->photo_url}");
+                $user->photo_url = 'default_avatar.jpg';
+            }
+        }
+        
+        if($request->has('blocked')){
+            $user->blocked = $request->blocked;
+        }
         $user->save();
-        return $user;
+        return new UserResource($user);
     }
 
     public function getCurrentOrder($id)
@@ -118,63 +135,59 @@ class UserController extends Controller
     }
 
 
+    public function usersByType(string $type_name)
+    {
+        return UserResource::collection(User::where('type', $type_name)->get());
+    }
+
     public function store(StoreUserRequest $request)
     {
         $user = new User();
         $user->fill($request->validated());
         $user->password = bcrypt($user->password);
+        if($request->hasFile('photo_url')){
+            $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
+            $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
+            $user->photo_url=$generated_new_name;
+        }else{
+            $user->photo_url='default_avatar.jpg';
+        }
         $user->save();
-        return response()->json(new UserResource($user), 201);
-    }
-    /* SEM StoreUserRequest */
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'name' => 'required|regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/',
-    //         'email' => 'required|email|unique:users',
-    //         'password' => 'required|min:8|confirmed',
-    //         'age' => 'required|integer|min:18|max:75',
-    //         'department_id' => 'required|integer',
-    //     ]);
-    //     $user = new User();
-    //     $user->fill($request->all());
-    //     $user->password = Hash::make($user->password);
-    //     $user->save();
-    //     return response()->json(new UserResource($user), 201);
-    // }
-
-    public function update(UpdateUserRequest $request, User $user)
-    {
-        $user->update($request->validated());
         return new UserResource($user);
     }
-    /* SEM UpdateUserRequest */
-    // public function update(Request $request, $id)
-    // {
-    //     $request->validate([
-    //         'name' => 'required|regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/',
-    //         'email' => 'required|email|unique:users,email,' . $this->user->id,
-    //         'password' => 'nullable|string|min:6|confirmed',
-    //         'age' => 'required|integer|min:18|max:75',
-    //         'department_id' => 'required|integer',
-    //     ]);
-    //     $user = User::findOrFail($id);
-    //     $user->update($request->all());
-    //     return new UserResource($user);
-    // }
+    
+
+    public function update(User $user, UpdateUserRequest $request)
+    {
+        $userOldPhoto = $user->photo_url;
+        $user->fill($request->validated());
+        
+        if($request->hasFile('photo_url')){
+            if($userOldPhoto != 'default_avatar.jpg'){
+                Storage::delete("public/fotos/{$userOldPhoto}");
+            }
+            $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
+            $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
+            $user->photo_url=$generated_new_name;
+        }
+        $user->save();
+        return new UserResource($user);
+    }
+    
 
     public function destroy(User $user)
     {
+        $removedUser = $user;
+        if($user->type == 'C'){
+            $user->customer()->delete();
+        }
+        if($user->photo_url != 'default_avatar.jpg'){
+            Storage::delete("public/fotos/{$user->photo_url}");
+        }
         $user->delete();
-        return response()->json(null, 204);
+        $user->save();
+        return new UserResource($removedUser);
     }
-    // public function destroy($id)
-    // {
-    //     $user = User::findOrFail($id);
-    //     $user->delete();
-    //     return response()->json(null, 204);
-    // }
-
 
     public function emailAvailable(Request $request)
     {
@@ -192,4 +205,13 @@ class UserController extends Controller
         return OrderResource::collection(Order::where('status', 'R')->orderBy('current_status_at', 'asc')->paginate(10));
     }
 
+    public function changePassword($id, Request $request){
+        $user=User::findOrFail($id);
+        $request->validate(['currentPassword' => ['required', 'string','min:3', new MatchOldPassword($user->password)], 'password' => ['required', 'string', 'min:3', 'confirmed']]);
+        $user->password= Hash::make($request->password);             
+        $user->save();
+        
+        
+        return new UserResource($user);
+    }
 }
