@@ -21,9 +21,16 @@
         <div class="form-group">
           <p style="text-align: center">
             <img
+              v-if="typeof user.photo_url == 'string'"
               class="img-profile rounded-circle"
               style="width: 100px; height: 100px"
               :src="`storage/fotos/${user.photo_url || 'default_avatar.jpg'}`"
+            />
+            <img
+              v-else
+              class="img-profile rounded-circle"
+              style="width: 100px; height: 100px"
+              :src="`${uploadedPhoto}`"
             />
             <button
               type="button"
@@ -80,6 +87,7 @@ export default {
     return {
       user: undefined,
       customer: undefined,
+      uploadedPhoto: undefined,
       errors: {},
     };
   },
@@ -143,6 +151,7 @@ export default {
     },
     handlePhotoUpload(event) {
       this.user.photo_url = event.target.files[0];
+      this.uploadedPhoto = URL.createObjectURL(event.target.files[0])
       console.log(this.user);
     },
   },

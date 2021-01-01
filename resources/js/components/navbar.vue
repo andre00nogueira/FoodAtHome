@@ -14,16 +14,16 @@
       >Dashboard</router-link
     >
     <router-link
-      v-if="$store.state.user && $store.state.user.type == 'EM'"
+      v-if="user && user.type == 'EM'"
       class="navbar-brand"
       :to="`/users`"
       >Users List</router-link
     >
 
     <router-link
-      v-if="$store.state.user && $store.state.user.type == 'ED'"
+      v-if="user && user.type == 'ED'"
       class="navbar-brand"
-      :to="`/deliveryman/${$store.state.user.id}/dashboard`"
+      :to="`/deliveryman/${user.id}/dashboard`"
       >Dashboard</router-link
     >
 
@@ -42,11 +42,9 @@
             <ul class="navbar-nav">
               <li class="nav-item dropdown" style="display: flex">
                 <img
-                  :src="`storage/fotos/${
-                    user.photo_url || 'default_avatar.jpg'
-                  }`"
+                  :src="`storage/fotos/${user.photo_url || 'default_avatar.jpg'}`"
                   class="rounded-circle"
-                  style="width: 40px; height: auto"
+                  style="width: 40px; height: 40px"
                 />
                 <a
                   class="nav-link dropdown-toggle"
@@ -102,7 +100,7 @@ export default {
           // And sets current user to NULL
           this.$store.commit("clearCart");
           axios
-            .patch(`/api/users/${this.$store.state.user.id}`, {
+            .patch(`/api/users/${this.user.id}`, {
               loggedin: new Boolean(false),
               available: new Boolean(false),
             })
