@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Http\Resources\Product as ProductResource;
+use App\Http\Resources\ProductResource as ProductResource;
 use App\Http\Resources\ProductTypeResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -56,7 +57,25 @@ class ProductController extends Controller
     }
 
     public function update(UpdateProductRequest $request, Product $product){
-        $product->update($request->validated());
+       /* $product->update($request->validated());
+        $product->save();
+        return new ProductResource($product);
+        */
+       /* $productOldPhoto = $product->photo_url;
+        $product->fill($request->validated());
+        $product->save();
+        return new ProductResource($product);*/
+        $productOldPhoto = $product->photo_url;
+        $product->fill($request->validated());
+        
+        if($request->hasFile('photo_url')){
+            $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
+            if(!empty($product->photo_url)){
+                Storage::delete("public/products/{$productOldPhoto}");
+            }
+            $request->file('photo_url')->storeAs('public/products', $generated_new_name);
+            $product->photo_url=$generated_new_name;
+        }
         $product->save();
         return new ProductResource($product);
     }

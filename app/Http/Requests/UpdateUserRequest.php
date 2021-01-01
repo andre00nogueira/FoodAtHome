@@ -26,8 +26,8 @@ class UpdateUserRequest extends FormRequest
     {
         return [
             'name' => 'required|regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/',
-            'email' => ['required','email',Rule::unique('users')->ignore($this->user->id)], //unique:users
-            'photo_url' => 'nullable|mimes:jpeg,png'
+            'email' => ['required','email',Rule::unique('users')->ignore($this->user)],
+            'photo_url' => 'nullable|image'
         ];
     }
 }

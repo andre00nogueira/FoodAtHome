@@ -3,7 +3,7 @@
     <navbar />
 
     <h2>Menu</h2>
-    <router-link to="/products/create">Create</router-link>
+    <router-link id="createButton" class="btn btn-primary" to="/products/create">Create Product</router-link>
     <div id="filterArea">
       <input
         class="form-control"
@@ -52,10 +52,10 @@
                 v-model="product.quantity"
                 type="number"
                 class="form-control"
-                style="width: 65%"
+                style="width: auto"
                 placeholder="Quantity"
                 min="1"
-                max="10"
+                max="20"
               />
               <button
                 class="btn btn-primary"
@@ -91,9 +91,7 @@
     </table>
 
     <pagination
-      :data="
-        Object.keys(productsData).length === 0 ? allProductsData : productsData
-      "
+      :data="productsData"
       @pagination-change-page="getProducts"
     ></pagination>
   </div>
@@ -105,8 +103,6 @@ import navbar from "./navbar.vue";
 export default {
   data() {
     return {
-      allProducts: [],
-      allProductsData: {},
       products: [],
       productsData: {},
       types: [],
@@ -121,14 +117,13 @@ export default {
   computed: {
     filterProducts() {
       if (!this.searchQuery) {
-        this.allProductsData = {};
         return this.products;
       } else {
         if (this.selectedTypeValue == "") {
-          if (this.allProducts.length == 0) {
+          if (this.products.length == 0) {
             this.getProducts(0);
           }
-          return this.allProducts.filter((product) => {
+          return this.products.filter((product) => {
             return product.name
               .toLowerCase()
               .includes(this.searchQuery.toLowerCase());
@@ -148,17 +143,11 @@ export default {
       let url = `api/products`;
       if (page != 0) {
         url += `?page=${page}`;
-
-        axios.get(url).then((response) => {
-          this.products = response.data.data;
-          this.productsData = response.data;
-        });
-      } else {
-        axios.get(url).then((response) => {
-          this.allProducts = response.data.data;
-          this.allProductsData = response.data;
-        });
       }
+      axios.get(url).then((response) => {
+        this.products = response.data.data;
+        this.productsData = response.data;
+      });
     },
 
     //#region GET FOOD BY TYPE
@@ -185,10 +174,7 @@ export default {
     },
     //#endregion
 
-    addToCart(product, quantity) {
-      this.$store.commit("addItemToCart", product);
-    },
-
+   
     deleteProduct(product){
       axios.delete(`api/products/${product.id}`).then((result)=>{
         let productDeletedIndex=this.products.findIndex((p)=>p.id==product.id)
@@ -197,6 +183,22 @@ export default {
       }).catch((error)=>{
         console.log(error)
       })
+    },
+    addToCart(product) {
+      if (product.quantity > 20 || product.quantity < 1) {
+        this.$toasted
+          .show(`Quantity should be between 1 and 20!`, {
+            type: "error",
+          })
+          .goAway(3500);
+        return;
+      }
+      this.$store.commit("addItemToCart", product);
+      this.$toasted
+        .show(`Product ${product.name} added to cart!`, {
+          type: "success",
+        })
+        .goAway(3500);
     },
   },
 
@@ -222,5 +224,9 @@ export default {
 
 #productTypeFilter {
   width: 20%;
+}
+#createButton{
+  position: relative;
+  left: calc(100% - 123px);
 }
 </style>

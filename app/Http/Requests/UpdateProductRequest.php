@@ -28,7 +28,7 @@ class UpdateProductRequest extends FormRequest
             'type' => 'required|in:dessert,drink,hot dish,cold dish',
             'description' => 'required|min:3|max:500',
             'price' =>'required|numeric|max:1000',
-            'photo_url' => 'required' //|mimes:jpeg,png
+            'photo_url' => 'image' //|mimes:jpeg,png
         ];
     }
 }
