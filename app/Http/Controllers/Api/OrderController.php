@@ -188,4 +188,8 @@ class OrderController extends Controller
         }
         return null;
     }
+
+    public function activeOrders(){
+        return OrderResource::collection(Order::whereNotIn('status',['C','D'])->orderBy('opened_at','asc')->paginate(10));
+    }
 }

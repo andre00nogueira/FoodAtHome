@@ -214,4 +214,8 @@ class UserController extends Controller
         
         return new UserResource($user);
     }
+
+    public function employeesIndex(){
+        return UserResource::collection(User::whereIn('type',['EC','ED'])->paginate(10));
+    }
 }

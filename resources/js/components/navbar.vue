@@ -16,14 +16,20 @@
     <router-link
       v-if="user && user.type == 'EM'"
       class="navbar-brand"
+      :to="`/manager/${user.id}/dashboard`"
+      >Dashboard</router-link
+    >
+    <router-link
+      v-if="user && user.type == 'EM'"
+      class="navbar-brand"
       :to="`/users`"
       >Users List</router-link
     >
 
     <router-link
-      v-if="user && user.type == 'ED'"
+      v-if="user && user.type == 'C'"
       class="navbar-brand"
-      :to="`/deliveryman/${user.id}/dashboard`"
+      :to="`/customer/${user.id}/dashboard`"
       >Dashboard</router-link
     >
 
@@ -42,7 +48,9 @@
             <ul class="navbar-nav">
               <li class="nav-item dropdown" style="display: flex">
                 <img
-                  :src="`storage/fotos/${user.photo_url || 'default_avatar.jpg'}`"
+                  :src="`storage/fotos/${
+                    user.photo_url || 'default_avatar.jpg'
+                  }`"
                   class="rounded-circle"
                   style="width: 40px; height: 40px"
                 />

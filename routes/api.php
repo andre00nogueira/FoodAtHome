@@ -77,12 +77,14 @@ Route::get('deliverymen/orders', [UserController::class, 'deliverymanOrders']);
 
 // Orders
 Route::get('orders/preparation/queue', [OrderController::class, 'nextOrderToPrepare']);
+Route::get('orders/active', [OrderController::class, 'activeOrders']);
 Route::get('orders/{id}', [OrderController::class, 'show']);
 Route::patch('orders/{id}', [OrderController::class, 'update']);
 
 
 
 //employees
+Route::get('employees', [UserController::class, 'employeesIndex']);
 Route::get('employee/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
 
 
