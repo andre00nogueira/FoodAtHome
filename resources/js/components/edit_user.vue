@@ -1,7 +1,7 @@
 <template>
-  <div v-if="user">
+  <div >
     <navbar />
-    <div class="jumbotron">
+    <div class="jumbotron" v-if="user">
       <h2>Edit User</h2>
       <form @submit.prevent="editUser">
         <div class="form-group">

@@ -1,93 +1,100 @@
 <template>
-  <div v-if="user">
+  <div>
     <navbar />
-    <h2>User List</h2>
-    <router-link
-      v-if="user.type == 'EM'"
-      class="btn btn-primary"
-      :to="`users/create`"
-      >Create User</router-link
-    >
-    <div id="filterArea">
-      <input
-        class="form-control"
-        type="text"
-        v-model="searchQuery"
-        placeholder="Search for a user..."
-      />
-
-      <select
-        @change="getUsersByType($event)"
-        class="custom-select"
-        id="userTypeFilter"
+    <div class="content" v-if="user">
+      <h2>User List</h2>
+      <router-link
+        v-if="user.type == 'EM'"
+        class="btn btn-primary"
+        :to="`users/create`"
+        >Create User</router-link
       >
-        <option value="">Choose Type...</option>
-        <option v-for="(type, index) in types" :key="index" :value="type.name">
-          {{ type.name }}
-        </option>
-      </select>
+      <div id="filterArea">
+        <input
+          class="form-control"
+          type="text"
+          v-model="searchQuery"
+          placeholder="Search for a user..."
+        />
+
+        <select
+          @change="getUsersByType($event)"
+          class="custom-select"
+          id="userTypeFilter"
+        >
+          <option value="">Choose Type...</option>
+          <option
+            v-for="(type, index) in types"
+            :key="index"
+            :value="type.name"
+          >
+            {{ type.name }}
+          </option>
+        </select>
+      </div>
+      <table id="tableUser" class="table table-striped">
+        <thead>
+          <tr>
+            <th />
+            <th>Name</th>
+            <th>Email</th>
+            <th>Type</th>
+            <th />
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user of filterUsers" :key="user.id">
+            <td>
+              <img
+                id="userPhoto"
+                :src="`storage/fotos/${user.photo_url || 'default_avatar.jpg'}`"
+              />
+            </td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.type }}</td>
+            <td>
+              <div style="display: flex">
+                <router-link
+                  v-if="user.type != 'C'"
+                  class="btn btn-primary"
+                  :to="`users/${user.id}/edit`"
+                  >✏️</router-link
+                >
+                <button
+                  class="btn btn-danger"
+                  style="margin-left: 2%"
+                  v-on:click="deleteUser(user)"
+                >
+                  🗑️
+                </button>
+                <button
+                  v-if="user.blocked"
+                  class="btn btn-success"
+                  style="margin-left: 2%"
+                  v-on:click="unblockUser(user)"
+                >
+                  Unblock
+                </button>
+                <button
+                  v-else
+                  class="btn btn-danger"
+                  style="margin-left: 2%"
+                  v-on:click="blockUser(user)"
+                >
+                  Block
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <pagination
+        :data="usersData"
+        :limit="2"
+        @pagination-change-page="getUsers"
+      ></pagination>
     </div>
-    <table id="tableUser" class="table table-striped">
-      <thead>
-        <tr>
-          <th />
-          <th>Name</th>
-          <th>Email</th>
-          <th>Type</th>
-          <th />
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user of filterUsers" :key="user.id">
-          <td>
-            <img
-              id="userPhoto"
-              :src="`storage/fotos/${user.photo_url || 'default_avatar.jpg'}`"
-            />
-          </td>
-          <td>{{ user.name }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.type }}</td>
-          <td>
-            <div style="display: flex">
-              <router-link
-                v-if="user.type != 'C'"
-                class="btn btn-primary"
-                :to="`users/${user.id}/edit`"
-                >✏️</router-link
-              >
-              <button
-                class="btn btn-danger"
-                style="margin-left: 2%"
-                v-on:click="deleteUser(user)"
-              >
-                🗑️
-              </button>
-              <button
-                v-if="user.blocked"
-                class="btn btn-success"
-                style="margin-left: 2%"
-                v-on:click="unblockUser(user)"
-              >
-                Unblock
-              </button>
-              <button v-else
-                class="btn btn-danger"
-                style="margin-left: 2%"
-                v-on:click="blockUser(user)"
-              >
-                Block
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <pagination
-      :data="usersData"
-      :limit="2"
-      @pagination-change-page="getUsers"
-    ></pagination>
   </div>
 </template>
 
@@ -199,15 +206,15 @@ export default {
           blocked: 1,
         })
         .then((response) => {
-          console.log(response.data)
+          console.log(response.data);
           user.blocked = response.data.data.blocked;
           user.logged_at = response.data.data.logged_at;
           this.$toasted
-              .show(`User: ${user.name} blocked successfully!`, {
-                type: "success",
-              })
-              .goAway(3500);
-          if(user.logged_at){
+            .show(`User: ${user.name} blocked successfully!`, {
+              type: "success",
+            })
+            .goAway(3500);
+          if (user.logged_at) {
             this.$socket.emit("blocked", user.id);
           }
         });
@@ -220,10 +227,10 @@ export default {
         .then((response) => {
           user.blocked = response.data.data.blocked;
           this.$toasted
-              .show(`User: ${user.name} unblocked successfully!`, {
-                type: "success",
-              })
-              .goAway(3500);
+            .show(`User: ${user.name} unblocked successfully!`, {
+              type: "success",
+            })
+            .goAway(3500);
         });
     },
   },

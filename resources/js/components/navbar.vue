@@ -42,7 +42,9 @@
             <ul class="navbar-nav">
               <li class="nav-item dropdown" style="display: flex">
                 <img
-                  :src="`storage/fotos/${user.photo_url || 'default_avatar.jpg'}`"
+                  :src="`storage/fotos/${
+                    user.photo_url || 'default_avatar.jpg'
+                  }`"
                   class="rounded-circle"
                   style="width: 40px; height: 40px"
                 />
