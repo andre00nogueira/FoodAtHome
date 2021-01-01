@@ -174,6 +174,12 @@ export default {
       }
     });
   },
+  beforeRouteUpdate(to, from, next){
+    if(to.path == `/users/${to.params.id}/edit` && to.params.id != this.$store.state.user.id){
+      return next(`/users/${this.$store.state.user.id}/edit`)
+    }
+    next()
+  },
   components: { navbar, editcustomer },
 };
 
