@@ -2,15 +2,13 @@
   <div>
     <navbar />
 
-    <div class="jumbotron">
+    <div class="jumbotron content">
       <h1>FOOD@HOME</h1>
-      <h5 style="margin-bottom: 5%">WELCOME TO OUR PROJECT</h5>
       <div class="menu">
         <router-link to="/menu" id="buttonMenu" class="button"
-          >Menu</router-link
+          >Check out our Menu</router-link
         >
       </div>
-
       <carousel @next="next" @prev="prev">
         <carousel-slide
           v-for="(slide, index) in slides"
@@ -22,6 +20,7 @@
           <img :src="slide" />
         </carousel-slide>
       </carousel>
+      <p v-if="!this.$store.state.user">Considering ordering? Please, <router-link to="/login">login</router-link> or <router-link to="customers/create">create an account</router-link></p>
     </div>
   </div>
 </template>
@@ -101,6 +100,7 @@ img {
 }
 
 .button {
+  border-radius: 5px;
   border: none;
   color: white;
   padding: 0;
@@ -117,25 +117,15 @@ img {
 }
 
 #buttonMenu {
-  background-color: black;
+  width: 100%;
+  background-color: #343a40;
   color: white;
   border: 2px solid #555555;
-
   position: relative;
-  left: 50%;
-  transform: translateX(-50%);
 }
+
 #buttonMenu:hover {
   background-color: white;
-  color: black;
-}
-
-.menu {
-  position: relative;
-}
-
-.menu > h5 {
-  position: relative;
-  text-align: center;
+  color: #343a40;
 }
 </style>    

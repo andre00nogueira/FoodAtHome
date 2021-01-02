@@ -52,13 +52,13 @@ class CustomerController extends Controller
         $user->name =$request->name;
         $user->email=$request->email;
         $user->password= bcrypt($request->password);
-        if($request->has('photo_url')){
-            /*
-            $upload_path = public_path('foto');
-            $file_name = $request->photo_url->getClientOriginalName();
-            $generated_new_name = time() . '.' . $request->photo_url->getClientOriginalExtension();
-            $request->file->move($upload_path, $generated_new_name);
-            $user->photo_url=$file_name;*/
+        $user->type=$request->type;
+        if($request->hasFile('photo_url')){
+            $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
+            $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
+            $user->photo_url=$generated_new_name;
+        }else{
+            $user->photo_url='default_avatar.jpg';
         }
         $user->save();
         $customer = new Customer();
