@@ -100,6 +100,9 @@
             <td>{{ order.current_status_at }}</td>
             <td>
               <router-link :to="`/orders/${order.id}`">Details</router-link>
+              <button class="btn btn-link" @click="cancelOrder(order.id)">
+                Cancel Order
+              </button>
             </td>
           </tr>
         </tbody>
@@ -248,6 +251,21 @@ export default {
         }
         order.currentEmployee = employee;
       });
+    },
+    cancelOrder(orderID) {
+      axios
+        .patch(`api/orders/${orderID}`, {
+          status: "C",
+        })
+        .then((response) => {
+          console.log(response.data.data);
+          let payload = {
+            userId: response.data.data.customer_id,
+            status: "C",
+            orderId: response.data.data.id,
+          };
+          this.$socket.emit("order_status", payload);
+        });
     },
   },
   computed: {

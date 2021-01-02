@@ -32,13 +32,6 @@
       >Users List</router-link
     >
 
-    <router-link
-      v-if="user && user.type == 'C'"
-      class="navbar-brand"
-      :to="`/customer/${user.id}/dashboard`"
-      >Dashboard</router-link
-    >
-
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <template v-if="!user">

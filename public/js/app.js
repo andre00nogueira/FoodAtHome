@@ -3955,6 +3955,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -4123,21 +4126,37 @@ __webpack_require__.r(__webpack_exports__);
 
         order.currentEmployee = employee;
       });
+    },
+    cancelOrder: function cancelOrder(orderID) {
+      var _this6 = this;
+
+      axios.patch("api/orders/".concat(orderID), {
+        status: "C"
+      }).then(function (response) {
+        console.log(response.data.data);
+        var payload = {
+          userId: response.data.data.customer_id,
+          status: "C",
+          orderId: response.data.data.id
+        };
+
+        _this6.$socket.emit("order_status", payload);
+      });
     }
   },
   computed: {
     filteredEmployees: function filteredEmployees() {
-      var _this6 = this;
+      var _this7 = this;
 
       return this.employees.filter(function (employee) {
-        return employee.type == _this6.employeeType || _this6.employeeType == "";
+        return employee.type == _this7.employeeType || _this7.employeeType == "";
       });
     },
     filteredOrders: function filteredOrders() {
-      var _this7 = this;
+      var _this8 = this;
 
       return this.activeOrders.filter(function (order) {
-        return order.status == _this7.orderStatus || _this7.orderStatus == "";
+        return order.status == _this8.orderStatus || _this8.orderStatus == "";
       });
     }
   },
@@ -4173,13 +4192,6 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -45578,6 +45590,23 @@ var render = function() {
                               "router-link",
                               { attrs: { to: "/orders/" + order.id } },
                               [_vm._v("Details")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-link",
+                                on: {
+                                  click: function($event) {
+                                    return _vm.cancelOrder(order.id)
+                                  }
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n              Cancel Order\n            "
+                                )
+                              ]
                             )
                           ],
                           1
@@ -45725,17 +45754,6 @@ var render = function() {
             "router-link",
             { staticClass: "navbar-brand", attrs: { to: "/users" } },
             [_vm._v("Users List")]
-          )
-        : _vm._e(),
-      _vm._v(" "),
-      _vm.user && _vm.user.type == "C"
-        ? _c(
-            "router-link",
-            {
-              staticClass: "navbar-brand",
-              attrs: { to: "/customer/" + _vm.user.id + "/dashboard" }
-            },
-            [_vm._v("Dashboard")]
           )
         : _vm._e(),
       _vm._v(" "),

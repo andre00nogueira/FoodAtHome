@@ -148,6 +148,10 @@ class OrderController extends Controller
                 $order->closed_at = $now;
                 $order->total_time = Carbon::parse($order->opened_at)->diffInSeconds($now);
             }
+            if($request->status == 'C'){
+                $order->closed_at = $now;
+                $order->total_time = Carbon::parse($order->opened_at)->diffInSeconds($now);
+            }
             $order->status = $request->status;
             $order->current_status_at = $now;
         }
