@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\OrderItemsController;
+use App\Http\Controllers\Api\OrderItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,6 +85,8 @@ Route::patch('orders/{id}', [OrderController::class, 'update']);
 //employees
 Route::get('employee/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
 
+//items
+Route::get('items/salesnumber/category', [OrderItemController::class, 'getNumberOfSalesPerCategory']);
 
 
 
