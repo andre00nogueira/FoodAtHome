@@ -47,23 +47,13 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="margin-top: 20px">
           <button class="btn btn-primary" type="submit">Save</button>
           <router-link class="btn btn-danger" :to="`/users/${user.id}`"
             >Cancel</router-link
           >
         </div>
       </form>
-      <div
-        class="alert"
-        :class="{ 'alert-success': successMessage }"
-        v-if="successMessage"
-      >
-        <button type="button" class="close-btn" @click="closeMessage()">
-          &times;
-        </button>
-        <strong>{{ successMessage }}</strong>
-      </div>
     </div>
   </div>
 </template>
@@ -77,7 +67,6 @@ export default {
       currentPassword: "",
       password: "",
       password_confirmation: "",
-      successMessage: "",
       errors: {},
     };
   },
@@ -91,13 +80,17 @@ export default {
           password_confirmation: this.password_confirmation,
         })
         .then((result) => {
-          this.successMessage = "User Password Changed";
+          this.$toasted
+            .show(`User's password changed successfuly`, {
+              type: "success",
+            })
+            .goAway(3500);
+            this.$router.push(`/users/${this.user.id}`)
         })
         .catch((error) => {
           if (error.response.status === 422) {
             this.errors = error.response.data.errors || {};
           }
-          this.successMessage = "";
         });
     },
   },

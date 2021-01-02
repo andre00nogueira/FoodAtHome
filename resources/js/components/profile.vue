@@ -1,7 +1,7 @@
 <template>
   <div>
     <navbar />
-    <div v-if="user" class="jumbotron">
+    <div v-if="user" class="jumbotron content">
       <h2>User Details</h2>
       <p style="text-align: center">
         <img
@@ -29,10 +29,16 @@
         </div>
       </div>
 
-      <router-link :to="`/users/${this.user.id}/edit`">Edit User</router-link>
-      <router-link :to="`/users/${this.user.id}/password`"
-        >Change Password</router-link
-      >
+      <div style="margin-top: 20px">
+        <router-link class="btn btn-primary" :to="`/users/${this.user.id}/edit`"
+          >Edit User</router-link
+        >
+        <router-link
+          class="btn btn-secondary"
+          :to="`/users/${this.user.id}/password`"
+          >Change Password</router-link
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -64,7 +70,7 @@ export default {
     });
   },
   computed() {
-    return this.$store.state.user.id
+    return this.$store.state.user.id;
   },
   components: { navbar },
 };
