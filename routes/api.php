@@ -31,8 +31,7 @@ use App\Http\Controllers\Api\OrderItemsController;
 //products
 Route::get('products', [ProductController::class, 'index']);
 Route::post('customers',[CustomerController::class, 'store']);
-Route::get('customers/{customer}',[CustomerController::class,'show']);
-Route::put('customers/{customer}',[CustomerController::class, 'update']);
+
 Route::get('products/types', [ProductController::class, 'types']);
 Route::get('products/types/{type_name}', [ProductController::class, 'productByType']);
 
@@ -42,6 +41,7 @@ Route::post('customers',[CustomerController::class, 'store']);
 Route::get('customers/orders/{customer}/open', [CustomerController::class, 'openOrders']);
 Route::get('customers/orders/{customer}/closed', [CustomerController::class, 'closedOrders']);
 Route::get('customers/{customer}',[CustomerController::class, 'show']);
+Route::put('customers/{customer}',[CustomerController::class, 'update']);
 
 
 
@@ -62,10 +62,10 @@ Route::get('users', [UserController::class, 'index']);
 Route::get('users/types', [UserController::class, 'types']);
 Route::get('users/types/{type_name}', [UserController::class, 'usersByType']);
 Route::get('users/{user}', [UserController::class, 'show']);
+Route::post('users',[UserController::class, 'store']);
 Route::post('users/{user}/password',[UserController::class,'changePassword']);
 Route::patch('users/{user}', [UserController::class, 'patchUser']);
 Route::delete('users/{user}', [UserController::class, 'destroy']);
-Route::post('users',[UserController::class, 'store']);
 Route::put('users/{user}',[UserController::class,'update']);
 
 

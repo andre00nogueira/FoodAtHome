@@ -112,7 +112,7 @@ class UserController extends Controller
         $orderToSend->total_time = $order->total_time;
         $orderToSend->customer_id = $order->customer_id;
         $orderToSend->customer_name = "";
-        $orderToSend->current_status_at = $order->current_status_at->format('Y-m-d H:i:s');
+        $orderToSend->current_status_at = $order->current_status_at;
 
         // ORDER ITEMS
         $orderItems = [];

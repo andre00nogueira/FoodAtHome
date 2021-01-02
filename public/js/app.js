@@ -3922,6 +3922,39 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -3929,7 +3962,29 @@ __webpack_require__.r(__webpack_exports__);
       employees: [],
       employeesData: {},
       activeOrders: [],
-      activeOrdersData: {}
+      activeOrdersData: {},
+      types: [{
+        name: "Cook",
+        value: "EC"
+      }, {
+        name: "Deliveryman",
+        value: "ED"
+      }],
+      statusList: [{
+        name: "Holding",
+        value: "H"
+      }, {
+        name: "Preparing",
+        value: "P"
+      }, {
+        name: "Ready",
+        value: "R"
+      }, {
+        name: "in Transit",
+        value: "T"
+      }],
+      employeeType: "",
+      orderStatus: ""
     };
   },
   created: function created() {
@@ -3945,6 +4000,8 @@ __webpack_require__.r(__webpack_exports__);
             _this.activeOrders = _this.activeOrdersData.data;
 
             _this.refreshEmployeeData();
+
+            _this.refreshOrderData();
           }
         });
       }
@@ -3960,7 +4017,7 @@ __webpack_require__.r(__webpack_exports__);
         return "Available";
       }
 
-      if (user.type = "ED") {
+      if (user.type == "ED") {
         return "Delivering Order";
       }
 
@@ -4002,29 +4059,25 @@ __webpack_require__.r(__webpack_exports__);
       var order = undefined;
 
       if (employee.type == "EC") {
-        console.log("EC");
         order = this.activeOrders.find(function (order) {
           return order.prepared_by == employee.id;
         });
+        employee.currentOrder = order;
       }
 
       if (employee.type == "ED") {
-        console.log("ED");
         order = this.activeOrders.find(function (order) {
           return order.delivered_by == employee.id;
         });
-        console.log(order);
+        employee.currentOrder = order;
       }
 
       if (!order) {
         axios.get("api/employee/".concat(employee.id, "/currentOrder")).then(function (response) {
-          console.log("axios");
-          order = response.data.data;
-          console.log(order);
+          employee.currentOrder = response.data;
+          console.log(employee);
         });
       }
-
-      employee.currentOrder = order;
     },
     refreshEmployeeData: function refreshEmployeeData() {
       var _this4 = this;
@@ -4032,21 +4085,62 @@ __webpack_require__.r(__webpack_exports__);
       var employeesWithActiveOrders = this.employees.filter(function (e) {
         return e.logged_at && !e.available_at;
       });
+      console.log(employeesWithActiveOrders);
 
       if (employeesWithActiveOrders) {
         employeesWithActiveOrders.forEach(function (employee) {
           _this4.getCurrentOrder(employee);
         });
       }
+    },
+    refreshOrderData: function refreshOrderData() {
+      var _this5 = this;
+
+      this.activeOrders.forEach(function (order) {
+        var employee = undefined;
+
+        if (order.delivered_by) {
+          employee = _this5.employees.find(function (employee) {
+            return order.delivered_by == employee.id;
+          });
+
+          if (!employee) {
+            axios.get("api/users/".concat(order.delivered_by)).then(function (response) {
+              employee = response.data.data;
+            });
+          }
+        } else {
+          employee = _this5.employees.find(function (employee) {
+            return order.prepared_by == employee.id;
+          });
+
+          if (!employee) {
+            axios.get("api/users/".concat(order.prepared_by)).then(function (response) {
+              employee = response.data.data;
+            });
+          }
+        }
+
+        order.currentEmployee = employee;
+      });
     }
-  }
-  /*,
-  computed: {
-  user() {
-    return this.$store.state.user;
   },
-  }*/
-  ,
+  computed: {
+    filteredEmployees: function filteredEmployees() {
+      var _this6 = this;
+
+      return this.employees.filter(function (employee) {
+        return employee.type == _this6.employeeType || _this6.employeeType == "";
+      });
+    },
+    filteredOrders: function filteredOrders() {
+      var _this7 = this;
+
+      return this.activeOrders.filter(function (order) {
+        return order.status == _this7.orderStatus || _this7.orderStatus == "";
+      });
+    }
+  },
   sockets: {
     update_user_status: function update_user_status(user) {
       console.log(user);
@@ -45251,138 +45345,260 @@ var render = function() {
       _vm._v(" "),
       _c("h2", [_vm._v("Employees List")]),
       _vm._v(" "),
-      _c(
-        "table",
-        { staticClass: "table table-striped", attrs: { id: "employee" } },
-        [
-          _vm._m(0),
-          _vm._v(" "),
-          _c(
-            "tbody",
-            _vm._l(_vm.employees, function(user) {
-              return _c("tr", { key: user.id }, [
-                _c("td", [_vm._v(_vm._s(user.id))]),
-                _vm._v(" "),
-                _c("td", [
-                  _c("img", {
-                    attrs: {
-                      id: "userPhoto",
-                      src:
-                        "storage/fotos/" +
-                        (user.photo_url || "default_avatar.jpg")
-                    }
+      _c("div", { staticClass: "text-right" }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.employeeType,
+                expression: "employeeType"
+              }
+            ],
+            staticClass: "custom-select",
+            attrs: { id: "employeeTypeFilter" },
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
                   })
-                ]),
-                _vm._v(" "),
-                _c("td", [_vm._v(_vm._s(user.name))]),
-                _vm._v(" "),
-                _c("td", [_vm._v(_vm._s(_vm.getStatus(user)))]),
-                _vm._v(" "),
-                _c("td", [
-                  _vm._v(_vm._s(user.logged_at ? user.logged_at : "-"))
-                ]),
-                _vm._v(" "),
-                _c("td", [
-                  _vm._v(
-                    "\n          " +
-                      _vm._s(user.currentOrder ? user.currentOrder.id : "-") +
-                      "\n        "
-                  )
-                ]),
-                _vm._v(" "),
-                _c("td", [
-                  _vm._v(
-                    "\n          " +
-                      _vm._s(
-                        user.currentOrder
-                          ? user.currentOrder.current_status_at
-                          : "-"
-                      ) +
-                      "\n        "
-                  )
-                ]),
-                _vm._v(" "),
-                _c(
-                  "td",
-                  [
-                    user.currentOrder
-                      ? _c(
-                          "router-link",
-                          { attrs: { to: "/orders/" + user.currentOrder.id } },
-                          [_vm._v("Details")]
-                        )
-                      : _vm._e()
-                  ],
-                  1
-                )
-              ])
-            }),
-            0
-          )
-        ]
-      ),
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.employeeType = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              }
+            }
+          },
+          [
+            _c("option", { attrs: { value: "" } }, [_vm._v("Choose Type...")]),
+            _vm._v(" "),
+            _vm._l(_vm.types, function(type, index) {
+              return _c(
+                "option",
+                { key: index, domProps: { value: type.value } },
+                [_vm._v("\n        " + _vm._s(type.name) + "\n      ")]
+              )
+            })
+          ],
+          2
+        )
+      ]),
       _vm._v(" "),
-      _vm.employees.length > 0
-        ? _c("pagination", {
-            attrs: { data: _vm.employeesData },
-            on: { "pagination-change-page": _vm.getResults }
-          })
-        : _vm._e(),
+      _vm.filteredEmployees.length
+        ? _c(
+            "div",
+            [
+              _c(
+                "table",
+                {
+                  staticClass: "table table-striped",
+                  attrs: { id: "employee" }
+                },
+                [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c(
+                    "tbody",
+                    _vm._l(_vm.filteredEmployees, function(user) {
+                      return _c("tr", { key: user.id }, [
+                        _c("td", [_vm._v(_vm._s(user.id))]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _c("img", {
+                            attrs: {
+                              id: "userPhoto",
+                              src:
+                                "storage/fotos/" +
+                                (user.photo_url || "default_avatar.jpg")
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(user.name))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.getStatus(user)))]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(user.logged_at ? user.logged_at : "-"))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(
+                            "\n            " +
+                              _vm._s(
+                                user.currentOrder ? user.currentOrder.id : "-"
+                              ) +
+                              "\n          "
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(
+                            "\n            " +
+                              _vm._s(
+                                user.currentOrder
+                                  ? user.currentOrder.current_status_at
+                                  : "-"
+                              ) +
+                              "\n          "
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "td",
+                          [
+                            user.currentOrder
+                              ? _c(
+                                  "router-link",
+                                  {
+                                    attrs: {
+                                      to: "/orders/" + user.currentOrder.id
+                                    }
+                                  },
+                                  [_vm._v("Details")]
+                                )
+                              : _vm._e()
+                          ],
+                          1
+                        )
+                      ])
+                    }),
+                    0
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _vm.employees.length > 0
+                ? _c("pagination", {
+                    attrs: { data: _vm.employeesData },
+                    on: { "pagination-change-page": _vm.getResults }
+                  })
+                : _vm._e()
+            ],
+            1
+          )
+        : _c("h5", [_vm._v("No Employees")]),
       _vm._v(" "),
       _c("h2", [_vm._v("Active Orders")]),
       _vm._v(" "),
-      _c(
-        "table",
-        { staticClass: "table table-striped", attrs: { id: "activeOrders" } },
-        [
-          _vm._m(1),
-          _vm._v(" "),
-          _c(
-            "tbody",
-            _vm._l(_vm.activeOrders, function(order) {
-              return _c("tr", { key: order.id }, [
-                _c("td", [_vm._v(_vm._s(order.id))]),
-                _vm._v(" "),
-                _c("td", [_vm._v(_vm._s(order.status))]),
-                _vm._v(" "),
-                _c("td", [
-                  _vm._v(
-                    "\n          " +
-                      _vm._s(
-                        order.delivered_by
-                          ? order.delivered_by
-                          : order.prepared_by
-                      ) +
-                      "\n        "
-                  )
-                ]),
-                _vm._v(" "),
-                _c("td", [_vm._v(_vm._s(order.current_status_at))]),
-                _vm._v(" "),
-                _c(
-                  "td",
-                  [
-                    _c(
-                      "router-link",
-                      { attrs: { to: "/orders/" + order.id } },
-                      [_vm._v("Details")]
-                    )
-                  ],
-                  1
-                )
-              ])
-            }),
-            0
-          )
-        ]
-      ),
+      _c("div", { staticClass: "text-right" }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.orderStatus,
+                expression: "orderStatus"
+              }
+            ],
+            staticClass: "custom-select",
+            attrs: { id: "orderTypeFilter" },
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.orderStatus = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              }
+            }
+          },
+          [
+            _c("option", { attrs: { value: "" } }, [
+              _vm._v("Choose Status...")
+            ]),
+            _vm._v(" "),
+            _vm._l(_vm.statusList, function(status, index) {
+              return _c(
+                "option",
+                { key: index, domProps: { value: status.value } },
+                [_vm._v("\n        " + _vm._s(status.name) + "\n      ")]
+              )
+            })
+          ],
+          2
+        )
+      ]),
       _vm._v(" "),
-      _vm.activeOrders.length > 0
-        ? _c("pagination", {
-            attrs: { data: _vm.activeOrdersData },
-            on: { "pagination-change-page": _vm.getResultsOrders }
-          })
-        : _vm._e()
+      _vm.filteredOrders.length
+        ? _c(
+            "div",
+            [
+              _c(
+                "table",
+                {
+                  staticClass: "table table-striped",
+                  attrs: { id: "activeOrders" }
+                },
+                [
+                  _vm._m(1),
+                  _vm._v(" "),
+                  _c(
+                    "tbody",
+                    _vm._l(_vm.filteredOrders, function(order) {
+                      return _c("tr", { key: order.id }, [
+                        _c("td", [_vm._v(_vm._s(order.id))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(order.status))]),
+                        _vm._v(" "),
+                        order.status != "D" && order.status != "R"
+                          ? _c("td", [
+                              _vm._v(
+                                "\n            " +
+                                  _vm._s(
+                                    order.currentEmployee
+                                      ? order.currentEmployee.name
+                                      : "-"
+                                  ) +
+                                  "\n          "
+                              )
+                            ])
+                          : _c("td", [_vm._v("-")]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(order.current_status_at))]),
+                        _vm._v(" "),
+                        _c(
+                          "td",
+                          [
+                            _c(
+                              "router-link",
+                              { attrs: { to: "/orders/" + order.id } },
+                              [_vm._v("Details")]
+                            )
+                          ],
+                          1
+                        )
+                      ])
+                    }),
+                    0
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _vm.activeOrders.length > 0
+                ? _c("pagination", {
+                    attrs: { data: _vm.activeOrdersData },
+                    on: { "pagination-change-page": _vm.getResultsOrders }
+                  })
+                : _vm._e()
+            ],
+            1
+          )
+        : _c("h5", [_vm._v("No Orders")])
     ],
     1
   )
@@ -45422,7 +45638,7 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Status")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Employee Name")]),
+        _c("th", [_vm._v("Current Employee Name")]),
         _vm._v(" "),
         _c("th", [_vm._v("Time Current Status")]),
         _vm._v(" "),
