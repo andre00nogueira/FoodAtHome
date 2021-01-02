@@ -69,8 +69,16 @@ export default {
       }
     });
   },
-  computed() {
-    return this.$store.state.user.id;
+  computed: {
+    loggedUser(){
+      return this.$store.state.user
+    }
+  },
+  beforeRouteUpdate(to, from, next){
+    if(to.path == `/users/${to.params.id}` && to.params.id != this.loggedUser.id){
+      return next(`/users/${this.loggedUser.id}`)
+    }
+    next()
   },
   components: { navbar },
 };

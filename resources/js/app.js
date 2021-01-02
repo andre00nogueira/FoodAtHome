@@ -44,6 +44,17 @@ Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('app', AppComponent)
 //Vue.component('app', CustomerComponent)
 
+/*function acessCustomerDashboard(to, from, next){
+    if(store.state.user.id==to.params.id){
+        console.log("1")
+        next()
+    }else {
+        next(`/customer/${store.state.user.id}/dashboard`)
+        
+    }
+    
+}*/
+
 const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
@@ -55,9 +66,9 @@ const routes = [
     //{ path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
-    { path: '/cart', component: ShoppingCartComponent },
-    { path: '/cart/checkout', component: CartCheckoutComponent },
-    { path: '/customer/:id/dashboard', component: CustomerDashboardComponent },
+    { path: '/cart', component: ShoppingCartComponent},
+    { path: '/cart/checkout', component: CartCheckoutComponent},
+    { path: '/customer/:id/dashboard', component: CustomerDashboardComponent/*, beforeEnter: acessCustomerDashboard*/},
     { path: '/orders/:id', component: OrderDetailsComponent },
     { path: '/cook/:id/dashboard', component: CookDashboardComponent },
     { path: '/users', component: UsersComponent },
@@ -70,34 +81,21 @@ const router = new VueRouter({
     routes: routes
 })
 
+
+
 const app = new Vue({
     el: '#app',
     router,
     store,
-    mounted() {
-        store.dispatch('loadUserLogged')
+    async mounted() {
+        await store.dispatch('loadUserLogged')
+        router.beforeEach((to, from, next) => {
+            if (to.path !== '/login' && to.path !== '/index' && to.path !== '/menu' && to.path !== '/customers/create' && !store.state.user) next('/login')
+            if (to.path == '/users' && store.state.user && store.state.user.type != 'EM') next('/')
+            else next()
+        })
     },
     sockets: {
-        /*order_id_message(orderID) {
-            axios.patch(`api/orders/${orderID}`, {
-                prepared_by: this.$store.state.user.id
-            }).then((response) => {
-                axios
-                    .patch(`api/users/${this.$store.state.user.id}`, {
-                        available: new Boolean(false),
-                    })
-                    .then((response) => {
-                        console.log(response.data);
-                        this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    });
-
-            }).catch((error) => {
-                console.log(error)
-            })
-        },*/
         blocked(userID) {
             if (userID) {
                 axios

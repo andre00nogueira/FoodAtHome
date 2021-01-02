@@ -1,14 +1,16 @@
 <template>
-  <div>
+  <div v-if="user">
     <navbar />
-    <div class="content" v-if="user">
-      <h2>User List</h2>
-      <router-link
-        v-if="user.type == 'EM'"
-        class="btn btn-primary"
-        :to="`users/create`"
-        >Create User</router-link
-      >
+
+    <h2>User List</h2>
+    <router-link
+      v-if="user.type == 'EM'"
+      class="btn btn-primary"
+      :to="`users/create`"
+      >Create User</router-link
+    >
+
+    <div class="content">
       <div id="filterArea">
         <input
           class="form-control"

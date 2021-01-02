@@ -99,6 +99,12 @@ export default {
     this.user = (await axios.get(`/api/users/${userID}`)).data.data;
     console.log(this.user);
   },
+  beforeRouteUpdate(to, from, next){
+    if(to.path == `/users/${to.params.id}/password` && to.params.id != this.$store.state.user.id){
+      return next(`/users/${this.$store.state.user.id}/password`)
+    }
+    next()
+  },
 };
 </script>
 <style>
