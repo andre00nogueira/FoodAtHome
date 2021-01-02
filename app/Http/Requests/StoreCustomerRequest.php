@@ -30,7 +30,7 @@ class StoreCustomerRequest extends FormRequest
             'address' =>'required|string|max:255',
             'nif' => 'nullable|numeric|digits:9',
             'phone' => 'required|min:9|max:15',
-            'photo_url' => 'nullable|image' //|mimes:jpeg,png
+            'photo_url' => 'nullable|image'
         ];
     }
 }

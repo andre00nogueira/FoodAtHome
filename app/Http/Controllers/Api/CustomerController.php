@@ -61,15 +61,19 @@ class CustomerController extends Controller
             $user->photo_url='default_avatar.jpg';
         }
         $user->save();
+        
         $customer = new Customer();
+       
         $customer->id = $user->id;
         $customer->address = $request->address;
         $customer->phone = $request->phone;
         if($request->has('nif')){
             $customer->nif = $request->nif;
         }
+
         $customer->save();
-        return response()->json(new CustomerResource($customer,$user),201);
+        return new CustomerResource($customer);
+        //return response()->json(new CustomerResource($customer,$user),201);
     }
 
     /**
@@ -148,11 +152,11 @@ class CustomerController extends Controller
 
     public function openOrders(Request $request)
     {
-        return OrderResource::collection(Customer::findOrFail($request->customer)->orders()->whereNotIn('status', ["D","C"])->orderBy('date', 'desc')->paginate(10));
+        return OrderResource::collection(Customer::findOrFail($request->customer)->orders()->whereNotIn('status', ["D","C"])->orderBy('created_at', 'asc')->paginate(10));
     }
 
     public function closedOrders(Request $request)
     {
-        return OrderResource::collection(Customer::findOrFail($request->customer)->orders()->whereIn('status', ["D","C"])->orderBy('date', 'desc')->paginate(10));
+        return OrderResource::collection(Customer::findOrFail($request->customer)->orders()->whereIn('status', ["D","C"])->orderBy('closed_at', 'desc')->paginate(10));
     } 
 }

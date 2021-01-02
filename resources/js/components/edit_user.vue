@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <navbar />
     <div class="jumbotron" v-if="user">
       <h2>Edit User</h2>
@@ -69,7 +69,11 @@
           </div>
         </div>
 
-        <editcustomer v-if="user.type == 'C'" :customer="customer"/>
+        <editcustomer
+          v-if="user.type == 'C'"
+          :customer="customer"
+          :errors="errors"
+        />
 
         <button class="btn btn-primary" type="submit">Save</button>
         <a class="btn btn-danger" href="#/index">Cancel</a>
@@ -79,7 +83,7 @@
 </template>  
 
 <script>
-import editcustomer from './edit_customer.vue';
+import editcustomer from "./edit_customer.vue";
 import navbar from "./navbar";
 
 export default {
@@ -109,31 +113,36 @@ export default {
       axios
         .post(`api/users/${this.user.id}`, data)
         .then((result) => {
-          this.$toasted
-            .show(`User ${this.user.name} edited successfully`, {
-              type: "success",
-            })
-            .goAway(3500);
-          this.$router.push(`/`);
-          this.failMessage = "";
+          if (this.user.type == "C") {
+            axios
+              .put(`api/customers/${this.user.id}`, this.customer)
+              .then((response) => {
+                this.$toasted
+                  .show(`Customer ${this.user.name} edited successfully`, {
+                    type: "success",
+                  })
+                  .goAway(3500);
+                this.$router.push(`/`);
+              })
+              .catch((error) => {
+                if (error.response.status === 422) {
+                  this.errors = error.response.data.errors || {};
+                }
+              });
+          } else {
+            this.$toasted
+              .show(`User ${this.user.name} edited successfully`, {
+                type: "success",
+              })
+              .goAway(3500);
+            this.$router.push(`/`);
+          }
         })
         .catch((error) => {
           if (error.response.status === 422) {
             this.errors = error.response.data.errors || {};
           }
         });
-      if (this.user.type == "C") {
-        axios
-          .put(`api/customers/${this.user.id}`, this.customer)
-          .then((result) => {
-            this.failMessage = "";
-          })
-          .catch((error) => {
-            if (error.response.status === 422) {
-              this.errors = error.response.data.errors || {};
-            }
-          });
-      }
     },
     removeProfilePhoto(userId) {
       axios
@@ -151,7 +160,7 @@ export default {
     },
     handlePhotoUpload(event) {
       this.user.photo_url = event.target.files[0];
-      this.uploadedPhoto = URL.createObjectURL(event.target.files[0])
+      this.uploadedPhoto = URL.createObjectURL(event.target.files[0]);
       console.log(this.user);
     },
   },
@@ -166,7 +175,7 @@ export default {
           .get(`api/customers/${this.user.id}`)
           .then((response) => {
             this.customer = response.data.data;
-            console.log(this.customer)
+            console.log(this.customer);
           })
           .catch((error) => {
             console.log(error);
@@ -176,7 +185,6 @@ export default {
   },
   components: { navbar, editcustomer },
 };
-
 </script>
 
 <style>

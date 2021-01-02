@@ -24,7 +24,7 @@ Vue.use(Toasted)
 
 import AppComponent from './App.vue'
 import ProductsComponent from './components/products.vue'
-import CustomerComponent from './components/create_customer.vue'
+//import CustomerComponent from './components/create_customer.vue'
 import CreateUserComponent from './components/create_user.vue'
 import LoginComponent from './components/login.vue'
 import ShoppingCartComponent from './components/shopping_cart.vue'
@@ -43,17 +43,17 @@ import ManagerDashboardComponent from './components/manager_dashboard.vue'
 
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('app', AppComponent)
-Vue.component('app', CustomerComponent)
+//Vue.component('app', CustomerComponent)
 
 const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
-    { path: '/customers/create', component: CustomerComponent },
-    { path: '/users/create', component: CreateUserComponent },
+    //{ path: '/customers/create', component: CustomerComponent },
+    { path: '/users/create', name: 'createUser', component: CreateUserComponent, props: true },
     { path: '/users/:id/edit', component: EditUserComponent },
     //{ path: '/customers/edit/:id', component: EditCustomerComponent },
     { path: '/users/:id', component: ProfileComponent },
-    { path: '/customers/create', component: CustomerComponent },
+    //{ path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
     { path: '/cart', component: ShoppingCartComponent },
@@ -63,9 +63,9 @@ const routes = [
     { path: '/cook/:id/dashboard', component: CookDashboardComponent },
     { path: '/users', component: UsersComponent },
     { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
-    { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
     { path: '/users/:id/password', component: ChangeUserPasswordComponent },
     { path: '/manager/:id/dashboard', component: ManagerDashboardComponent }
+    //{ path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
 ]
 
 const router = new VueRouter({
@@ -142,6 +142,15 @@ const app = new Vue({
                     break
                 case 'R':
                     status = "Ready"
+                    break
+                case 'T':
+                    status = "In Transit"
+                    break
+                case 'D':
+                    status = "Delivered"
+                    break
+                default:
+
                     break
             }
             this.$toasted.show(`Order #${payload.orderId} marked as ${status}!`, { type: "success", }).goAway(3500);

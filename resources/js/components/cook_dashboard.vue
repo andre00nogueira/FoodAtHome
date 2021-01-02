@@ -148,7 +148,7 @@ export default {
             orderId: this.order.id,
           };
           this.order = undefined;
-          this.$socket.emit("order_ready", payload);
+          //this.$socket.emit("order_ready", payload);
           console.log(response.data);
         })
         .catch((error) => {
