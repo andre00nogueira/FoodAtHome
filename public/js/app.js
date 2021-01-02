@@ -2323,6 +2323,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _navbar_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./navbar.vue */ "./resources/js/components/navbar.vue");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -2376,13 +2377,39 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
+  components: {
+    navbar: _navbar_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+  },
   data: function data() {
     return {
       user: undefined,
-      currentPassword: '',
-      password: '',
-      password_confirmation: '',
+      currentPassword: "",
+      password: "",
+      password_confirmation: "",
       successMessage: "",
       errors: {}
     };
@@ -3206,6 +3233,12 @@ __webpack_require__.r(__webpack_exports__);
         status: "T",
         delivered_by: this.$store.state.user.id
       }).then(function (response) {
+        axios.patch("api/users/".concat(_this5.$store.state.user.id), {
+          available: new Boolean(false)
+        }).then(function (response) {
+          console.log("testing");
+          console.log(response);
+        });
         axios.get("api/employee/".concat(_this5.$route.params.id, "/currentOrder")).then(function (response) {
           _this5.currentOrder = response.data.data;
 
@@ -3755,7 +3788,7 @@ __webpack_require__.r(__webpack_exports__);
       axios.patch("api/users/".concat(user.id), {
         available: new Boolean(value)
       }).then(function (response) {
-        var user = response.data;
+        var user = response.data.data;
         console.log(user);
         console.log("NO ORDER, WE SET EMPLOYEE AVAILABLE = " + user);
 
@@ -3873,6 +3906,22 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -3890,19 +3939,19 @@ __webpack_require__.r(__webpack_exports__);
       if (response) {
         _this.employeesData = response.data;
         _this.employees = _this.employeesData.data;
-      }
-    });
-    axios.get("api/orders/active").then(function (response) {
-      if (response) {
-        _this.activeOrdersData = response.data;
-        _this.activeOrders = _this.activeOrdersData.data;
+        axios.get("api/orders/active").then(function (response) {
+          if (response) {
+            _this.activeOrdersData = response.data;
+            _this.activeOrders = _this.activeOrdersData.data;
+
+            _this.refreshEmployeeData();
+          }
+        });
       }
     });
   },
   methods: {
     getStatus: function getStatus(user) {
-      console.log(user.logged_at);
-
       if (!user.logged_at) {
         return "Offline";
       }
@@ -3911,11 +3960,11 @@ __webpack_require__.r(__webpack_exports__);
         return "Available";
       }
 
-      if (user.type = "EC") {
-        return "Preparing Order";
+      if (user.type = "ED") {
+        return "Delivering Order";
       }
 
-      return "Delivering Order";
+      return "Preparing Order";
     },
     getResults: function getResults() {
       var _this2 = this;
@@ -3929,6 +3978,8 @@ __webpack_require__.r(__webpack_exports__);
         axios.get(url).then(function (response) {
           _this2.employeesData = response.data;
           _this2.employees = _this2.employeesData.data;
+
+          _this2.refreshEmployeeData();
         });
       }
     },
@@ -3946,23 +3997,70 @@ __webpack_require__.r(__webpack_exports__);
           _this3.activeOrders = _this3.activeOrdersData.data;
         });
       }
+    },
+    getCurrentOrder: function getCurrentOrder(employee) {
+      var order = undefined;
+
+      if (employee.type == "EC") {
+        console.log("EC");
+        order = this.activeOrders.find(function (order) {
+          return order.prepared_by == employee.id;
+        });
+      }
+
+      if (employee.type == "ED") {
+        console.log("ED");
+        order = this.activeOrders.find(function (order) {
+          return order.delivered_by == employee.id;
+        });
+        console.log(order);
+      }
+
+      if (!order) {
+        axios.get("api/employee/".concat(employee.id, "/currentOrder")).then(function (response) {
+          console.log("axios");
+          order = response.data.data;
+          console.log(order);
+        });
+      }
+
+      employee.currentOrder = order;
+    },
+    refreshEmployeeData: function refreshEmployeeData() {
+      var _this4 = this;
+
+      var employeesWithActiveOrders = this.employees.filter(function (e) {
+        return e.logged_at && !e.available_at;
+      });
+
+      if (employeesWithActiveOrders) {
+        employeesWithActiveOrders.forEach(function (employee) {
+          _this4.getCurrentOrder(employee);
+        });
+      }
     }
-  },
+  }
+  /*,
   computed: {
-    user: function user() {
-      return this.$store.state.user;
-    }
+  user() {
+    return this.$store.state.user;
   },
+  }*/
+  ,
   sockets: {
     update_user_status: function update_user_status(user) {
-      debugger;
+      console.log(user);
       var employeeIndex = this.employees.findIndex(function (e) {
         return e.id == user.id;
       });
+      console.log(employeeIndex);
 
       if (employeeIndex != -1) {
-        this.employees = user;
+        this.employees[employeeIndex].logged_at = user.logged_at;
+        this.employees[employeeIndex].available_at = user.available_at;
       }
+
+      console.log(this.employees);
     }
   },
   components: {
@@ -4079,6 +4177,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   methods: {
     logout: function logout() {
@@ -4094,7 +4198,7 @@ __webpack_require__.r(__webpack_exports__);
           loggedin: new Boolean(false),
           available: new Boolean(false)
         }).then(function (response) {
-          console.log(response.data);
+          console.log(response.data.data);
         })["catch"](function (error) {
           console.log(error);
         });
@@ -4395,12 +4499,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      allProducts: [],
-      allProductsData: {},
       products: [],
       productsData: {},
       types: [],
@@ -4417,15 +4521,14 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       if (!this.searchQuery) {
-        this.allProductsData = {};
         return this.products;
       } else {
         if (this.selectedTypeValue == "") {
-          if (this.allProducts.length == 0) {
+          if (this.products.length == 0) {
             this.getProducts(0);
           }
 
-          return this.allProducts.filter(function (product) {
+          return this.products.filter(function (product) {
             return product.name.toLowerCase().includes(_this.searchQuery.toLowerCase());
           });
         } else {
@@ -4445,16 +4548,12 @@ __webpack_require__.r(__webpack_exports__);
 
       if (page != 0) {
         url += "?page=".concat(page);
-        axios.get(url).then(function (response) {
-          _this2.products = response.data.data;
-          _this2.productsData = response.data;
-        });
-      } else {
-        axios.get(url).then(function (response) {
-          _this2.allProducts = response.data.data;
-          _this2.allProductsData = response.data;
-        });
       }
+
+      axios.get(url).then(function (response) {
+        _this2.products = response.data.data;
+        _this2.productsData = response.data;
+      });
     },
     //#region GET FOOD BY TYPE
     getProductsByType: function getProductsByType(event) {
@@ -4483,8 +4582,18 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     //#endregion
-    addToCart: function addToCart(product, quantity) {
-      this.$store.commit('addItemToCart', product);
+    addToCart: function addToCart(product) {
+      if (product.quantity > 20 || product.quantity < 1) {
+        this.$toasted.show("Quantity should be between 1 and 20!", {
+          type: "error"
+        }).goAway(3500);
+        return;
+      }
+
+      this.$store.commit("addItemToCart", product);
+      this.$toasted.show("Product ".concat(product.name, " added to cart!"), {
+        type: "success"
+      }).goAway(3500);
     }
   },
   components: {
@@ -4687,6 +4796,13 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -43382,191 +43498,208 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "jumbotron" }, [
-    _c("h2", [_vm._v("Edit User")]),
-    _vm._v(" "),
-    _vm.user
-      ? _c(
-          "form",
-          {
-            on: {
-              submit: function($event) {
-                $event.preventDefault()
-                return _vm.changePassword($event)
-              }
-            }
-          },
-          [
-            _c("div", { staticClass: "form-group" }, [
-              _c("label", { attrs: { for: "password" } }, [
-                _vm._v("Current Password")
-              ]),
-              _vm._v(" "),
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.currentPassword,
-                    expression: "currentPassword"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: {
-                  type: "password",
-                  name: "currentPassword",
-                  id: "currentPassword"
-                },
-                domProps: { value: _vm.currentPassword },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.currentPassword = $event.target.value
-                  }
-                }
-              }),
-              _vm._v(" "),
-              _vm.errors && _vm.errors.currentPassword
-                ? _c("div", { staticClass: "text-danger" }, [
-                    _vm._v(
-                      "\n      " +
-                        _vm._s(_vm.errors.currentPassword[0]) +
-                        "\n    "
-                    )
-                  ])
-                : _vm._e()
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
-              _c("label", { attrs: { for: "password" } }, [
-                _vm._v("New Password")
-              ]),
-              _vm._v(" "),
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.password,
-                    expression: "password"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: { type: "password", name: "password", id: "password" },
-                domProps: { value: _vm.password },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.password = $event.target.value
-                  }
-                }
-              }),
-              _vm._v(" "),
-              _vm.errors && _vm.errors.password
-                ? _c("div", { staticClass: "text-danger" }, [
-                    _vm._v(
-                      "\n      " + _vm._s(_vm.errors.password[0]) + "\n    "
-                    )
-                  ])
-                : _vm._e()
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "field" }, [
-              _c("label", [_vm._v("Confirm Password")]),
-              _vm._v(" "),
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.password_confirmation,
-                    expression: "password_confirmation"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: {
-                  type: "password",
-                  name: "password_confirmation",
-                  id: "password_confirmation"
-                },
-                domProps: { value: _vm.password_confirmation },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.password_confirmation = $event.target.value
-                  }
-                }
-              }),
-              _vm._v(" "),
-              _vm.errors && _vm.errors.password_confirmation
-                ? _c("div", { staticClass: "text-danger" }, [
-                    _vm._v(
-                      "\n      " +
-                        _vm._s(_vm.errors.password_confirmation[0]) +
-                        "\n    "
-                    )
-                  ])
-                : _vm._e()
-            ]),
-            _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "form-group" },
-              [
-                _c(
-                  "button",
-                  { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-                  [_vm._v("Save")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "router-link",
-                  {
-                    staticClass: "btn btn-danger",
-                    attrs: { to: "/users/" + _vm.user.id }
-                  },
-                  [_vm._v("Cancel")]
-                )
-              ],
-              1
-            )
-          ]
-        )
-      : _vm._e(),
-    _vm._v(" "),
-    _vm.successMessage
-      ? _c(
-          "div",
-          {
-            staticClass: "alert",
-            class: { "alert-success": _vm.successMessage }
-          },
-          [
-            _c(
-              "button",
+  return _c(
+    "div",
+    [
+      _c("navbar"),
+      _vm._v(" "),
+      _c("div", { staticClass: "jumbotron" }, [
+        _c("h2", [_vm._v("Edit User")]),
+        _vm._v(" "),
+        _vm.user
+          ? _c(
+              "form",
               {
-                staticClass: "close-btn",
-                attrs: { type: "button" },
                 on: {
-                  click: function($event) {
-                    return _vm.closeMessage()
+                  submit: function($event) {
+                    $event.preventDefault()
+                    return _vm.changePassword($event)
                   }
                 }
               },
-              [_vm._v("\n    ×\n  ")]
-            ),
-            _vm._v(" "),
-            _c("strong", [_vm._v(_vm._s(_vm.successMessage))])
-          ]
-        )
-      : _vm._e()
-  ])
+              [
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "password" } }, [
+                    _vm._v("Current Password")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.currentPassword,
+                        expression: "currentPassword"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "password",
+                      name: "currentPassword",
+                      id: "currentPassword"
+                    },
+                    domProps: { value: _vm.currentPassword },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.currentPassword = $event.target.value
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _vm.errors && _vm.errors.currentPassword
+                    ? _c("div", { staticClass: "text-danger" }, [
+                        _vm._v(
+                          "\n          " +
+                            _vm._s(_vm.errors.currentPassword[0]) +
+                            "\n        "
+                        )
+                      ])
+                    : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "password" } }, [
+                    _vm._v("New Password")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.password,
+                        expression: "password"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "password",
+                      name: "password",
+                      id: "password"
+                    },
+                    domProps: { value: _vm.password },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.password = $event.target.value
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _vm.errors && _vm.errors.password
+                    ? _c("div", { staticClass: "text-danger" }, [
+                        _vm._v(
+                          "\n          " +
+                            _vm._s(_vm.errors.password[0]) +
+                            "\n        "
+                        )
+                      ])
+                    : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "field" }, [
+                  _c("label", [_vm._v("Confirm Password")]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.password_confirmation,
+                        expression: "password_confirmation"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "password",
+                      name: "password_confirmation",
+                      id: "password_confirmation"
+                    },
+                    domProps: { value: _vm.password_confirmation },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.password_confirmation = $event.target.value
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _vm.errors && _vm.errors.password_confirmation
+                    ? _c("div", { staticClass: "text-danger" }, [
+                        _vm._v(
+                          "\n          " +
+                            _vm._s(_vm.errors.password_confirmation[0]) +
+                            "\n        "
+                        )
+                      ])
+                    : _vm._e()
+                ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "form-group" },
+                  [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "submit" }
+                      },
+                      [_vm._v("Save")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "router-link",
+                      {
+                        staticClass: "btn btn-danger",
+                        attrs: { to: "/users/" + _vm.user.id }
+                      },
+                      [_vm._v("Cancel")]
+                    )
+                  ],
+                  1
+                )
+              ]
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.successMessage
+          ? _c(
+              "div",
+              {
+                staticClass: "alert",
+                class: { "alert-success": _vm.successMessage }
+              },
+              [
+                _c(
+                  "button",
+                  {
+                    staticClass: "close-btn",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.closeMessage()
+                      }
+                    }
+                  },
+                  [_vm._v("\n        ×\n      ")]
+                ),
+                _vm._v(" "),
+                _c("strong", [_vm._v(_vm._s(_vm.successMessage))])
+              ]
+            )
+          : _vm._e()
+      ])
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -44739,13 +44872,13 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm.user
-    ? _c(
-        "div",
-        [
-          _c("navbar"),
-          _vm._v(" "),
-          _c("div", { staticClass: "jumbotron" }, [
+  return _c(
+    "div",
+    [
+      _c("navbar"),
+      _vm._v(" "),
+      _vm.user
+        ? _c("div", { staticClass: "jumbotron" }, [
             _c("h2", [_vm._v("Edit User")]),
             _vm._v(" "),
             _c(
@@ -44908,10 +45041,10 @@ var render = function() {
               1
             )
           ])
-        ],
-        1
-      )
-    : _vm._e()
+        : _vm._e()
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -45111,119 +45244,148 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm.user
-    ? _c(
-        "div",
+  return _c(
+    "div",
+    [
+      _c("navbar"),
+      _vm._v(" "),
+      _c("h2", [_vm._v("Employees List")]),
+      _vm._v(" "),
+      _c(
+        "table",
+        { staticClass: "table table-striped", attrs: { id: "employee" } },
         [
-          _c("navbar"),
-          _vm._v(" "),
-          _c("h2", [_vm._v("Employees List")]),
+          _vm._m(0),
           _vm._v(" "),
           _c(
-            "table",
-            { staticClass: "table table-striped", attrs: { id: "employee" } },
-            [
-              _vm._m(0),
-              _vm._v(" "),
-              _c(
-                "tbody",
-                _vm._l(_vm.employees, function(user) {
-                  return _c("tr", { key: user.id }, [
-                    _c("td", [_vm._v(_vm._s(user.id))]),
-                    _vm._v(" "),
-                    _c("td", [
-                      _c("img", {
-                        attrs: {
-                          id: "userPhoto",
-                          src:
-                            "storage/fotos/" +
-                            (user.photo_url || "default_avatar.jpg")
-                        }
-                      })
-                    ]),
-                    _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(user.name))]),
-                    _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(_vm.getStatus(user)))]),
-                    _vm._v(" "),
-                    _c("td", [
-                      _vm._v(_vm._s(user.logged_at ? user.logged_at : "-"))
-                    ])
-                  ])
-                }),
-                0
-              )
-            ]
-          ),
-          _vm._v(" "),
-          _vm.employees.length > 0
-            ? _c("pagination", {
-                attrs: { data: _vm.employeesData },
-                on: { "pagination-change-page": _vm.getResults }
-              })
-            : _vm._e(),
-          _vm._v(" "),
-          _c("h2", [_vm._v("Active Orders")]),
-          _vm._v(" "),
-          _c(
-            "table",
-            {
-              staticClass: "table table-striped",
-              attrs: { id: "activeOrders" }
-            },
-            [
-              _vm._m(1),
-              _vm._v(" "),
-              _c(
-                "tbody",
-                _vm._l(_vm.activeOrders, function(order) {
-                  return _c("tr", { key: order.id }, [
-                    _c("td", [_vm._v(_vm._s(order.id))]),
-                    _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(order.status))]),
-                    _vm._v(" "),
-                    _c("td", [
-                      _vm._v(
-                        "\n          " +
-                          _vm._s(
-                            order.delivered_by
-                              ? order.delivered_by
-                              : order.prepared_by
-                          ) +
-                          "\n        "
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(order.current_status_at))]),
-                    _vm._v(" "),
-                    _c(
-                      "td",
-                      [
-                        _c(
+            "tbody",
+            _vm._l(_vm.employees, function(user) {
+              return _c("tr", { key: user.id }, [
+                _c("td", [_vm._v(_vm._s(user.id))]),
+                _vm._v(" "),
+                _c("td", [
+                  _c("img", {
+                    attrs: {
+                      id: "userPhoto",
+                      src:
+                        "storage/fotos/" +
+                        (user.photo_url || "default_avatar.jpg")
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(user.name))]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(_vm.getStatus(user)))]),
+                _vm._v(" "),
+                _c("td", [
+                  _vm._v(_vm._s(user.logged_at ? user.logged_at : "-"))
+                ]),
+                _vm._v(" "),
+                _c("td", [
+                  _vm._v(
+                    "\n          " +
+                      _vm._s(user.currentOrder ? user.currentOrder.id : "-") +
+                      "\n        "
+                  )
+                ]),
+                _vm._v(" "),
+                _c("td", [
+                  _vm._v(
+                    "\n          " +
+                      _vm._s(
+                        user.currentOrder
+                          ? user.currentOrder.current_status_at
+                          : "-"
+                      ) +
+                      "\n        "
+                  )
+                ]),
+                _vm._v(" "),
+                _c(
+                  "td",
+                  [
+                    user.currentOrder
+                      ? _c(
                           "router-link",
-                          { attrs: { to: "/orders/" + order.id } },
+                          { attrs: { to: "/orders/" + user.currentOrder.id } },
                           [_vm._v("Details")]
                         )
-                      ],
-                      1
-                    )
-                  ])
-                }),
-                0
-              )
-            ]
-          ),
+                      : _vm._e()
+                  ],
+                  1
+                )
+              ])
+            }),
+            0
+          )
+        ]
+      ),
+      _vm._v(" "),
+      _vm.employees.length > 0
+        ? _c("pagination", {
+            attrs: { data: _vm.employeesData },
+            on: { "pagination-change-page": _vm.getResults }
+          })
+        : _vm._e(),
+      _vm._v(" "),
+      _c("h2", [_vm._v("Active Orders")]),
+      _vm._v(" "),
+      _c(
+        "table",
+        { staticClass: "table table-striped", attrs: { id: "activeOrders" } },
+        [
+          _vm._m(1),
           _vm._v(" "),
-          _vm.activeOrders.length > 0
-            ? _c("pagination", {
-                attrs: { data: _vm.activeOrdersData },
-                on: { "pagination-change-page": _vm.getResultsOrders }
-              })
-            : _vm._e()
-        ],
-        1
-      )
-    : _vm._e()
+          _c(
+            "tbody",
+            _vm._l(_vm.activeOrders, function(order) {
+              return _c("tr", { key: order.id }, [
+                _c("td", [_vm._v(_vm._s(order.id))]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(order.status))]),
+                _vm._v(" "),
+                _c("td", [
+                  _vm._v(
+                    "\n          " +
+                      _vm._s(
+                        order.delivered_by
+                          ? order.delivered_by
+                          : order.prepared_by
+                      ) +
+                      "\n        "
+                  )
+                ]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(order.current_status_at))]),
+                _vm._v(" "),
+                _c(
+                  "td",
+                  [
+                    _c(
+                      "router-link",
+                      { attrs: { to: "/orders/" + order.id } },
+                      [_vm._v("Details")]
+                    )
+                  ],
+                  1
+                )
+              ])
+            }),
+            0
+          )
+        ]
+      ),
+      _vm._v(" "),
+      _vm.activeOrders.length > 0
+        ? _c("pagination", {
+            attrs: { data: _vm.activeOrdersData },
+            on: { "pagination-change-page": _vm.getResultsOrders }
+          })
+        : _vm._e()
+    ],
+    1
+  )
 }
 var staticRenderFns = [
   function() {
@@ -45240,7 +45402,13 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Status")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Started Shift at")])
+        _c("th", [_vm._v("Started Shift at")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Current order ID")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Order Start Time")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Order")])
       ])
     ])
   },
@@ -45309,6 +45477,17 @@ var render = function() {
             {
               staticClass: "navbar-brand",
               attrs: { to: "/cook/" + _vm.user.id + "/dashboard" }
+            },
+            [_vm._v("Dashboard")]
+          )
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.user && _vm.user.type == "ED"
+        ? _c(
+            "router-link",
+            {
+              staticClass: "navbar-brand",
+              attrs: { to: "/deliveryman/" + _vm.user.id + "/dashboard" }
             },
             [_vm._v("Dashboard")]
           )
@@ -45893,12 +46072,12 @@ var render = function() {
                         }
                       ],
                       staticClass: "form-control",
-                      staticStyle: { width: "65%" },
+                      staticStyle: { width: "auto" },
                       attrs: {
                         type: "number",
                         placeholder: "Quantity",
                         min: "1",
-                        max: "10"
+                        max: "20"
                       },
                       domProps: { value: product.quantity },
                       on: {
@@ -45934,12 +46113,7 @@ var render = function() {
       ),
       _vm._v(" "),
       _c("pagination", {
-        attrs: {
-          data:
-            Object.keys(_vm.productsData).length === 0
-              ? _vm.allProductsData
-              : _vm.productsData
-        },
+        attrs: { data: _vm.productsData },
         on: { "pagination-change-page": _vm.getProducts }
       })
     ],
@@ -46166,183 +46340,203 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm.user
-    ? _c(
-        "div",
-        [
-          _c("navbar"),
-          _vm._v(" "),
-          _c("h2", [_vm._v("User List")]),
-          _vm._v(" "),
-          _vm.user.type == "EM"
-            ? _c(
-                "router-link",
-                {
-                  staticClass: "btn btn-primary",
-                  attrs: { to: "users/create" }
-                },
-                [_vm._v("Create User")]
-              )
-            : _vm._e(),
-          _vm._v(" "),
-          _c("div", { attrs: { id: "filterArea" } }, [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.searchQuery,
-                  expression: "searchQuery"
-                }
-              ],
-              staticClass: "form-control",
-              attrs: { type: "text", placeholder: "Search for a user..." },
-              domProps: { value: _vm.searchQuery },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.searchQuery = $event.target.value
-                }
-              }
-            }),
-            _vm._v(" "),
-            _c(
-              "select",
-              {
-                staticClass: "custom-select",
-                attrs: { id: "userTypeFilter" },
-                on: {
-                  change: function($event) {
-                    return _vm.getUsersByType($event)
-                  }
-                }
-              },
-              [
-                _c("option", { attrs: { value: "" } }, [
-                  _vm._v("Choose Type...")
-                ]),
-                _vm._v(" "),
-                _vm._l(_vm.types, function(type, index) {
-                  return _c(
-                    "option",
-                    { key: index, domProps: { value: type.name } },
-                    [_vm._v("\n        " + _vm._s(type.name) + "\n      ")]
-                  )
-                })
-              ],
-              2
-            )
-          ]),
-          _vm._v(" "),
-          _c(
-            "table",
-            { staticClass: "table table-striped", attrs: { id: "tableUser" } },
+  return _c(
+    "div",
+    [
+      _c("navbar"),
+      _vm._v(" "),
+      _vm.user
+        ? _c(
+            "div",
+            { staticClass: "content" },
             [
-              _vm._m(0),
+              _c("h2", [_vm._v("User List")]),
               _vm._v(" "),
-              _c(
-                "tbody",
-                _vm._l(_vm.filterUsers, function(user) {
-                  return _c("tr", { key: user.id }, [
-                    _c("td", [
-                      _c("img", {
-                        attrs: {
-                          id: "userPhoto",
-                          src:
-                            "storage/fotos/" +
-                            (user.photo_url || "default_avatar.jpg")
-                        }
-                      })
+              _vm.user.type == "EM"
+                ? _c(
+                    "router-link",
+                    {
+                      staticClass: "btn btn-primary",
+                      attrs: { to: "users/create" }
+                    },
+                    [_vm._v("Create User")]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _c("div", { attrs: { id: "filterArea" } }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.searchQuery,
+                      expression: "searchQuery"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", placeholder: "Search for a user..." },
+                  domProps: { value: _vm.searchQuery },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.searchQuery = $event.target.value
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "select",
+                  {
+                    staticClass: "custom-select",
+                    attrs: { id: "userTypeFilter" },
+                    on: {
+                      change: function($event) {
+                        return _vm.getUsersByType($event)
+                      }
+                    }
+                  },
+                  [
+                    _c("option", { attrs: { value: "" } }, [
+                      _vm._v("Choose Type...")
                     ]),
                     _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(user.name))]),
-                    _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(user.email))]),
-                    _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(user.type))]),
-                    _vm._v(" "),
-                    _c("td", [
-                      _c(
-                        "div",
-                        { staticStyle: { display: "flex" } },
+                    _vm._l(_vm.types, function(type, index) {
+                      return _c(
+                        "option",
+                        { key: index, domProps: { value: type.name } },
                         [
-                          user.type != "C"
-                            ? _c(
-                                "router-link",
-                                {
-                                  staticClass: "btn btn-primary",
-                                  attrs: { to: "users/" + user.id + "/edit" }
-                                },
-                                [_vm._v("✏️")]
-                              )
-                            : _vm._e(),
-                          _vm._v(" "),
+                          _vm._v(
+                            "\n          " + _vm._s(type.name) + "\n        "
+                          )
+                        ]
+                      )
+                    })
+                  ],
+                  2
+                )
+              ]),
+              _vm._v(" "),
+              _c(
+                "table",
+                {
+                  staticClass: "table table-striped",
+                  attrs: { id: "tableUser" }
+                },
+                [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c(
+                    "tbody",
+                    _vm._l(_vm.filterUsers, function(user) {
+                      return _c("tr", { key: user.id }, [
+                        _c("td", [
+                          _c("img", {
+                            attrs: {
+                              id: "userPhoto",
+                              src:
+                                "storage/fotos/" +
+                                (user.photo_url || "default_avatar.jpg")
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(user.name))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(user.email))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(user.type))]),
+                        _vm._v(" "),
+                        _c("td", [
                           _c(
-                            "button",
-                            {
-                              staticClass: "btn btn-danger",
-                              staticStyle: { "margin-left": "2%" },
-                              on: {
-                                click: function($event) {
-                                  return _vm.deleteUser(user)
-                                }
-                              }
-                            },
-                            [_vm._v("\n              🗑️\n            ")]
-                          ),
-                          _vm._v(" "),
-                          user.blocked
-                            ? _c(
-                                "button",
-                                {
-                                  staticClass: "btn btn-success",
-                                  staticStyle: { "margin-left": "2%" },
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.unblockUser(user)
-                                    }
-                                  }
-                                },
-                                [
-                                  _vm._v(
-                                    "\n              Unblock\n            "
+                            "div",
+                            { staticStyle: { display: "flex" } },
+                            [
+                              user.type != "C"
+                                ? _c(
+                                    "router-link",
+                                    {
+                                      staticClass: "btn btn-primary",
+                                      attrs: {
+                                        to: "users/" + user.id + "/edit"
+                                      }
+                                    },
+                                    [_vm._v("✏️")]
                                   )
-                                ]
-                              )
-                            : _c(
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _c(
                                 "button",
                                 {
                                   staticClass: "btn btn-danger",
                                   staticStyle: { "margin-left": "2%" },
                                   on: {
                                     click: function($event) {
-                                      return _vm.blockUser(user)
+                                      return _vm.deleteUser(user)
                                     }
                                   }
                                 },
-                                [_vm._v("\n              Block\n            ")]
-                              )
-                        ],
-                        1
-                      )
-                    ])
-                  ])
-                }),
-                0
-              )
-            ]
-          ),
-          _vm._v(" "),
-          _c("pagination", {
-            attrs: { data: _vm.usersData, limit: 2 },
-            on: { "pagination-change-page": _vm.getUsers }
-          })
-        ],
-        1
-      )
-    : _vm._e()
+                                [_vm._v("\n                🗑️\n              ")]
+                              ),
+                              _vm._v(" "),
+                              user.blocked
+                                ? _c(
+                                    "button",
+                                    {
+                                      staticClass: "btn btn-success",
+                                      staticStyle: { "margin-left": "2%" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.unblockUser(user)
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _vm._v(
+                                        "\n                Unblock\n              "
+                                      )
+                                    ]
+                                  )
+                                : _c(
+                                    "button",
+                                    {
+                                      staticClass: "btn btn-danger",
+                                      staticStyle: { "margin-left": "2%" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.blockUser(user)
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _vm._v(
+                                        "\n                Block\n              "
+                                      )
+                                    ]
+                                  )
+                            ],
+                            1
+                          )
+                        ])
+                      ])
+                    }),
+                    0
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _c("pagination", {
+                attrs: { data: _vm.usersData, limit: 2 },
+                on: { "pagination-change-page": _vm.getUsers }
+              })
+            ],
+            1
+          )
+        : _vm._e()
+    ],
+    1
+  )
 }
 var staticRenderFns = [
   function() {
@@ -65038,6 +65232,11 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
   mutations: {
     clearUser: function clearUser(state) {
       if (state.user) {
+        state.user.logged_at = null;
+        state.user.available_at = null;
+        console.log("TESTING");
+        console.log(state.user);
+
         this._vm.$socket.emit('user_logged_out', state.user);
       }
 

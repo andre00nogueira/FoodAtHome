@@ -145,7 +145,7 @@ const app = new Vue({
                     break
             }
             this.$toasted.show(`Order #${payload.orderId} marked as ${status}!`, { type: "success", }).goAway(3500);
-        },
+        }
     },
     data() {
         return {

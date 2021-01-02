@@ -131,7 +131,7 @@ export default {
           available: new Boolean(value),
         })
         .then((response) => {
-          let user = response.data;
+          let user = response.data.data;
           console.log(user);
           console.log("NO ORDER, WE SET EMPLOYEE AVAILABLE = " + user);
           this.saveUserAndRedirect(user);

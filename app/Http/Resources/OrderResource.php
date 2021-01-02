@@ -23,7 +23,7 @@ class OrderResource extends JsonResource
             'total_price' => $this->total_price,
             'date' => $this->date,
             'preparation_time' => $this->preparation_time,
-            'current_status_at' => $this->current_status_at,
+            'current_status_at' => $this->current_status_at->format('Y-m-d H:i:s'),
             'prepared_by' => $this->prepared_by,
             'delivery_time' => $this->delivery_time,
             'delivered_by' => $this->delivered_by,

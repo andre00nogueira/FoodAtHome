@@ -22,7 +22,8 @@ class UserResource extends JsonResource
             'type' => $this->type,
             'blocked' => $this->blocked,
             'logged_at' => $this->logged_at,
-            'current_order' => $this->current_order
+            'current_order' => $this->current_order,
+            'available_at' => $this->available_at
         ];
     }
 }

@@ -12,6 +12,10 @@ export default new Vuex.Store({
     mutations: {
         clearUser(state) {
             if(state.user) {
+                state.user.logged_at=null
+                state.user.available_at=null
+                console.log("TESTING")
+                console.log(state.user)
                 this._vm.$socket.emit('user_logged_out', state.user)
             }
             state.user = null

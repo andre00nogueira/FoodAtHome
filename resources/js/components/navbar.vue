@@ -14,6 +14,12 @@
       >Dashboard</router-link
     >
     <router-link
+      v-if="user && user.type == 'ED'"
+      class="navbar-brand"
+      :to="`/deliveryman/${user.id}/dashboard`"
+      >Dashboard</router-link
+    >
+    <router-link
       v-if="user && user.type == 'EM'"
       class="navbar-brand"
       :to="`/manager/${user.id}/dashboard`"
@@ -113,7 +119,7 @@ export default {
               available: new Boolean(false),
             })
             .then((response) => {
-              console.log(response.data);
+              console.log(response.data.data);
             })
             .catch((error) => {
               console.log(error);

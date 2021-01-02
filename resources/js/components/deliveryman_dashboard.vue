@@ -18,10 +18,10 @@
           <h5>Phone - {{ client.phone }}</h5>
           <h5>Email - {{ client.email }}</h5>
           <img
-          class="img-profile rounded-circle"
-          style="width: 100px; height: 100px"
-          :src="`storage/fotos/${client.photo_url|| 'default_avatar.jpg'}`"
-        />
+            class="img-profile rounded-circle"
+            style="width: 100px; height: 100px"
+            :src="`storage/fotos/${client.photo_url || 'default_avatar.jpg'}`"
+          />
         </div>
         <br />
         <h4>Status - {{ currentOrder.status }}</h4>
@@ -67,14 +67,14 @@ export default {
       ordersData: {},
       client: undefined,
       currentOrder: undefined,
-      page: 1
+      page: 1,
     };
   },
   created() {
     axios
       .get(`api/employee/${this.$route.params.id}/currentOrder`)
       .then((response) => {
-        console.log(response)
+        console.log(response);
         if (response.data) {
           this.currentOrder = response.data.data;
           console.log(this.currentOrder);
@@ -88,7 +88,7 @@ export default {
     getResults(page = 1) {
       let url = `api/deliverymen/orders`;
       if (page != 0) {
-        this.page=page;
+        this.page = page;
         url += `?page=${page}`;
         axios.get(url).then((response) => {
           this.ordersData = response.data;
@@ -118,6 +118,14 @@ export default {
           delivered_by: this.$store.state.user.id,
         })
         .then((response) => {
+          axios
+            .patch(`api/users/${this.$store.state.user.id}`, {
+              available: new Boolean(false),
+            })
+            .then((response) => {
+              console.log("testing");
+              console.log(response);
+            });
           axios
             .get(`api/employee/${this.$route.params.id}/currentOrder`)
             .then((response) => {
@@ -157,7 +165,7 @@ export default {
       console.log("complete order");
       axios
         .patch(`api/orders/${this.currentOrder.id}`, {
-          status: "D"
+          status: "D",
         })
         .then((response) => {
           console.log(response);
