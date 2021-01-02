@@ -27,6 +27,13 @@
       >Dashboard</router-link
     >
 
+    <router-link
+      v-if="user && user.type == 'EM'"
+      class="navbar-brand"
+      :to="`/stats`"
+      >Stats</router-link
+    >
+
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <template v-if="!user">
