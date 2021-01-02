@@ -61,15 +61,19 @@ class CustomerController extends Controller
             $user->photo_url='default_avatar.jpg';
         }
         $user->save();
+        
         $customer = new Customer();
+       
         $customer->id = $user->id;
         $customer->address = $request->address;
         $customer->phone = $request->phone;
         if($request->has('nif')){
             $customer->nif = $request->nif;
         }
+
         $customer->save();
-        return response()->json(new CustomerResource($customer,$user),201);
+        return new CustomerResource($customer);
+        //return response()->json(new CustomerResource($customer,$user),201);
     }
 
     /**

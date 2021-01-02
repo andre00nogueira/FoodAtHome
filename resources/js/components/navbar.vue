@@ -32,7 +32,7 @@
         <template v-if="!user">
           <li class="nav-item">
             <router-link to="/login" class="btn btn-primary">Login</router-link>
-            <router-link to="/customers/create" class="btn btn-primary"
+            <router-link :to="{ name: 'createUser', params: { isTypeCustomer: true } }" class="btn btn-primary"
               >Register</router-link
             >
           </li>
