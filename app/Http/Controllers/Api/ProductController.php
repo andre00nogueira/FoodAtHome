@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Product as ProductResource;
 use App\Http\Resources\ProductTypeResource;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -34,5 +36,11 @@ class ProductController extends Controller
         $hotDish=Product::where('type','hot dish')->count();
         $coldDish=Product::where('type','cold dish')->count();
         return response()->json(['drink'=>$drink,'dessert'=>$dessert,'hot dish'=>$hotDish,'cold dish'=>$coldDish],200);
+    }
+
+    public function getTopSoldProducts(){
+        $topTenProducts = DB::select('SELECT name, SUM(quantity) as quantity FROM order_items INNER JOIN products ON product_id = products.id GROUP BY product_id ORDER BY SUM(quantity) DESC LIMIT 10');
+        //$topTenProducts = DB::table('order_items')->join('products', 'products.id', '=', 'product_id')->select(DB::raw('products.name, SUM(quantity) as quantity'))->groupBy('product_id')->orderByRaw('SUM(quantity) DESC')->limit(10)->get();
+        return response()->json($topTenProducts);
     }
 }

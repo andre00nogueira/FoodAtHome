@@ -89,5 +89,5 @@ Route::get('employee/{id}/currentOrder', [UserController::class, 'getCurrentOrde
 Route::get('items/salesnumber/category', [OrderItemController::class, 'getNumberOfSalesPerCategory']);
 
 Route::get('products/total/category', [ProductController::class, 'getTotalProductsByType']);
-
+Route::get('products/total', [ProductController::class, 'getTopSoldProducts']);
 
