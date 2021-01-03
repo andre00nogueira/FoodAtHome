@@ -134,6 +134,11 @@ const app = new Vue({
                 this.$toasted.show(`You've been assigned with a new order (${orderID})`, { type: 'info' }).goAway(3500)
             }
         },
+        order_cancelled(orderID) {
+            if (orderID) {
+                this.$toasted.show(`Your current order has been cancelled by a Manager (${orderID})`, { type: 'danger' }).goAway(3500)
+            }
+        },
         order_status_changed(payload) {
             let status = ""
             switch (payload.status) {
@@ -150,7 +155,7 @@ const app = new Vue({
                     status = "Delivered"
                     break
                 default:
-
+                    status = "Cancelled"
                     break
             }
             this.$toasted.show(`Order #${payload.orderId} marked as ${status}!`, { type: "success", }).goAway(3500);

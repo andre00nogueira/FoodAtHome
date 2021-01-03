@@ -73,7 +73,7 @@ export default {
   },
   sockets: {
     order_status_changed(payload) {
-      if (payload.status == "D") {
+      if (payload.status == "D" || payload.status == "C") {
         this.getOpenResults();
         this.getClosedResults();
       }

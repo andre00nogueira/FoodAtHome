@@ -112,7 +112,7 @@ export default {
                     prepared_by: this.$store.state.user.id,
                   })
                   .then((response) => {
-                    console.log(response)
+                    console.log(response);
                     this.$toasted
                       .show(
                         `You've been assigned with a new order (${order.id})`,
@@ -159,6 +159,12 @@ export default {
   sockets: {
     new_order(orderID) {
       this.getCurrentOrder(orderID);
+    },
+    order_cancelled(orderID) {
+      if (this.order && orderID == this.order.id) {
+        this.order = undefined;
+        this.orderItems = [];
+      }
     },
   },
   mounted() {

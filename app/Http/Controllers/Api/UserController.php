@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource as UserResource;
+use App\Http\Resources\UserToManagerResource;
 use App\Http\Resources\OrderResource as OrderResource; 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -216,6 +217,6 @@ class UserController extends Controller
     }
 
     public function employeesIndex(){
-        return UserResource::collection(User::whereIn('type',['EC','ED'])->paginate(10));
+        return UserToManagerResource::collection(User::whereIn('type',['EC','ED'])->paginate(10));
     }
 }

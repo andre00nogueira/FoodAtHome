@@ -22,9 +22,9 @@
             <th />
             <th>Name</th>
             <th>Status</th>
-            <th>Started Shift at</th>
+            <th>Shift Start</th>
             <th>Current order ID</th>
-            <th>Order Start Time</th>
+            <th>Started Preparaton/Delivery</th>
             <th>Order</th>
           </tr>
         </thead>
@@ -41,17 +41,17 @@
             <td>{{ getStatus(user) }}</td>
             <td>{{ user.logged_at ? user.logged_at : "-" }}</td>
             <td>
-              {{ user.currentOrder ? user.currentOrder.id : "-" }}
+              {{ user.current_order ? user.current_order.id : "-" }}
             </td>
             <td>
               {{
-                user.currentOrder ? user.currentOrder.current_status_at : "-"
+                user.current_order ? user.current_order.current_status_at : "-"
               }}
             </td>
             <td>
               <router-link
-                v-if="user.currentOrder"
-                :to="`/orders/${user.currentOrder.id}`"
+                v-if="user.current_order.id"
+                :to="`/orders/${user.current_order.id}`"
                 >Details</router-link
               >
             </td>
@@ -66,6 +66,7 @@
     </div>
     <h5 v-else>No Employees</h5>
     <h2>Active Orders</h2>
+    <div v-if="filteredOrders.length">
     <div class="text-right">
       <select v-model="orderStatus" class="custom-select" id="orderTypeFilter">
         <option value="">Choose Status...</option>
@@ -78,7 +79,6 @@
         </option>
       </select>
     </div>
-    <div v-if="filteredOrders.length">
       <table id="activeOrders" class="table table-striped">
         <thead>
           <tr>
@@ -86,7 +86,7 @@
             <th>Status</th>
             <th>Current Employee Name</th>
             <th>Time Current Status</th>
-            <th>Details</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -94,7 +94,7 @@
             <td>{{ order.id }}</td>
             <td>{{ order.status }}</td>
             <td v-if="order.status != 'D' && order.status != 'R'">
-              {{ order.currentEmployee ? order.currentEmployee.name : "-" }}
+              {{ order.current_employee ? order.current_employee.name : "-" }}
             </td>
             <td v-else>-</td>
             <td>{{ order.current_status_at }}</td>
@@ -145,12 +145,11 @@ export default {
       if (response) {
         this.employeesData = response.data;
         this.employees = this.employeesData.data;
+        console.log(this.employees);
         axios.get("api/orders/active").then((response) => {
           if (response) {
             this.activeOrdersData = response.data;
             this.activeOrders = this.activeOrdersData.data;
-            this.refreshEmployeeData();
-            this.refreshOrderData();
           }
         });
       }
@@ -216,55 +215,30 @@ export default {
           });
       }
     },
-    refreshEmployeeData() {
-      let employeesWithActiveOrders = this.employees.filter(
-        (e) => e.logged_at && !e.available_at
-      );
-      console.log(employeesWithActiveOrders);
-      if (employeesWithActiveOrders) {
-        employeesWithActiveOrders.forEach((employee) => {
-          this.getCurrentOrder(employee);
-        });
-      }
-    },
-    refreshOrderData() {
-      this.activeOrders.forEach((order) => {
-        let employee = undefined;
-        if (order.delivered_by) {
-          employee = this.employees.find(
-            (employee) => order.delivered_by == employee.id
-          );
-          if (!employee) {
-            axios.get(`api/users/${order.delivered_by}`).then((response) => {
-              employee = response.data.data;
-            });
-          }
-        } else {
-          employee = this.employees.find(
-            (employee) => order.prepared_by == employee.id
-          );
-          if (!employee) {
-            axios.get(`api/users/${order.prepared_by}`).then((response) => {
-              employee = response.data.data;
-            });
-          }
-        }
-        order.currentEmployee = employee;
-      });
-    },
     cancelOrder(orderID) {
       axios
         .patch(`api/orders/${orderID}`, {
           status: "C",
         })
         .then((response) => {
-          console.log(response.data.data);
+          let order= response.data.data;
           let payload = {
-            userId: response.data.data.customer_id,
+            userId: order.customer_id,
             status: "C",
-            orderId: response.data.data.id,
+            orderId: order.id,
           };
           this.$socket.emit("order_status", payload);
+          let payloadToCancel = {
+            employeeId: '',
+            orderId: order.id,
+          };
+          if(order.delivered_by){
+            payloadToCancel.employeeId=order.delivered_by;
+            this.$socket.emit("order_cancelled", payloadToCancel);
+          }else if(order.prepared_by){
+            payloadToCancel.employeeId=order.delivered_by;
+            this.$socket.emit("order_cancelled", payloadToCancel);
+          }
         });
     },
   },

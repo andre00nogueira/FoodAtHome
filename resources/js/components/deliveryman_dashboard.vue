@@ -195,6 +195,14 @@ export default {
         });
       }
     },
+    order_cancelled(orderID) {
+      if (this.currenOrder && orderID == this.currenOrder.id) {
+        this.currenOrder = undefined;
+      }
+      if (this.orders.findIndex((order) => (order.id = orderID)) != -1) {
+        this.getResults(this.page);
+      }
+    },
   },
   components: { navbar, orderTable, itemsTable, chronometer },
 };

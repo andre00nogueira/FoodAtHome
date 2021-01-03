@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\OrderItem;
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\OrderToManagerResource;
 use App\Http\Resources\OrderItemResource;
 use Carbon\Carbon;
 use DateTime;
@@ -194,6 +195,6 @@ class OrderController extends Controller
     }
 
     public function activeOrders(){
-        return OrderResource::collection(Order::whereNotIn('status',['C','D'])->orderBy('opened_at','asc')->paginate(10));
+        return OrderToManagerResource::collection(Order::whereNotIn('status',['C','D'])->orderBy('opened_at','asc')->paginate(10));
     }
 }
