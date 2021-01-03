@@ -27,4 +27,12 @@ class ProductController extends Controller
     {
         return ProductResource::collection(Product::where('type', $type_name)->get());
     }
+
+    public function getTotalProductsByType(){
+        $drink=Product::where('type','drink')->count();
+        $dessert=Product::where('type','dessert')->count();
+        $hotDish=Product::where('type','hot dish')->count();
+        $coldDish=Product::where('type','cold dish')->count();
+        return response()->json(['drink'=>$drink,'dessert'=>$dessert,'hot dish'=>$hotDish,'cold dish'=>$coldDish],200);
+    }
 }
