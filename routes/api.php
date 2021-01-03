@@ -91,3 +91,11 @@ Route::get('items/salesnumber/category', [OrderItemController::class, 'getNumber
 Route::get('products/total/category', [ProductController::class, 'getTotalProductsByType']);
 Route::get('products/total', [ProductController::class, 'getTopSoldProducts']);
 Route::get('products/sold/category', [ProductController::class, 'getQuantitySoldByCategory']);
+Route::get('orders/average/time', [OrderController::class, 'averageTimePerTask']);
+Route::get('orders/quantity/year', [OrderController::class, 'ordersPerYear']);
+Route::get('orders/quantity/month', [OrderController::class, 'ordersPerMonth']);
+Route::get('orders/total/status', [OrderController::class, 'ordersStatus']);
+Route::get('sales/quantity/year', [OrderController::class, 'salesPerYear']);
+Route::get('sales/quantity/month', [OrderController::class, 'salesPerMonth']);
+
+
