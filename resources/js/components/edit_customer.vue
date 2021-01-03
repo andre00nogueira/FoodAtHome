@@ -46,12 +46,7 @@
 
 <script>
 export default {
-  props: ["customer"],
-  data() {
-    return {
-      errors: {},
-    };
-  },
+  props: ["customer", "errors"],
 };
 </script>
 <style>

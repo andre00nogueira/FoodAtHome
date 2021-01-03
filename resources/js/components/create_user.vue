@@ -32,7 +32,7 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" v-if="!isTypeCustomer">
           <label for="userType">User Type</label>
           <select class="custom-select" id="userType" v-model="user.type">
             <option value="">Choose Type...</option>
@@ -95,6 +95,12 @@
           </div>
         </div>
 
+        <createcustomer
+          v-if="isTypeCustomer"
+          :customer="customer"
+          :errors="errors"
+        />
+
         <button type="submit" class="btn btn-primary">Create</button>
         <router-link to="/users" class="btn btn-secondary">Cancel</router-link>
       </form>
@@ -102,11 +108,13 @@
   </div>
 </template>
 <script>
+import createcustomer from "./create_customer.vue";
 import navbar from "./navbar.vue";
 export default {
   data() {
     return {
       user: {},
+      customer: {},
       errors: {},
       types: [],
     };
@@ -117,28 +125,56 @@ export default {
       if (this.user.photo_url) {
         data.append("photo_url", this.user.photo_url);
       }
-      data.append("name", this.user.name);
-      data.append("email", this.user.email);
-      data.append("type", this.user.type);
-      data.append("password", this.user.password);
-      data.append("password_confirmation", this.user.password_confirmation);
-      axios
-        .post("api/users", data)
-        .then((result) => {
-          this.$toasted
-            .show(`User ${this.user.name} created successfully!`, {
-              type: "success",
-            })
-            .goAway(3500);
-          this.$router.push(`/users`);
+      data.append("name", this.user.name || "");
+      data.append("email", this.user.email || "");
+      if (this.isTypeCustomer) {
+        data.append("type", "C");
+      } else {
+        data.append("type", this.user.type);
+      }
+      data.append("password", this.user.password || "");
+      data.append(
+        "password_confirmation",
+        this.user.password_confirmation || ""
+      );
+      if (this.isTypeCustomer) {
+        data.append("address", this.customer.address || "");
+        data.append("nif", this.customer.nif || "");
 
-          this.failMessage = "";
-        })
-        .catch((error) => {
-          if (error.response.status === 422) {
-            this.errors = error.response.data.errors || {};
-          }
-        });
+        data.append("phone", this.customer.phone || "");
+
+        axios
+          .post("api/customers", data)
+          .then((result) => {
+            this.$toasted
+              .show(`Customer ${this.user.name} created successfully!`, {
+                type: "success",
+              })
+              .goAway(3500);
+            this.$router.push(`/login`);
+          })
+          .catch((error) => {
+            if (error.response.status === 422) {
+              this.errors = error.response.data.errors || {};
+            }
+          });
+      } else {
+        axios
+          .post("api/users", data)
+          .then((result) => {
+            this.$toasted
+              .show(`User ${this.user.name} created successfully!`, {
+                type: "success",
+              })
+              .goAway(3500);
+            this.$router.push(`/login`);
+          })
+          .catch((error) => {
+            if (error.response.status === 422) {
+              this.errors = error.response.data.errors || {};
+            }
+          });
+      }
     },
     handlePhotoUpload(event) {
       this.user.photo_url = event.target.files[0];
@@ -154,11 +190,20 @@ export default {
         );
       });
     },
+    someMethod(){
+      alert('assd')
+    }
+  },
+  computed: {
+    isTypeCustomer(){
+      return this.$route.path == `/customers/create` ? true : false
+    }
   },
   mounted() {
-    this.getTypes();
+    console.log(this.$route.path)
+    if (!this.isTypeCustomer) this.getTypes();
   },
-  components: { navbar },
+  components: { navbar, createcustomer },
 };
 </script>
 <style>

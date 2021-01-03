@@ -47,7 +47,7 @@
           <td>{{ product.description.substring(0, 100) + "..." }}</td>
           <td>{{ product.price }}€</td>
           <td>
-            <div style="display: flex">
+            <div style="display: flex" v-if="user && user.type == 'C'">
               <input
                 v-model="product.quantity"
                 type="number"
@@ -137,6 +137,9 @@ export default {
         }
       }
     },
+    user(){
+      return this.$store.state.user
+    }
   },
   methods: {
     getProducts(page = 1) {

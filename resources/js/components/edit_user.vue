@@ -69,7 +69,11 @@
           </div>
         </div>
 
-        <editcustomer v-if="user.type == 'C'" :customer="customer" />
+        <editcustomer
+          v-if="user.type == 'C'"
+          :customer="customer"
+          :errors="errors"
+        />
 
         <button class="btn btn-primary" type="submit">Save</button>
         <a class="btn btn-danger" href="#/index">Cancel</a>
@@ -109,31 +113,36 @@ export default {
       axios
         .post(`api/users/${this.user.id}`, data)
         .then((result) => {
-          this.$toasted
-            .show(`User ${this.user.name} edited successfully`, {
-              type: "success",
-            })
-            .goAway(3500);
-          this.$router.push(`/`);
-          this.failMessage = "";
+          if (this.user.type == "C") {
+            axios
+              .put(`api/customers/${this.user.id}`, this.customer)
+              .then((response) => {
+                this.$toasted
+                  .show(`Customer ${this.user.name} edited successfully`, {
+                    type: "success",
+                  })
+                  .goAway(3500);
+                this.$router.push(`/`);
+              })
+              .catch((error) => {
+                if (error.response.status === 422) {
+                  this.errors = error.response.data.errors || {};
+                }
+              });
+          } else {
+            this.$toasted
+              .show(`User ${this.user.name} edited successfully`, {
+                type: "success",
+              })
+              .goAway(3500);
+            this.$router.push(`/`);
+          }
         })
         .catch((error) => {
           if (error.response.status === 422) {
             this.errors = error.response.data.errors || {};
           }
         });
-      if (this.user.type == "C") {
-        axios
-          .put(`api/customers/${this.user.id}`, this.customer)
-          .then((result) => {
-            this.failMessage = "";
-          })
-          .catch((error) => {
-            if (error.response.status === 422) {
-              this.errors = error.response.data.errors || {};
-            }
-          });
-      }
     },
     removeProfilePhoto(userId) {
       axios
@@ -173,6 +182,13 @@ export default {
           });
       }
     });
+  },
+  beforeRouteUpdate(to, from, next){
+    if(from.path == `/users/${this.$store.state.user.id}/edit` && to.path == `/users/${to.params.id}/edit` && to.params.id != this.$store.state.user.id){
+      return next(`/users/${this.$store.state.user.id}/edit`)
+    }
+    if(from.path == `/users` && to.path == `/users/${to.params.id}/edit` && (to.params.id != this.$store.state.user.id  || this.$store.state.user.type == 'EM'))
+    next()
   },
   components: { navbar, editcustomer },
 };

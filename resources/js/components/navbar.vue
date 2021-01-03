@@ -1,38 +1,12 @@
 <template>
   <nav class="navbar navbar-dark bg-dark navbar-expand-sm">
     <router-link class="navbar-brand" to="/">Food@Home</router-link>
-    <router-link
-      v-if="user && user.type == 'C'"
-      class="navbar-brand"
-      :to="`/customer/${user.id}/dashboard`"
-      >Dashboard</router-link
-    >
-    <router-link
-      v-if="user && user.type == 'EC'"
-      class="navbar-brand"
-      :to="`/cook/${user.id}/dashboard`"
-      >Dashboard</router-link
-    >
-    <router-link
-      v-if="user && user.type == 'EM'"
-      class="navbar-brand"
-      :to="`/users`"
-      >Users List</router-link
-    >
-
-    <router-link
-      v-if="user && user.type == 'ED'"
-      class="navbar-brand"
-      :to="`/deliveryman/${user.id}/dashboard`"
-      >Dashboard</router-link
-    >
-
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
         <template v-if="!user">
           <li class="nav-item">
             <router-link to="/login" class="btn btn-primary">Login</router-link>
-            <router-link to="/customers/create" class="btn btn-primary"
+            <router-link :to="{ name: 'createCustomer' }" class="btn btn-primary"
               >Register</router-link
             >
           </li>
@@ -63,10 +37,33 @@
                   aria-labelledby="navbarDropdownMenuLink"
                 >
                   <router-link
+                    v-if="user.type == 'C'"
                     :to="`/customer/${user.id}/dashboard`"
                     class="dropdown-item"
                     >Dashboard</router-link
                   >
+
+                  <router-link
+                    v-if="user.type == 'EC'"
+                    :to="`/cook/${user.id}/dashboard`"
+                    class="dropdown-item"
+                    >Dashboard</router-link
+                  >
+
+                  <router-link
+                    v-if="user.type == 'ED'"
+                    :to="`/deliveryman/${user.id}/dashboard`"
+                    class="dropdown-item"
+                    >Dashboard</router-link
+                  >
+
+                  <router-link
+                    v-if="user.type == 'EM'"
+                    class="dropdown-item"
+                    :to="`/users`"
+                    >Users List</router-link
+                  >
+
                   <router-link :to="`/users/${user.id}`" class="dropdown-item"
                     >Profile</router-link
                   >
@@ -122,9 +119,11 @@ export default {
   },
   computed: {
     user() {
+      console.log("USER")
+      console.log(this.$store.state.user)
       return this.$store.state.user;
     },
-  },
+  }
 };
 </script>
 
