@@ -37,7 +37,7 @@
         <template v-if="!user">
           <li class="nav-item">
             <router-link to="/login" class="btn btn-primary">Login</router-link>
-            <router-link :to="{ name: 'createUser', params: { isTypeCustomer: true } }" class="btn btn-primary"
+            <router-link :to="{ name: 'createCustomer' }" class="btn btn-primary"
               >Register</router-link
             >
           </li>
@@ -68,10 +68,33 @@
                   aria-labelledby="navbarDropdownMenuLink"
                 >
                   <router-link
+                    v-if="user.type == 'C'"
                     :to="`/customer/${user.id}/dashboard`"
                     class="dropdown-item"
                     >Dashboard</router-link
                   >
+
+                  <router-link
+                    v-if="user.type == 'EC'"
+                    :to="`/cook/${user.id}/dashboard`"
+                    class="dropdown-item"
+                    >Dashboard</router-link
+                  >
+
+                  <router-link
+                    v-if="user.type == 'ED'"
+                    :to="`/deliveryman/${user.id}/dashboard`"
+                    class="dropdown-item"
+                    >Dashboard</router-link
+                  >
+
+                  <router-link
+                    v-if="user.type == 'EM'"
+                    class="dropdown-item"
+                    :to="`/users`"
+                    >Users List</router-link
+                  >
+
                   <router-link :to="`/users/${user.id}`" class="dropdown-item"
                     >Profile</router-link
                   >
@@ -127,9 +150,11 @@ export default {
   },
   computed: {
     user() {
+      console.log("USER")
+      console.log(this.$store.state.user)
       return this.$store.state.user;
     },
-  },
+  }
 };
 </script>
 

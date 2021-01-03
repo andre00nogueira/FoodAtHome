@@ -3,7 +3,9 @@
     <navbar />
 
     <h2>Menu</h2>
-
+    <router-link v-if="user && user.type == 'EM'" class="btn btn-primary" to="/products/create"
+      >Create Product</router-link
+    >
     <div id="filterArea">
       <input
         class="form-control"
@@ -48,22 +50,54 @@
           <td>{{ product.price }}€</td>
           <td>
             <div style="display: flex">
-              <input
-                v-model="product.quantity"
-                type="number"
-                class="form-control"
-                style="width: auto"
-                placeholder="Quantity"
-                min="1"
-                max="20"
-              />
-              <button
-                class="btn btn-primary"
-                style="margin-left: 2%"
-                v-on:click="addToCart(product)"
+              <div style="display: flex" v-if="user && user.type == 'C'">
+                <input
+                  v-model="product.quantity"
+                  type="number"
+                  class="form-control"
+                  style="width: auto"
+                  placeholder="0"
+                  min="1"
+                  max="20"
+                />
+                <button
+                  class="btn btn-primary"
+                  style="margin-left: 2%"
+                  v-on:click="addToCart(product)"
+                >
+                  🛒
+                </button>
+              </div>
+
+              <div style="display: flex" v-if="user && user.type == 'EM'">
+                <router-link
+                  class="btn btn-primary"
+                  style="margin-left: 2%"
+                  :to="`/products/${product.id}/edit`"
+                  >✏️</router-link
+                >
+
+                <button
+                  class="btn btn-danger"
+                  style="margin-left: 2%"
+                  @click.prevent="deleteProduct(product)"
+                >
+                  🗑️
+                </button>
+              </div>
+
+              <!--
+              <form
+                method="POST"
+                action="{{route('products.destroy',$product)}}"
+                onsubmit="return confirm('Are you sure you want to delete this record?');"
               >
-                🛒
-              </button>
+                @csrf @method('DELETE')
+                <button type="submit" class="btn btn-xs btn-danger btn-p">
+                  Delete
+                </button>
+              </form>
+              -->
             </div>
           </td>
         </tr>
@@ -117,6 +151,9 @@ export default {
         }
       }
     },
+    user() {
+      return this.$store.state.user;
+    },
   },
   methods: {
     getProducts(page = 1) {
@@ -154,6 +191,22 @@ export default {
     },
     //#endregion
 
+    deleteProduct(product) {
+      axios
+        .delete(`api/products/${product.id}`)
+        .then((result) => {
+          let productDeletedIndex = this.products.findIndex(
+            (p) => p.id == product.id
+          );
+          this.products.splice(productDeletedIndex, 1);
+          this.$toasted
+            .show(`Product ${product.name} deleted!`, { type: "success" })
+            .goAway(3500);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     addToCart(product) {
       if (product.quantity > 20 || product.quantity < 1) {
         this.$toasted

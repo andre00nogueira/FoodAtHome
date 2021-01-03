@@ -171,6 +171,12 @@ export default {
   mounted() {
     this.getCurrentOrderId();
   },
+  beforeRouteUpdate(to, from, next){
+    if(to.path == `/cook/${to.params.id}/dashboard` && to.params.id != this.$store.state.user.id){
+      return next(`/cook/${this.$store.state.user.id}/dashboard`)
+    }
+    next()
+  },
   components: { navbar, itemsTable, chronometer },
 };
 </script><style>

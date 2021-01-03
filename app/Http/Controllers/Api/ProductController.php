@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Http\Resources\Product as ProductResource;
+use App\Http\Resources\ProductResource as ProductResource;
 use App\Http\Resources\ProductTypeResource;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -26,5 +29,46 @@ class ProductController extends Controller
     public function productByType(string $type_name)
     {
         return ProductResource::collection(Product::where('type', $type_name)->get());
+    }
+
+    public function show(Product $product){
+        return new ProductResource($product);
+    }
+
+    public function store(StoreProductRequest $request){
+        $request->validated();
+        $product = new Product();
+        $product->name=$request->name;
+        $product->type=$request->type;
+        $product->description=$request->description;
+        $product->price=$request->price;
+        $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
+        $request->file('photo_url')->storeAs('public/products', $generated_new_name);
+        $product->photo_url=$generated_new_name;
+        $product->save();
+        return response()->json(new ProductResource($product), 201);
+    }
+
+    public function update(UpdateProductRequest $request, Product $product){
+        $productOldPhoto = $product->photo_url;
+        $product->fill($request->validated());
+        
+        if($request->hasFile('photo_url')){
+            $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
+            if(!empty($product->photo_url)){
+                Storage::delete("public/products/{$productOldPhoto}");
+            }
+            $request->file('photo_url')->storeAs('public/products', $generated_new_name);
+            $product->photo_url=$generated_new_name;
+        }
+        $product->save();
+        return new ProductResource($product);
+    }
+
+    public function destroy(Product $product){
+        $removedProduct=$product;
+        Storage::delete("public/fotos/{$product->photo_url}");
+        $product->delete();
+        return new ProductResource($removedProduct);
     }
 }

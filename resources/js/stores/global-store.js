@@ -107,6 +107,6 @@ export default new Vuex.Store({
             }).catch(error => {
                 context.commit('clearUser')
             })
-        },
+        }
     }
 })

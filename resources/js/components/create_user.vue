@@ -111,7 +111,6 @@
 import createcustomer from "./create_customer.vue";
 import navbar from "./navbar.vue";
 export default {
-  props: ["isTypeCustomer"],
   data() {
     return {
       user: {},
@@ -191,8 +190,17 @@ export default {
         );
       });
     },
+    someMethod(){
+      alert('assd')
+    }
+  },
+  computed: {
+    isTypeCustomer(){
+      return this.$route.path == `/customers/create` ? true : false
+    }
   },
   mounted() {
+    console.log(this.$route.path)
     if (!this.isTypeCustomer) this.getTypes();
   },
   components: { navbar, createcustomer },

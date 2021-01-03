@@ -7,6 +7,8 @@
   </div>
 </template>
 <script>
+//codigo inspirado no seguinte video
+//https://www.youtube.com/watch?v=6-JEiEfkluc
 export default {
   data() {
     return {};

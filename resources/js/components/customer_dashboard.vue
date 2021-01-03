@@ -86,6 +86,12 @@ export default {
       }
     },
   },
+  beforeRouteUpdate(to, from, next){
+    if(to.path == `/customer/${to.params.id}/dashboard` && to.params.id != this.$store.state.user.id){
+      return next(`/customer/${this.$store.state.user.id}/dashboard`)
+    }
+    next()
+  },
   components: { navbar, orderTable },
 };
 </script>

@@ -183,6 +183,13 @@ export default {
       }
     });
   },
+  beforeRouteUpdate(to, from, next){
+    if(from.path == `/users/${this.$store.state.user.id}/edit` && to.path == `/users/${to.params.id}/edit` && to.params.id != this.$store.state.user.id){
+      return next(`/users/${this.$store.state.user.id}/edit`)
+    }
+    if(from.path == `/users` && to.path == `/users/${to.params.id}/edit` && (to.params.id != this.$store.state.user.id  || this.$store.state.user.type == 'EM'))
+    next()
+  },
   components: { navbar, editcustomer },
 };
 </script>
