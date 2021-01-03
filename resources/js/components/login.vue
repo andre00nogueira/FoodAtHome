@@ -1,6 +1,6 @@
 <template>
   <div>
-    <navbar/>
+    <navbar />
     <div class="jumbotron">
       <h2>Login</h2>
       <div class="form-group">
@@ -32,7 +32,7 @@
   </div>
 </template>
 <script>
-import navbar from './navbar.vue';
+import navbar from "./navbar.vue";
 export default {
   components: { navbar },
   data: function () {
@@ -65,18 +65,14 @@ export default {
                     .goAway(3500);
                   return;
                 }
-                console.log("PATCH LOGGEDIN RESPONSE = " + user.type);
                 switch (user.type) {
                   case "EC":
-                    console.log("ENTERED EC");
                     this.getCurrentOrder(user);
                     break;
                   case "ED":
-                    console.log("ENTERED ED");
                     this.getCurrentOrder(user);
                     break;
                   default:
-                    console.log("ENTERED C");
                     this.saveUserAndRedirect(user);
                     break;
                 }
@@ -100,15 +96,12 @@ export default {
       axios.get(`api/employee/${user.id}/currentOrder`).then((response) => {
         // Already have order
         if (response.data.data) {
-          console.log("THERE IS AN ORDER ALREADY");
           console.log(response.data.data.id);
           this.saveUserAndRedirect(user);
         } else {
-          console.log("NO ORDER, EMPLOYEE IS AVAILABLE");
           axios.get("api/orders/preparation/queue").then((response) => {
             console.log(response.data);
             if (response.data != "") {
-              console.log("entrou");
               let order = response.data.data;
               axios
                 .patch(`api/orders/${order.id}`, {
@@ -136,14 +129,13 @@ export default {
           available: new Boolean(value),
         })
         .then((response) => {
-          let user = response.data;
+          let user = response.data.data;
           console.log(user);
-          console.log("NO ORDER, WE SET EMPLOYEE AVAILABLE = " + user);
           this.saveUserAndRedirect(user);
         });
     },
     saveUserAndRedirect(user) {
-      this.$store.commit("setUser", user);
+      this.$store.commit("setUser", user)
       this.$router.push("/");
     },
     logout(user) {
