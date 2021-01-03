@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource as UserResource;
 use App\Http\Resources\UserToManagerResource;
-use App\Http\Resources\OrderResource as OrderResource; 
+use App\Http\Resources\OrderResource as OrderResource;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserTypesResource;
@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Storage;
 use stdClass;
 use Illuminate\Support\Facades\Hash;
 use App\Rules\MatchOldPassword;
+use Illuminate\Auth\Access\Gate;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -34,26 +36,24 @@ class UserController extends Controller
         }
     }
 
-    public function types(){
+    public function types()
+    {
         return UserTypesResource::collection(User::select('type')->distinct('type')->get());
     }
 
     public function show($id)
     {
-        return new UserResource(User::findOrFail($id));
-    }
-/*
-    public function show(int $id)
-    {
         $user = User::findOrFail($id);
-        return new UserResource($user);
+        if ($user->can('view', Auth::user())) {
+            return new UserResource($user);
+        }
+        abort(403);
     }
-*/
 
     public function patchUser($id, Request $request)
     {
         $user = User::findOrFail($id);
-        $now= now();
+        $now = now();
         if ($request->has('loggedin')) {
             if ($request->loggedin) {
                 $user->logged_at = $now;
@@ -71,14 +71,14 @@ class UserController extends Controller
             }
         }
 
-        if($request->has('photo_url')){
-            if($request->photo_url == 'default_avatar.jpg' && $user->photo_url != 'default_avatar.jpg'){
+        if ($request->has('photo_url')) {
+            if ($request->photo_url == 'default_avatar.jpg' && $user->photo_url != 'default_avatar.jpg') {
                 Storage::delete("public/fotos/{$user->photo_url}");
                 $user->photo_url = 'default_avatar.jpg';
             }
         }
-        
-        if($request->has('blocked')){
+
+        if ($request->has('blocked')) {
             $user->blocked = $request->blocked;
         }
         $user->save();
@@ -87,11 +87,11 @@ class UserController extends Controller
 
     public function getCurrentOrder($id)
     {
-        $user=User::findOrFail($id);
-        if($user->type=='EC'){
-            $query=Order::where('prepared_by', $user->id)->whereIn('status', ['H','P']);
-        }else{
-            $query=Order::where('delivered_by', $user->id)->where('status', 'T');
+        $user = User::findOrFail($id);
+        if ($user->type == 'EC') {
+            $query = Order::where('prepared_by', $user->id)->whereIn('status', ['H', 'P']);
+        } else {
+            $query = Order::where('delivered_by', $user->id)->where('status', 'T');
         }
         $order =  $query->first();
         if ($order == null) {
@@ -146,43 +146,43 @@ class UserController extends Controller
         $user = new User();
         $user->fill($request->validated());
         $user->password = bcrypt($user->password);
-        if($request->hasFile('photo_url')){
+        if ($request->hasFile('photo_url')) {
             $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
             $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
-            $user->photo_url=$generated_new_name;
-        }else{
-            $user->photo_url='default_avatar.jpg';
+            $user->photo_url = $generated_new_name;
+        } else {
+            $user->photo_url = 'default_avatar.jpg';
         }
         $user->save();
         return new UserResource($user);
     }
-    
+
 
     public function update(User $user, UpdateUserRequest $request)
     {
         $userOldPhoto = $user->photo_url;
         $user->fill($request->validated());
-        
-        if($request->hasFile('photo_url')){
-            if($userOldPhoto != 'default_avatar.jpg'){
+
+        if ($request->hasFile('photo_url')) {
+            if ($userOldPhoto != 'default_avatar.jpg') {
                 Storage::delete("public/fotos/{$userOldPhoto}");
             }
             $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
             $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
-            $user->photo_url=$generated_new_name;
+            $user->photo_url = $generated_new_name;
         }
         $user->save();
         return new UserResource($user);
     }
-    
+
 
     public function destroy(User $user)
     {
         $removedUser = $user;
-        if($user->type == 'C'){
+        if ($user->type == 'C') {
             $user->customer()->delete();
         }
-        if($user->photo_url != 'default_avatar.jpg'){
+        if ($user->photo_url != 'default_avatar.jpg') {
             Storage::delete("public/fotos/{$user->photo_url}");
         }
         $user->delete();
@@ -206,17 +206,19 @@ class UserController extends Controller
         return OrderResource::collection(Order::where('status', 'R')->orderBy('current_status_at', 'asc')->paginate(10));
     }
 
-    public function changePassword($id, Request $request){
-        $user=User::findOrFail($id);
-        $request->validate(['currentPassword' => ['required', 'string','min:3', new MatchOldPassword($user->password)], 'password' => ['required', 'string', 'min:3', 'confirmed']]);
-        $user->password= Hash::make($request->password);             
+    public function changePassword($id, Request $request)
+    {
+        $user = User::findOrFail($id);
+        $request->validate(['currentPassword' => ['required', 'string', 'min:3', new MatchOldPassword($user->password)], 'password' => ['required', 'string', 'min:3', 'confirmed']]);
+        $user->password = Hash::make($request->password);
         $user->save();
-        
-        
+
+
         return new UserResource($user);
     }
 
-    public function employeesIndex(){
-        return UserToManagerResource::collection(User::whereIn('type',['EC','ED'])->paginate(10));
+    public function employeesIndex()
+    {
+        return UserToManagerResource::collection(User::whereIn('type', ['EC', 'ED'])->paginate(10));
     }
 }
