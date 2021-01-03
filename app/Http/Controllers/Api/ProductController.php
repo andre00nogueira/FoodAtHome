@@ -40,7 +40,11 @@ class ProductController extends Controller
 
     public function getTopSoldProducts(){
         $topTenProducts = DB::select('SELECT name, SUM(quantity) as quantity FROM order_items INNER JOIN products ON product_id = products.id GROUP BY product_id ORDER BY SUM(quantity) DESC LIMIT 10');
-        //$topTenProducts = DB::table('order_items')->join('products', 'products.id', '=', 'product_id')->select(DB::raw('products.name, SUM(quantity) as quantity'))->groupBy('product_id')->orderByRaw('SUM(quantity) DESC')->limit(10)->get();
         return response()->json($topTenProducts);
+    }
+
+    public function getQuantitySoldByCategory(){
+        $soldByCategory = DB::select('SELECT type, SUM(quantity) as quantity FROM order_items INNER JOIN products ON product_id = products.id GROUP BY type ORDER BY SUM(quantity) DESC');
+        return response()->json($soldByCategory);
     }
 }

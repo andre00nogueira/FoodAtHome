@@ -1,12 +1,14 @@
 <template>
-  <div style="margin-top: 5%; display: flex; justify-content: space-between">
+  <div
+    style="margin-top: 5%; display: flex; justify-content: space-between"
+    v-if="!isFetching"
+  >
     <div style="margin-right: 10%">
       <hr />
       <h3>Total Products by Category</h3>
       <hr />
       <doughnutchart
         style="width: 85%; height: 85%"
-        v-if="!isFetching"
         :data="productsByCategoryData"
       />
     </div>
@@ -14,20 +16,15 @@
       <hr />
       <h3>10 Most Sold Products</h3>
       <hr />
-      <barchart
-        style="width: 100%; height: 80%"
-        v-if="!isFetching"
-        :data="topTenProducts"
-      />
+      <barchart style="width: 100%; height: 80%" :data="topTenProducts" />
     </div>
     <div style="margin-right: 10%">
       <hr />
-      <h3>Total Products by Category</h3>
+      <h3>Amount Sold by Category</h3>
       <hr />
-      <barchart
-        style="width: 100%; height: 80%"
-        v-if="!isFetching"
-        :data="productsByCategoryData"
+      <doughnutchart
+        style="width:  85%; height: 85%"
+        :data="salesByCategoryData"
       />
     </div>
   </div>
@@ -54,6 +51,15 @@ export default {
           },
         ],
       },
+      salesByCategoryData: {
+        labels: [],
+        datasets: [
+          {
+            backgroundColor: [],
+            data: [],
+          },
+        ],
+      },
     };
   },
   components: {
@@ -63,6 +69,7 @@ export default {
   async mounted() {
     await this.productsByCategory();
     await this.topProductsSold();
+    await this.quantitySoldByCategory();
     this.isFetching = false;
   },
   methods: {
@@ -77,11 +84,20 @@ export default {
     },
     topProductsSold() {
       return axios.get(`/api/products/total`).then((result) => {
-        console.log(result);
         result.data.forEach((element) => {
           this.topTenProducts.labels.push(element.name);
           this.topTenProducts.datasets[0].data.push(element.quantity);
         });
+      });
+    },
+    quantitySoldByCategory() {
+      return axios.get(`/api/products/sold/category`).then((result) => {
+        result.data.forEach((element) => {
+          this.salesByCategoryData.labels.push(element.type)
+          this.salesByCategoryData.datasets[0].data.push(element.quantity);
+        });
+        this.salesByCategoryData.datasets[0].backgroundColor = ["#41B883", "#E46651", "#00D8FF", "#DD1B16"];
+        console.log(this.salesByCategoryData);
       });
     },
   },

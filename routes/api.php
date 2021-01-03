@@ -90,4 +90,4 @@ Route::get('items/salesnumber/category', [OrderItemController::class, 'getNumber
 
 Route::get('products/total/category', [ProductController::class, 'getTotalProductsByType']);
 Route::get('products/total', [ProductController::class, 'getTopSoldProducts']);
-
+Route::get('products/sold/category', [ProductController::class, 'getQuantitySoldByCategory']);
