@@ -20,7 +20,7 @@
           <img :src="slide" />
         </carousel-slide>
       </carousel>
-      <p v-if="!this.$store.state.user">Considering ordering? Please, <router-link to="/login">login</router-link> or <router-link to="customers/create">create an account</router-link></p>
+      <p v-if="!this.$store.state.user">Considering ordering? Please, <router-link to="/login">login</router-link> or <router-link :to="{ name: 'createCustomer' }">create an account</router-link></p>
     </div>
   </div>
 </template>

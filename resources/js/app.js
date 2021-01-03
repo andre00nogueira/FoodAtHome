@@ -58,12 +58,10 @@ Vue.component('app', AppComponent)
 const routes = [
     { path: '/', redirect: '/index' },
     { path: '/index', component: AppComponent },
-    //{ path: '/customers/create', component: CustomerComponent },
-    { path: '/users/create', name: 'createUser', component: CreateUserComponent, props: true },
+    { path: '/users/create', name: 'createUser', component: CreateUserComponent },
+    { path: '/customers/create', name: 'createCustomer', component: CreateUserComponent },
     { path: '/users/:id/edit', component: EditUserComponent },
-    //{ path: '/customers/edit/:id', component: EditCustomerComponent },
     { path: '/users/:id', component: ProfileComponent },
-    //{ path: '/customers/create', component: CustomerComponent },
     { path: '/login', component: LoginComponent },
     { path: '/menu', component: ProductsComponent },
     { path: '/cart', component: ShoppingCartComponent},
@@ -73,7 +71,6 @@ const routes = [
     { path: '/cook/:id/dashboard', component: CookDashboardComponent },
     { path: '/users', component: UsersComponent },
     { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
-    //{ path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
     { path: '/users/:id/password', component: ChangeUserPasswordComponent }
 ]
 
@@ -90,7 +87,7 @@ const app = new Vue({
     async mounted() {
         await store.dispatch('loadUserLogged')
         router.beforeEach((to, from, next) => {
-            if (to.path !== '/login' && to.path !== '/index' && to.path !== '/menu' && to.path !== '/customers/create' && !store.state.user) next('/login')
+            if (to.path !== '/login' && to.path !== '/index' && to.path !== '/menu' && to.name !== 'createCustomer' && !store.state.user) next('/login')
             if (to.path == '/users' && store.state.user && store.state.user.type != 'EM') next('/')
             else next()
         })
