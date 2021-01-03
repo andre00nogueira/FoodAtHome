@@ -42,13 +42,6 @@ class ProductController extends Controller
         $product->type=$request->type;
         $product->description=$request->description;
         $product->price=$request->price;
-        //$product->photo_url=$request->photo_url;
-        /*
-            $upload_path = public_path('foto');
-            $file_name = $request->photo_url->getClientOriginalName();
-            $generated_new_name = time() . '.' . $request->photo_url->getClientOriginalExtension();
-            $request->file->move($upload_path, $generated_new_name);
-            $product->photo_url=$file_name;*/
         $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
         $request->file('photo_url')->storeAs('public/products', $generated_new_name);
         $product->photo_url=$generated_new_name;
@@ -57,14 +50,6 @@ class ProductController extends Controller
     }
 
     public function update(UpdateProductRequest $request, Product $product){
-       /* $product->update($request->validated());
-        $product->save();
-        return new ProductResource($product);
-        */
-       /* $productOldPhoto = $product->photo_url;
-        $product->fill($request->validated());
-        $product->save();
-        return new ProductResource($product);*/
         $productOldPhoto = $product->photo_url;
         $product->fill($request->validated());
         
@@ -82,6 +67,7 @@ class ProductController extends Controller
 
     public function destroy(Product $product){
         $removedProduct=$product;
+        Storage::delete("public/fotos/{$product->photo_url}");
         $product->delete();
         return new ProductResource($removedProduct);
     }

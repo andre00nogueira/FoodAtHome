@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProductRequest extends FormRequest
@@ -24,11 +25,11 @@ class StoreProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/',
+            'name' => ['required','regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/', Rule::unique('products')->ignore($this->product)],
             'type' => 'required|in:dessert,drink,hot dish,cold dish',
             'description' => 'required|min:3|max:500',
-            'price' =>'required|numeric|max:1000',
-            'photo_url' => 'required' //|mimes:jpeg,png
+            'price' =>'required|numeric|min:0.01|max:1000',
+            'photo_url' => 'required|image'
         ];
     }
 }
