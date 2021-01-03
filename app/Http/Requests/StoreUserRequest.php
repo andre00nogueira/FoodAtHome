@@ -26,7 +26,7 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => 'required|regex:/^[A-Za-záàâãéèêíóôõúçÁÀÂÃÉÈÍÓÔÕÚÇ ]+$/',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|min:3|confirmed',
             'type' => 'required|in:EM,EC,ED,C',
             'photo_url' => 'nullable|image',
         ];
