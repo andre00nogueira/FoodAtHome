@@ -135,7 +135,8 @@ const app = new Vue({
             }
         },
         order_cancelled(orderID) {
-            if (orderID) {
+            if (orderID && store.state.user.type == 'EC') {
+                debugger
                 this.$toasted.show(`Your current order has been cancelled by a Manager (${orderID})`, { type: 'danger' }).goAway(3500)
             }
         },

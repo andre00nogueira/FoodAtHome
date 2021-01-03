@@ -197,7 +197,23 @@ export default {
     },
     order_cancelled(orderID) {
       if (this.currenOrder && orderID == this.currenOrder.id) {
-        this.currenOrder = undefined;
+        axios
+        .patch(`api/users/${this.$store.state.user.id}`, {
+          available: new Boolean(true),
+        })
+        .then((response) => {
+          this.currentOrder = undefined;
+          this.getOrdersToDeliver();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+        this.$toasted
+          .show(
+            `Your current order has been cancelled by a Manager (${orderID})`,
+            { type: "danger" }
+          )
+          .goAway(3500);
       }
       if (this.orders.findIndex((order) => (order.id = orderID)) != -1) {
         this.getResults(this.page);

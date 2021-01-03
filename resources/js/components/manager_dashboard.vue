@@ -67,18 +67,22 @@
     <h5 v-else>No Employees</h5>
     <h2>Active Orders</h2>
     <div v-if="filteredOrders.length">
-    <div class="text-right">
-      <select v-model="orderStatus" class="custom-select" id="orderTypeFilter">
-        <option value="">Choose Status...</option>
-        <option
-          v-for="(status, index) in statusList"
-          :key="index"
-          :value="status.value"
+      <div class="text-right">
+        <select
+          v-model="orderStatus"
+          class="custom-select"
+          id="orderTypeFilter"
         >
-          {{ status.name }}
-        </option>
-      </select>
-    </div>
+          <option value="">Choose Status...</option>
+          <option
+            v-for="(status, index) in statusList"
+            :key="index"
+            :value="status.value"
+          >
+            {{ status.name }}
+          </option>
+        </select>
+      </div>
       <table id="activeOrders" class="table table-striped">
         <thead>
           <tr>
@@ -221,7 +225,7 @@ export default {
           status: "C",
         })
         .then((response) => {
-          let order= response.data.data;
+          let order = response.data.data;
           let payload = {
             userId: order.customer_id,
             status: "C",
@@ -229,14 +233,17 @@ export default {
           };
           this.$socket.emit("order_status", payload);
           let payloadToCancel = {
-            employeeId: '',
+            employeeId: "",
+            employeeType: "",
             orderId: order.id,
           };
-          if(order.delivered_by){
-            payloadToCancel.employeeId=order.delivered_by;
+          if (order.delivered_by) {
+            payloadToCancel.employeeId = order.delivered_by;
+            payloadToCancel.employeeType = "ED";
             this.$socket.emit("order_cancelled", payloadToCancel);
-          }else if(order.prepared_by){
-            payloadToCancel.employeeId=order.delivered_by;
+          } else if (order.prepared_by) {
+            payloadToCancel.employeeId = order.prepared_by;
+            payloadToCancel.employeeType = "EC";
             this.$socket.emit("order_cancelled", payloadToCancel);
           }
         });

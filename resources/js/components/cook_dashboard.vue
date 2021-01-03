@@ -161,9 +161,10 @@ export default {
       this.getCurrentOrder(orderID);
     },
     order_cancelled(orderID) {
+      debugger
+      console.log(orderID);
       if (this.order && orderID == this.order.id) {
-        this.order = undefined;
-        this.orderItems = [];
+        this.setCookAvailable();
       }
     },
   },

@@ -2666,9 +2666,11 @@ __webpack_require__.r(__webpack_exports__);
       this.getCurrentOrder(orderID);
     },
     order_cancelled: function order_cancelled(orderID) {
+      debugger;
+      console.log(orderID);
+
       if (this.order && orderID == this.order.id) {
-        this.order = undefined;
-        this.orderItems = [];
+        this.setCookAvailable();
       }
     }
   },
@@ -3288,8 +3290,21 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     order_cancelled: function order_cancelled(orderID) {
+      var _this9 = this;
+
       if (this.currenOrder && orderID == this.currenOrder.id) {
-        this.currenOrder = undefined;
+        axios.patch("api/users/".concat(this.$store.state.user.id), {
+          available: new Boolean(true)
+        }).then(function (response) {
+          _this9.currentOrder = undefined;
+
+          _this9.getOrdersToDeliver();
+        })["catch"](function (error) {
+          console.log(error);
+        });
+        this.$toasted.show("Your current order has been cancelled by a Manager (".concat(orderID, ")"), {
+          type: "danger"
+        }).goAway(3500);
       }
 
       if (this.orders.findIndex(function (order) {
@@ -3948,6 +3963,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -4085,16 +4104,19 @@ __webpack_require__.r(__webpack_exports__);
         _this4.$socket.emit("order_status", payload);
 
         var payloadToCancel = {
-          employeeId: '',
+          employeeId: "",
+          employeeType: "",
           orderId: order.id
         };
 
         if (order.delivered_by) {
           payloadToCancel.employeeId = order.delivered_by;
+          payloadToCancel.employeeType = "ED";
 
           _this4.$socket.emit("order_cancelled", payloadToCancel);
         } else if (order.prepared_by) {
-          payloadToCancel.employeeId = order.delivered_by;
+          payloadToCancel.employeeId = order.prepared_by;
+          payloadToCancel.employeeType = "EC";
 
           _this4.$socket.emit("order_cancelled", payloadToCancel);
         }
@@ -45312,7 +45334,7 @@ var render = function() {
                         { key: index, domProps: { value: status.value } },
                         [
                           _vm._v(
-                            "\n        " + _vm._s(status.name) + "\n      "
+                            "\n          " + _vm._s(status.name) + "\n        "
                           )
                         ]
                       )
@@ -63390,7 +63412,8 @@ var app = new Vue({
       }
     },
     order_cancelled: function order_cancelled(orderID) {
-      if (orderID) {
+      if (orderID && _stores_global_store__WEBPACK_IMPORTED_MODULE_2__["default"].state.user.type == 'EC') {
+        debugger;
         this.$toasted.show("Your current order has been cancelled by a Manager (".concat(orderID, ")"), {
           type: 'danger'
         }).goAway(3500);
