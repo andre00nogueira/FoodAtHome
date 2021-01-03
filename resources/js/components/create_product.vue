@@ -34,18 +34,22 @@
               {{ type.name }}
             </option>
           </select>
+          <div v-if="errors && errors.type" class="text-danger">
+            {{ errors.type[0] }}
+          </div>
         </div>
+
         <div class="form-group">
-          <label for="description" style="width: 100%;">Description</label>
+          <label for="description" style="width: 100%">Description</label>
           <textarea
             name="description"
             id="description"
             v-model="product.description"
             rows="5"
             cols="50"
-            style="width: 100%;"
+            style="width: 100%"
           ></textarea>
-          <div v-if="errors && errors.name" class="text-danger">
+          <div v-if="errors && errors.description" class="text-danger">
             {{ errors.description[0] }}
           </div>
         </div>
@@ -59,7 +63,7 @@
             id="price"
             v-model="product.price"
           />
-          <div v-if="errors && errors.name" class="text-danger">
+          <div v-if="errors && errors.price" class="text-danger">
             {{ errors.price[0] }}
           </div>
         </div>
@@ -81,16 +85,6 @@
         <button type="submit" class="btn btn-primary">Create</button>
         <router-link to="/menu" class="btn btn-secondary">Cancel</router-link>
       </form>
-      <div
-        class="alert"
-        :class="{ 'alert-success': successMessage }"
-        v-if="successMessage"
-      >
-        <button type="button" class="close-btn" @click="closeMessage()">
-          &times;
-        </button>
-        <strong>{{ successMessage }}</strong>
-      </div>
     </div>
   </div>
 </template>
@@ -100,7 +94,6 @@ export default {
   data() {
     return {
       product: {},
-      successMessage: "",
       errors: {},
       types: [],
     };
@@ -111,11 +104,11 @@ export default {
   methods: {
     createProduct: function () {
       const data = new FormData();
-      data.append("name",this.product.name);
-      data.append("type",this.product.type);
-      data.append("description",this.product.description);
-      data.append("price",this.product.price);
-      data.append("photo_url",this.product.photo_url);
+      data.append("name", this.product.name || '');
+      data.append("type", this.product.type || '');
+      data.append("description", this.product.description || '');
+      data.append("price", this.product.price || '');
+      data.append("photo_url", this.product.photo_url);
       axios
         .post("api/products", data)
         .then((result) => {
@@ -125,18 +118,10 @@ export default {
             })
             .goAway(3500);
           this.$router.push(`/menu`);
-
-          this.failMessage = "";
         })
         .catch((error) => {
-          if (error.response.status === 422) {
-            this.errors = error.response.data.errors || {};
-          }
-          this.successMessage = "";
+          this.errors = error.response.data.errors || {};
         });
-    },
-    closeMessage: function () {
-      this.successMessage = "";
     },
     getTypes() {
       let url = `api/products/types`;

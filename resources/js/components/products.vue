@@ -3,7 +3,9 @@
     <navbar />
 
     <h2>Menu</h2>
-    <router-link id="createButton" class="btn btn-primary" to="/products/create">Create Product</router-link>
+    <router-link v-if="user && user.type == 'EM'" class="btn btn-primary" to="/products/create"
+      >Create Product</router-link
+    >
     <div id="filterArea">
       <input
         class="form-control"
@@ -47,32 +49,44 @@
           <td>{{ product.description.substring(0, 100) + "..." }}</td>
           <td>{{ product.price }}€</td>
           <td>
-            <div style="display: flex" v-if="user && user.type == 'C'">
-              <input
-                v-model="product.quantity"
-                type="number"
-                class="form-control"
-                style="width: auto"
-                placeholder="Quantity"
-                min="1"
-                max="20"
-              />
-              <button
-                class="btn btn-primary"
-                style="margin-left: 2%"
-                v-on:click="addToCart(product)"
-              >
-                🛒
-              </button>
-              
-              <router-link class="btn btn-warning" style="margin-left: 2%" :to="`/products/${product.id}/edit`">🔨</router-link>
+            <div style="display: flex">
+              <div style="display: flex" v-if="user && user.type == 'C'">
+                <input
+                  v-model="product.quantity"
+                  type="number"
+                  class="form-control"
+                  style="width: auto"
+                  placeholder="0"
+                  min="1"
+                  max="20"
+                />
+                <button
+                  class="btn btn-primary"
+                  style="margin-left: 2%"
+                  v-on:click="addToCart(product)"
+                >
+                  🛒
+                </button>
+              </div>
 
-              <button class="btn btn-danger" style="margin-left: 2%" @click.prevent="deleteProduct(product)">
-                🗑️
-              </button>
-              
-            
-            <!--
+              <div style="display: flex" v-if="user && user.type == 'EM'">
+                <router-link
+                  class="btn btn-primary"
+                  style="margin-left: 2%"
+                  :to="`/products/${product.id}/edit`"
+                  >✏️</router-link
+                >
+
+                <button
+                  class="btn btn-danger"
+                  style="margin-left: 2%"
+                  @click.prevent="deleteProduct(product)"
+                >
+                  🗑️
+                </button>
+              </div>
+
+              <!--
               <form
                 method="POST"
                 action="{{route('products.destroy',$product)}}"
@@ -137,9 +151,9 @@ export default {
         }
       }
     },
-    user(){
-      return this.$store.state.user
-    }
+    user() {
+      return this.$store.state.user;
+    },
   },
   methods: {
     getProducts(page = 1) {
@@ -177,15 +191,21 @@ export default {
     },
     //#endregion
 
-   
-    deleteProduct(product){
-      axios.delete(`api/products/${product.id}`).then((result)=>{
-        let productDeletedIndex=this.products.findIndex((p)=>p.id==product.id)
-        this.products.splice(productDeletedIndex,1)
-        this.$toasted.show(`Product ${product.name} deleted!`, {type: "success",}).goAway(3500);
-      }).catch((error)=>{
-        console.log(error)
-      })
+    deleteProduct(product) {
+      axios
+        .delete(`api/products/${product.id}`)
+        .then((result) => {
+          let productDeletedIndex = this.products.findIndex(
+            (p) => p.id == product.id
+          );
+          this.products.splice(productDeletedIndex, 1);
+          this.$toasted
+            .show(`Product ${product.name} deleted!`, { type: "success" })
+            .goAway(3500);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     addToCart(product) {
       if (product.quantity > 20 || product.quantity < 1) {
@@ -227,9 +247,5 @@ export default {
 
 #productTypeFilter {
   width: 20%;
-}
-#createButton{
-  position: relative;
-  left: calc(100% - 123px);
 }
 </style>
