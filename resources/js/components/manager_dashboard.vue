@@ -322,6 +322,12 @@ export default {
       }
     },
   },
+  beforeRouteUpdate(to, from, next){
+    if(to.path == `/manager/${to.params.id}/dashboard` && to.params.id != this.$store.state.user.id){
+      return next(`/manager/${this.$store.state.user.id}/dashboard`)
+    }
+    next()
+  },
   components: { navbar },
 };
 </script>
