@@ -1,29 +1,26 @@
 <template>
-  <div
-    style="margin-top: 5%; display: flex; justify-content: space-between"
-    v-if="!isFetching"
-  >
-    <div style="margin-right: 10%">
+  <div style="margin-top: 5%; display: flex; justify-content: space-between">
+    <div style="margin-right: 10%" v-if="!isFetching1">
       <hr />
       <h3>Total Products by Category</h3>
       <hr />
       <doughnutchart
-        style="width: 85%; height: 85%"
+        style="width: 80%; height: 80%"
         :data="productsByCategoryData"
       />
     </div>
-    <div style="margin-right: 10%">
+    <div style="margin-right: 10%" v-if="!isFetching2">
       <hr />
       <h3>10 Most Sold Products</h3>
       <hr />
-      <barchart style="width: 100%; height: 80%" :data="topTenProducts" />
+      <barchart style="width: 90%; height: 70%" :data="topTenProducts" />
     </div>
-    <div style="margin-right: 10%">
+    <div style="margin-right: 10%" v-if="!isFetching3">
       <hr />
       <h3>Amount Sold by Category</h3>
       <hr />
       <doughnutchart
-        style="width:  85%; height: 85%"
+        style="width: 80%; height: 80%"
         :data="salesByCategoryData"
       />
     </div>
@@ -36,7 +33,9 @@ import barchart from "./graphs/BarChart.vue";
 export default {
   data() {
     return {
-      isFetching: true,
+      isFetching1: true,
+      isFetching2: true,
+      isFetching3: true,
       productsByCategoryData: {
         labels: [],
         datasets: [],
@@ -66,11 +65,10 @@ export default {
     doughnutchart,
     barchart,
   },
-  async mounted() {
-    await this.productsByCategory();
-    await this.topProductsSold();
-    await this.quantitySoldByCategory();
-    this.isFetching = false;
+  mounted() {
+    this.productsByCategory();
+    this.topProductsSold();
+    this.quantitySoldByCategory();
   },
   methods: {
     productsByCategory() {
@@ -80,6 +78,7 @@ export default {
           backgroundColor: ["#41B883", "#E46651", "#00D8FF", "#DD1B16"],
           data: Object.values(result.data),
         });
+        this.isFetching1 = false;
       });
     },
     topProductsSold() {
@@ -88,16 +87,22 @@ export default {
           this.topTenProducts.labels.push(element.name);
           this.topTenProducts.datasets[0].data.push(element.quantity);
         });
+        this.isFetching2 = false;
       });
     },
     quantitySoldByCategory() {
       return axios.get(`/api/products/sold/category`).then((result) => {
         result.data.forEach((element) => {
-          this.salesByCategoryData.labels.push(element.type)
+          this.salesByCategoryData.labels.push(element.type);
           this.salesByCategoryData.datasets[0].data.push(element.quantity);
         });
-        this.salesByCategoryData.datasets[0].backgroundColor = ["#41B883", "#E46651", "#00D8FF", "#DD1B16"];
-        console.log(this.salesByCategoryData);
+        this.salesByCategoryData.datasets[0].backgroundColor = [
+          "#41B883",
+          "#E46651",
+          "#00D8FF",
+          "#DD1B16",
+        ];
+        this.isFetching3 = false;
       });
     },
   },
