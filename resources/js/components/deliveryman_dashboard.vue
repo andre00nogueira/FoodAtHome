@@ -28,7 +28,9 @@
         <h5>Delivery Started - {{ currentOrder.current_status_at }}</h5>
         <chronometer :initial-time="currentOrder.current_status_at" />
         <h6>Price - {{ currentOrder.total_price }}€</h6>
-        <h6>Notes - {{ currentOrder.notes ? currentOrder.notes : "No notes" }}</h6>
+        <h6>
+          Notes - {{ currentOrder.notes ? currentOrder.notes : "No notes" }}
+        </h6>
         <div class="content">
           <h2>Items</h2>
           <itemsTable
@@ -123,6 +125,8 @@ export default {
               available: new Boolean(false),
             })
             .then((response) => {
+              console.log(response.data.data);
+              this.$socket.emit("refresh_user", response.data.data.id);
               console.log("testing");
               console.log(response);
             });
@@ -154,6 +158,8 @@ export default {
           available: new Boolean(true),
         })
         .then((response) => {
+          console.log(response.data.data);
+          this.$socket.emit("refresh_user", response.data.data.id);
           this.currentOrder = undefined;
           this.getOrdersToDeliver();
         })
@@ -196,18 +202,20 @@ export default {
       }
     },
     order_cancelled(orderID) {
-      if (this.currenOrder && orderID == this.currenOrder.id) {
+      console.log(orderID);
+      console.log(this.currentOrder);
+      if (this.currentOrder && orderID == this.currentOrder.id) {
         axios
-        .patch(`api/users/${this.$store.state.user.id}`, {
-          available: new Boolean(true),
-        })
-        .then((response) => {
-          this.currentOrder = undefined;
-          this.getOrdersToDeliver();
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+          .patch(`api/users/${this.$store.state.user.id}`, {
+            available: new Boolean(true),
+          })
+          .then((response) => {
+            this.currentOrder = undefined;
+            this.getOrdersToDeliver();
+          })
+          .catch((error) => {
+            console.log(error);
+          });
         this.$toasted
           .show(
             `Your current order has been cancelled by a Manager (${orderID})`,
@@ -220,11 +228,14 @@ export default {
       }
     },
   },
-  beforeRouteUpdate(to, from, next){
-    if(to.path == `/deliveryman/${to.params.id}/dashboard` && to.params.id != this.$store.state.user.id){
-      return next(`/deliveryman/${this.$store.state.user.id}/dashboard`)
+  beforeRouteUpdate(to, from, next) {
+    if (
+      to.path == `/deliveryman/${to.params.id}/dashboard` &&
+      to.params.id != this.$store.state.user.id
+    ) {
+      return next(`/deliveryman/${this.$store.state.user.id}/dashboard`);
     }
-    next()
+    next();
   },
   components: { navbar, orderTable, itemsTable, chronometer },
 };

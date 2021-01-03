@@ -2224,16 +2224,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       cart: undefined,
-      notes: ''
+      notes: ""
     };
   },
   methods: {
@@ -2262,8 +2259,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     checkout: function checkout() {
       var _this2 = this;
 
-      if (typeof this.cart !== 'undefined' && this.cart.length > 0) {
-        axios.post('api/cart/checkout', {
+      if (typeof this.cart !== "undefined" && this.cart.length > 0) {
+        axios.post("api/cart/checkout", {
           cart: this.cart,
           notes: this.notes,
           customer: this.$store.state.user.id,
@@ -2281,11 +2278,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               orderID: order.id
             };
 
-            _this2.$socket.emit('new_order_request', payload);
+            _this2.$socket.emit("new_order_request", payload);
+          } else {
+            _this2.$socket.emit("new_order_manager", order.id);
           }
 
-          _this2.$toasted.show('Order created successfully!', {
-            type: 'info'
+          _this2.$toasted.show("Order created successfully!", {
+            type: "info"
           }).goAway(3500);
 
           _this2.$router.push("/customer/".concat(_this2.$store.state.user.id, "/dashboard"));
@@ -2631,6 +2630,8 @@ __webpack_require__.r(__webpack_exports__);
                   type: "info"
                 }).goAway(3500);
 
+                _this3.$socket.emit("refresh_user", _this3.$store.state.user.id);
+
                 _this3.getCurrentOrder(response.data.data.id);
               });
             } else {
@@ -2657,6 +2658,8 @@ __webpack_require__.r(__webpack_exports__);
         };
         _this4.order = undefined; //this.$socket.emit("order_ready", payload);
 
+        _this4.$socket.emit("refresh_user", response.data.data.id);
+
         console.log(response.data);
       })["catch"](function (error) {
         console.log(error);
@@ -2668,7 +2671,6 @@ __webpack_require__.r(__webpack_exports__);
       this.getCurrentOrder(orderID);
     },
     order_cancelled: function order_cancelled(orderID) {
-      debugger;
       console.log(orderID);
 
       if (this.order && orderID == this.order.id) {
@@ -3319,6 +3321,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 
@@ -3392,6 +3396,10 @@ __webpack_require__.r(__webpack_exports__);
         axios.patch("api/users/".concat(_this5.$store.state.user.id), {
           available: new Boolean(false)
         }).then(function (response) {
+          console.log(response.data.data);
+
+          _this5.$socket.emit("refresh_user", response.data.data.id);
+
           console.log("testing");
           console.log(response);
         });
@@ -3420,6 +3428,10 @@ __webpack_require__.r(__webpack_exports__);
       axios.patch("api/users/".concat(this.$store.state.user.id), {
         available: new Boolean(true)
       }).then(function (response) {
+        console.log(response.data.data);
+
+        _this6.$socket.emit("refresh_user", response.data.data.id);
+
         _this6.currentOrder = undefined;
 
         _this6.getOrdersToDeliver();
@@ -3468,7 +3480,10 @@ __webpack_require__.r(__webpack_exports__);
     order_cancelled: function order_cancelled(orderID) {
       var _this9 = this;
 
-      if (this.currenOrder && orderID == this.currenOrder.id) {
+      console.log(orderID);
+      console.log(this.currentOrder);
+
+      if (this.currentOrder && orderID == this.currentOrder.id) {
         axios.patch("api/users/".concat(this.$store.state.user.id), {
           available: new Boolean(true)
         }).then(function (response) {
@@ -4406,7 +4421,9 @@ __webpack_require__.r(__webpack_exports__);
         value: "T"
       }],
       employeeType: "",
-      orderStatus: ""
+      orderStatus: "",
+      employeesPage: 1,
+      ordersPage: 1
     };
   },
   created: function created() {
@@ -4446,6 +4463,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this2 = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      this.employeesPage = page;
       var url = "api/employees";
 
       if (page != 0) {
@@ -4454,8 +4472,6 @@ __webpack_require__.r(__webpack_exports__);
         axios.get(url).then(function (response) {
           _this2.employeesData = response.data;
           _this2.employees = _this2.employeesData.data;
-
-          _this2.refreshEmployeeData();
         });
       }
     },
@@ -4463,6 +4479,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this3 = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      this.ordersPage = page;
       var url = "api/orders/active";
 
       if (page != 0) {
@@ -4501,6 +4518,14 @@ __webpack_require__.r(__webpack_exports__);
     cancelOrder: function cancelOrder(orderID) {
       var _this4 = this;
 
+      var orderIndex = this.activeOrders.findIndex(function (o) {
+        return o.id == orderID;
+      });
+
+      if (orderIndex != -1) {
+        this.getResultsOrders(this.ordersPage);
+      }
+
       axios.patch("api/orders/".concat(orderID), {
         status: "C"
       }).then(function (response) {
@@ -4529,6 +4554,19 @@ __webpack_require__.r(__webpack_exports__);
           payloadToCancel.employeeType = "EC";
 
           _this4.$socket.emit("order_cancelled", payloadToCancel);
+        } //atualizar lista de employees se necessário
+
+
+        var employeeIndex = _this4.employees.findIndex(function (e) {
+          if (e.current_order) {
+            return e.current_order.id == orderID;
+          }
+
+          return false;
+        });
+
+        if (employeeIndex != -1) {
+          _this4.getResults(_this4.employeesPage);
         }
       });
     }
@@ -4563,6 +4601,44 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       console.log(this.employees);
+    },
+    new_order: function new_order(orderID) {
+      this.getResultsOrders(this.ordersPage);
+      this.getResults(this.employeesPage);
+    },
+    order_status: function order_status(orderID) {
+      console.log("order status");
+      console.log(orderID);
+      var orderIndex = this.activeOrders.findIndex(function (o) {
+        return o.id == orderID;
+      });
+
+      if (orderIndex != -1) {
+        this.getResultsOrders(this.ordersPage);
+      }
+
+      var employeeIndex = this.employees.findIndex(function (e) {
+        if (e.current_order) {
+          return e.current_order.id == orderID;
+        }
+
+        return false;
+      });
+
+      if (employeeIndex != -1) {
+        this.getResults(this.employeesPage);
+      }
+    },
+    refresh_user: function refresh_user(userID) {
+      var employeeIndex = this.employees.findIndex(function (e) {
+        console.log(e);
+        return e.id == userID;
+      });
+      console.log(employeeIndex);
+
+      if (employeeIndex != -1) {
+        this.getResults(this.employeesPage);
+      }
     }
   },
   components: {
@@ -44068,7 +44144,7 @@ var render = function() {
                         staticClass: "btn btn-primary",
                         on: { click: _vm.checkout }
                       },
-                      [_vm._v("Confirm Checkout")]
+                      [_vm._v("\n          Confirm Checkout\n        ")]
                     )
                   ],
                   1
@@ -45322,12 +45398,13 @@ var render = function() {
                     _vm._v(" "),
                     _c("h6", [
                       _vm._v(
-                        "Notes - " +
+                        "\n        Notes - " +
                           _vm._s(
                             _vm.currentOrder.notes
                               ? _vm.currentOrder.notes
                               : "No notes"
-                          )
+                          ) +
+                          "\n      "
                       )
                     ]),
                     _vm._v(" "),
@@ -64633,7 +64710,6 @@ var app = new Vue({
     },
     order_cancelled: function order_cancelled(orderID) {
       if (orderID && _stores_global_store__WEBPACK_IMPORTED_MODULE_3__["default"].state.user.type == 'EC') {
-        debugger;
         this.$toasted.show("Your current order has been cancelled by a Manager (".concat(orderID, ")"), {
           type: 'danger'
         }).goAway(3500);
@@ -66765,8 +66841,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\laragon\www\FoodAtHome\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\laragon\www\FoodAtHome\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! D:\DAD\FoodAtHome\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\DAD\FoodAtHome\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

@@ -142,6 +142,8 @@ export default {
       ],
       employeeType: "",
       orderStatus: "",
+      employeesPage: 1,
+      ordersPage: 1,
     };
   },
   created() {
@@ -173,6 +175,7 @@ export default {
       return "Preparing Order";
     },
     getResults(page = 1) {
+      this.employeesPage = page;
       let url = `api/employees`;
       if (page != 0) {
         this.page = page;
@@ -180,11 +183,11 @@ export default {
         axios.get(url).then((response) => {
           this.employeesData = response.data;
           this.employees = this.employeesData.data;
-          this.refreshEmployeeData();
         });
       }
     },
     getResultsOrders(page = 1) {
+      this.ordersPage = page;
       let url = `api/orders/active`;
       if (page != 0) {
         this.page = page;
@@ -220,6 +223,10 @@ export default {
       }
     },
     cancelOrder(orderID) {
+      let orderIndex = this.activeOrders.findIndex((o) => o.id == orderID);
+      if (orderIndex != -1) {
+        this.getResultsOrders(this.ordersPage);
+      }
       axios
         .patch(`api/orders/${orderID}`, {
           status: "C",
@@ -246,6 +253,16 @@ export default {
             payloadToCancel.employeeType = "EC";
             this.$socket.emit("order_cancelled", payloadToCancel);
           }
+          //atualizar lista de employees se necessário
+          let employeeIndex = this.employees.findIndex((e) => {
+            if (e.current_order) {
+              return e.current_order.id == orderID;
+            }
+            return false;
+          });
+          if (employeeIndex != -1) {
+            this.getResults(this.employeesPage);
+          }
         });
     },
   },
@@ -271,6 +288,37 @@ export default {
         this.employees[employeeIndex].available_at = user.available_at;
       }
       console.log(this.employees);
+    },
+    new_order(orderID) {
+      this.getResultsOrders(this.ordersPage);
+      this.getResults(this.employeesPage);
+    },
+    order_status(orderID) {
+      console.log("order status");
+      console.log(orderID);
+      let orderIndex = this.activeOrders.findIndex((o) => o.id == orderID);
+      if (orderIndex != -1) {
+        this.getResultsOrders(this.ordersPage);
+      }
+      let employeeIndex = this.employees.findIndex((e) => {
+        if (e.current_order) {
+          return e.current_order.id == orderID;
+        }
+        return false;
+      });
+      if (employeeIndex != -1) {
+        this.getResults(this.employeesPage);
+      }
+    },
+    refresh_user(userID) {
+      let employeeIndex = this.employees.findIndex((e) => {
+        console.log(e);
+        return e.id == userID;
+      });
+      console.log(employeeIndex);
+      if (employeeIndex != -1) {
+        this.getResults(this.employeesPage);
+      }
     },
   },
   components: { navbar },

@@ -121,6 +121,10 @@ export default {
                         }
                       )
                       .goAway(3500);
+                    this.$socket.emit(
+                      "refresh_user",
+                      this.$store.state.user.id
+                    );
                     this.getCurrentOrder(response.data.data.id);
                   });
               } else {
@@ -149,6 +153,7 @@ export default {
           };
           this.order = undefined;
           //this.$socket.emit("order_ready", payload);
+          this.$socket.emit("refresh_user", response.data.data.id);
           console.log(response.data);
         })
         .catch((error) => {
@@ -161,7 +166,6 @@ export default {
       this.getCurrentOrder(orderID);
     },
     order_cancelled(orderID) {
-      debugger
       console.log(orderID);
       if (this.order && orderID == this.order.id) {
         this.setCookAvailable();
@@ -171,11 +175,14 @@ export default {
   mounted() {
     this.getCurrentOrderId();
   },
-  beforeRouteUpdate(to, from, next){
-    if(to.path == `/cook/${to.params.id}/dashboard` && to.params.id != this.$store.state.user.id){
-      return next(`/cook/${this.$store.state.user.id}/dashboard`)
+  beforeRouteUpdate(to, from, next) {
+    if (
+      to.path == `/cook/${to.params.id}/dashboard` &&
+      to.params.id != this.$store.state.user.id
+    ) {
+      return next(`/cook/${this.$store.state.user.id}/dashboard`);
     }
-    next()
+    next();
   },
   components: { navbar, itemsTable, chronometer },
 };
