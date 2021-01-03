@@ -66,7 +66,7 @@
     </div>
     <h5 v-else>No Employees</h5>
     <h2>Active Orders</h2>
-    <div v-if="filteredOrders.length">
+    
       <div class="text-right">
         <select
           v-model="orderStatus"
@@ -83,6 +83,7 @@
           </option>
         </select>
       </div>
+      <div v-if="filteredOrders.length">
       <table id="activeOrders" class="table table-striped">
         <thead>
           <tr>

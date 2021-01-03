@@ -4392,6 +4392,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -46451,61 +46452,57 @@ var render = function() {
       _vm._v(" "),
       _c("h2", [_vm._v("Active Orders")]),
       _vm._v(" "),
+      _c("div", { staticClass: "text-right" }, [
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.orderStatus,
+                expression: "orderStatus"
+              }
+            ],
+            staticClass: "custom-select",
+            attrs: { id: "orderTypeFilter" },
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.orderStatus = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              }
+            }
+          },
+          [
+            _c("option", { attrs: { value: "" } }, [
+              _vm._v("Choose Status...")
+            ]),
+            _vm._v(" "),
+            _vm._l(_vm.statusList, function(status, index) {
+              return _c(
+                "option",
+                { key: index, domProps: { value: status.value } },
+                [_vm._v("\n          " + _vm._s(status.name) + "\n        ")]
+              )
+            })
+          ],
+          2
+        )
+      ]),
+      _vm._v(" "),
       _vm.filteredOrders.length
         ? _c(
             "div",
             [
-              _c("div", { staticClass: "text-right" }, [
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.orderStatus,
-                        expression: "orderStatus"
-                      }
-                    ],
-                    staticClass: "custom-select",
-                    attrs: { id: "orderTypeFilter" },
-                    on: {
-                      change: function($event) {
-                        var $$selectedVal = Array.prototype.filter
-                          .call($event.target.options, function(o) {
-                            return o.selected
-                          })
-                          .map(function(o) {
-                            var val = "_value" in o ? o._value : o.value
-                            return val
-                          })
-                        _vm.orderStatus = $event.target.multiple
-                          ? $$selectedVal
-                          : $$selectedVal[0]
-                      }
-                    }
-                  },
-                  [
-                    _c("option", { attrs: { value: "" } }, [
-                      _vm._v("Choose Status...")
-                    ]),
-                    _vm._v(" "),
-                    _vm._l(_vm.statusList, function(status, index) {
-                      return _c(
-                        "option",
-                        { key: index, domProps: { value: status.value } },
-                        [
-                          _vm._v(
-                            "\n          " + _vm._s(status.name) + "\n        "
-                          )
-                        ]
-                      )
-                    })
-                  ],
-                  2
-                )
-              ]),
-              _vm._v(" "),
               _c(
                 "table",
                 {
