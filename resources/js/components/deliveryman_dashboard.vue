@@ -28,7 +28,7 @@
         <h5>Delivery Started - {{ currentOrder.current_status_at }}</h5>
         <chronometer :initial-time="currentOrder.current_status_at" />
         <h6>Price - {{ currentOrder.total_price }}€</h6>
-        <h6>Notes - {{ currentOrder.notes ? order.notes : "No notes" }}</h6>
+        <h6>Notes - {{ currentOrder.notes ? currentOrder.notes : "No notes" }}</h6>
         <div class="content">
           <h2>Items</h2>
           <itemsTable
