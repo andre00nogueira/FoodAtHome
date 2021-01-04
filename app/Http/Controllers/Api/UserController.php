@@ -29,10 +29,13 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        if ($request->has('page')) {
-            return UserResource::collection(User::paginate(10));
-        } else {
-            return UserResource::collection(User::all());
+        $user = User::findOrFail(Auth::id());
+        if ($user->can('viewAny', $user)) {
+            if ($request->has('page')) {
+                return UserResource::collection(User::paginate(10));
+            } else {
+                return UserResource::collection(User::all());
+            }
         }
     }
 

@@ -20,6 +20,11 @@ class UserPolicy
         return $user->id === $curr->id || $curr->type === 'EM';
     }
 
+    public function viewAny(User $user)
+    {
+        return $user->type === 'EM';
+    }
+
     /*public function edit(User $user, Post $post)
     {
         return $user->id == $post->user_id;
