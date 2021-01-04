@@ -14,6 +14,7 @@ use App\Http\Resources\OrderItemResource;
 use Carbon\Carbon;
 use DateTime;
 use stdClass;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -196,5 +197,41 @@ class OrderController extends Controller
 
     public function activeOrders(){
         return OrderToManagerResource::collection(Order::whereNotIn('status',['C','D'])->orderBy('opened_at','asc')->paginate(10));
+    }
+    
+    public function averageTimePerTask(){
+        return response()->json([
+            'preparation_time' => Order::whereNotNull('preparation_time')->avg('preparation_time'),
+            'delivery_time' => Order::whereNotNull('delivery_time')->avg('delivery_time'),
+            'total_time' => Order::whereNotNull('total_time')->avg('total_time')
+        ]);
+    }
+
+    public function ordersPerYear(){
+        $ordersPerYear=DB::select("SELECT DATE_FORMAT(created_at, '%Y') as year, COUNT(*) as quantity FROM orders GROUP BY DATE_FORMAT(created_at, '%Y')");
+        return response()->json($ordersPerYear);
+    }
+
+    public function ordersPerMonth(){
+        $ordersPerMonth=DB::select("SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as quantity FROM orders GROUP BY DATE_FORMAT(created_at, '%Y-%m')");
+        return response()->json($ordersPerMonth);
+    }
+
+    public function salesPerYear(){
+        $salesPerYear=DB::select("SELECT DATE_FORMAT(created_at, '%Y') as year, COUNT(*) as quantity FROM orders WHERE status='D' GROUP BY DATE_FORMAT(created_at, '%Y')");
+        return response()->json($salesPerYear);
+    }
+
+    public function salesPerMonth(){
+        $salesPerMonth=DB::select("SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as quantity FROM orders WHERE status='D' GROUP BY DATE_FORMAT(created_at, '%Y-%m')");
+        return response()->json($salesPerMonth);
+    }
+
+    public function ordersStatus(){
+        return response()->json([
+            'delivered' => Order::where('status','D')->count(),
+            'cancelled' => Order::where('status','C')->count(),
+            'ongoing' => Order::whereNotIn('status',['C','D'])->count()
+        ]);
     }
 }

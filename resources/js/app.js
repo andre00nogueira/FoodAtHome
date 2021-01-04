@@ -41,6 +41,7 @@ import EditCustomerComponent from './components/edit_customer.vue'
 import ProfileComponent from './components/profile.vue'
 import ChangeUserPasswordComponent from './components/change_user_password.vue'
 import ManagerDashboardComponent from './components/manager_dashboard.vue'
+import StatsComponent from './components/stats.vue'
 
 
 Vue.component('pagination', require('laravel-vue-pagination'));
@@ -76,9 +77,10 @@ const routes = [
     { path: '/products/:id/edit', component: EditProductComponent},
     { path: '/users', component: UsersComponent },
     { path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
-    { path: '/users/:id/password', component: ChangeUserPasswordComponent },
-    { path: '/manager/:id/dashboard', component: ManagerDashboardComponent }
+    { path: '/manager/:id/dashboard', component: ManagerDashboardComponent },
     //{ path: '/deliveryman/:id/dashboard', component: DeliverymanDashboardComponent },
+    { path: '/users/:id/password', component: ChangeUserPasswordComponent },
+    { path: '/stats', component: StatsComponent }
 ]
 
 const router = new VueRouter({

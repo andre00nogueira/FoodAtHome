@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\ProductResource as ProductResource;
 use App\Http\Resources\ProductTypeResource;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -70,5 +72,23 @@ class ProductController extends Controller
         Storage::delete("public/fotos/{$product->photo_url}");
         $product->delete();
         return new ProductResource($removedProduct);
+    }
+    
+    public function getTotalProductsByType(){
+        $drink=Product::where('type','drink')->count();
+        $dessert=Product::where('type','dessert')->count();
+        $hotDish=Product::where('type','hot dish')->count();
+        $coldDish=Product::where('type','cold dish')->count();
+        return response()->json(['drink'=>$drink,'dessert'=>$dessert,'hot dish'=>$hotDish,'cold dish'=>$coldDish],200);
+    }
+
+    public function getTopSoldProducts(){
+        $topTenProducts = DB::select('SELECT name, SUM(quantity) as quantity FROM order_items INNER JOIN products ON product_id = products.id GROUP BY product_id ORDER BY SUM(quantity) DESC LIMIT 10');
+        return response()->json($topTenProducts);
+    }
+
+    public function getQuantitySoldByCategory(){
+        $soldByCategory = DB::select('SELECT type, SUM(quantity) as quantity FROM order_items INNER JOIN products ON product_id = products.id GROUP BY type ORDER BY SUM(quantity) DESC');
+        return response()->json($soldByCategory);
     }
 }

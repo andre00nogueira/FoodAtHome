@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\OrderItemsController;
+use App\Http\Controllers\Api\OrderItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +31,9 @@ use App\Http\Controllers\Api\OrderItemsController;
 //products
 Route::get('products', [ProductController::class, 'index']);
 Route::post('customers',[CustomerController::class, 'store']);
+
+
+Route::get('products/total', [ProductController::class, 'getTopSoldProducts']);
 
 Route::get('products/types', [ProductController::class, 'types']);
 Route::get('products/types/{type_name}', [ProductController::class, 'productByType']);
@@ -91,6 +94,20 @@ Route::patch('orders/{id}', [OrderController::class, 'update']);
 Route::get('employees', [UserController::class, 'employeesIndex']);
 Route::get('employee/{id}/currentOrder', [UserController::class, 'getCurrentOrder']);
 
+//items
+Route::get('items/salesnumber/category', [OrderItemController::class, 'getNumberOfSalesPerCategory']);
 
+
+
+
+
+Route::get('products/total/category', [ProductController::class, 'getTotalProductsByType']);
+Route::get('products/sold/category', [ProductController::class, 'getQuantitySoldByCategory']);
+Route::get('orders/average/time', [OrderController::class, 'averageTimePerTask']);
+Route::get('orders/quantity/year', [OrderController::class, 'ordersPerYear']);
+Route::get('orders/quantity/month', [OrderController::class, 'ordersPerMonth']);
+Route::get('orders/total/status', [OrderController::class, 'ordersStatus']);
+Route::get('sales/quantity/year', [OrderController::class, 'salesPerYear']);
+Route::get('sales/quantity/month', [OrderController::class, 'salesPerMonth']);
 
 
