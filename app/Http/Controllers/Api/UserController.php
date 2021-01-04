@@ -146,18 +146,22 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request)
     {
-        $user = new User();
-        $user->fill($request->validated());
-        $user->password = bcrypt($user->password);
-        if ($request->hasFile('photo_url')) {
-            $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
-            $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
-            $user->photo_url = $generated_new_name;
-        } else {
-            $user->photo_url = 'default_avatar.jpg';
+        $currUser = User::findOrFail(Auth::id());
+        if ($currUser->can('create', $currUser)) {
+            $user = new User();
+            $user->fill($request->validated());
+            $user->password = bcrypt($user->password);
+            if ($request->hasFile('photo_url')) {
+                $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
+                $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
+                $user->photo_url = $generated_new_name;
+            } else {
+                $user->photo_url = 'default_avatar.jpg';
+            }
+            $user->save();
+            return new UserResource($user);
         }
-        $user->save();
-        return new UserResource($user);
+        abort(403);
     }
 
 

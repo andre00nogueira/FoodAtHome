@@ -12,7 +12,7 @@ class UserPolicy
 
     public function create(User $user)
     {
-        return true;
+        return $user->type === 'EM';
     }
 
     public function view(User $user, User $curr)

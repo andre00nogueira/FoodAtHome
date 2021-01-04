@@ -172,6 +172,12 @@ export default {
           .catch((error) => {
             if (error.response.status === 422) {
               this.errors = error.response.data.errors || {};
+            } else {
+              this.$toasted
+                .show(`Could not create user`, {
+                  type: "error",
+                })
+                .goAway(3500);
             }
           });
       }
@@ -190,17 +196,17 @@ export default {
         );
       });
     },
-    someMethod(){
-      alert('assd')
-    }
+    someMethod() {
+      alert("assd");
+    },
   },
   computed: {
-    isTypeCustomer(){
-      return this.$route.path == `/customers/create` ? true : false
-    }
+    isTypeCustomer() {
+      return this.$route.path == `/customers/create` ? true : false;
+    },
   },
   mounted() {
-    console.log(this.$route.path)
+    console.log(this.$route.path);
     if (!this.isTypeCustomer) this.getTypes();
   },
   components: { navbar, createcustomer },
