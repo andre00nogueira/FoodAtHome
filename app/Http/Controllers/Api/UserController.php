@@ -167,19 +167,23 @@ class UserController extends Controller
 
     public function update(User $user, UpdateUserRequest $request)
     {
-        $userOldPhoto = $user->photo_url;
-        $user->fill($request->validated());
+        $currUser = User::findOrFail(Auth::id());
+        if ($currUser->can('edit', $user)) {
+            $userOldPhoto = $user->photo_url;
+            $user->fill($request->validated());
 
-        if ($request->hasFile('photo_url')) {
-            if ($userOldPhoto != 'default_avatar.jpg') {
-                Storage::delete("public/fotos/{$userOldPhoto}");
+            if ($request->hasFile('photo_url')) {
+                if ($userOldPhoto != 'default_avatar.jpg') {
+                    Storage::delete("public/fotos/{$userOldPhoto}");
+                }
+                $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
+                $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
+                $user->photo_url = $generated_new_name;
             }
-            $generated_new_name = time() . '.' . $request->file('photo_url')->getClientOriginalExtension();
-            $request->file('photo_url')->storeAs('public/fotos', $generated_new_name);
-            $user->photo_url = $generated_new_name;
+            $user->save();
+            return new UserResource($user);
         }
-        $user->save();
-        return new UserResource($user);
+        abort(403);
     }
 
 
