@@ -3,38 +3,40 @@
     <router-link class="navbar-brand" to="/">Food@Home</router-link>
     <router-link
       v-if="user && user.type == 'C'"
-      class="navbar-brand"
+      class="btn btn-dark navitem"
       :to="`/customer/${user.id}/dashboard`"
       >Dashboard</router-link
     >
     <router-link
       v-if="user && user.type == 'EC'"
-      class="navbar-brand"
+      class="btn btn-dark navitem"
       :to="`/cook/${user.id}/dashboard`"
       >Dashboard</router-link
     >
     <router-link
       v-if="user && user.type == 'ED'"
-      class="navbar-brand"
+      class="btn btn-dark navitem"
       :to="`/deliveryman/${user.id}/dashboard`"
       >Dashboard</router-link
     >
+
     <router-link
       v-if="user && user.type == 'EM'"
-      class="navbar-brand"
+      class="btn btn-dark navitem"
       :to="`/manager/${user.id}/dashboard`"
       >Dashboard</router-link
     >
+
     <router-link
       v-if="user && user.type == 'EM'"
-      class="navbar-brand"
+      class="btn btn-dark navitem"
       :to="`/users`"
       >Users List</router-link
     >
 
     <router-link
       v-if="user && user.type == 'EM'"
-      class="navbar-brand"
+      class="btn btn-dark navitem"
       :to="`/stats`"
       >Stats</router-link
     >
@@ -44,7 +46,9 @@
         <template v-if="!user">
           <li class="nav-item">
             <router-link to="/login" class="btn btn-primary">Login</router-link>
-            <router-link :to="{ name: 'createCustomer' }" class="btn btn-primary"
+            <router-link
+              :to="{ name: 'createCustomer' }"
+              class="btn btn-primary"
               >Register</router-link
             >
           </li>
@@ -82,6 +86,13 @@
                   >
 
                   <router-link
+                    v-if="user.type == 'C'"
+                    to="/cart"
+                    class="dropdown-item"
+                    >Cart</router-link
+                  >
+
+                  <router-link
                     v-if="user.type == 'EC'"
                     :to="`/cook/${user.id}/dashboard`"
                     class="dropdown-item"
@@ -98,19 +109,30 @@
                   <router-link
                     v-if="user.type == 'EM'"
                     class="dropdown-item"
+                    :to="`/manager/${user.id}/dashboard`"
+                    >Dashboard</router-link
+                  >
+
+                  <router-link
+                    v-if="user.type == 'EM'"
+                    class="dropdown-item"
                     :to="`/users`"
                     >Users List</router-link
                   >
 
+                  <router-link
+                    v-if="user.type == 'EM'"
+                    class="dropdown-item"
+                    :to="`/stats`"
+                    >Stats</router-link
+                  >
+
+                  <hr />
                   <router-link :to="`/users/${user.id}`" class="dropdown-item"
                     >Profile</router-link
                   >
-                  <router-link
-                    v-if="user.type == 'C'"
-                    to="/cart"
-                    class="dropdown-item"
-                    >Cart</router-link
-                  >
+
+                  <hr />
                   <a class="dropdown-item" @click.prevent="logout" href="#"
                     >Logout</a
                   >
@@ -157,11 +179,9 @@ export default {
   },
   computed: {
     user() {
-      console.log("USER")
-      console.log(this.$store.state.user)
       return this.$store.state.user;
     },
-  }
+  },
 };
 </script>
 
@@ -177,5 +197,9 @@ export default {
 
 .dropdown-toggle {
   text-align: right;
+}
+
+.navitem {
+  margin-right: 1%;
 }
 </style>

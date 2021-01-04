@@ -17,7 +17,7 @@ class UserPolicy
 
     public function view(User $user, User $curr)
     {
-        return $user->id === $curr->id;
+        return $user->id === $curr->id || $curr->type === 'EM';
     }
 
     /*public function edit(User $user, Post $post)
